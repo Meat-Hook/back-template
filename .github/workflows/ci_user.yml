@@ -1,0 +1,43 @@
+name: CI_USER
+
+on:
+  push:
+    paths:
+
+    paths-ignore:
+      - 'README.adoc'
+      - 'go.mod'
+      - 'go.sum'
+    branches:
+      - master
+  pull_request:
+    paths-ignore:
+      - 'README.adoc'
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        with:
+          version: v1.31
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Install Go 1.15
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.15
+
+      - name: Checkout repository.
+        uses: actions/checkout@v2
+
+      - name: Start test.
+        run: time go test -race -tags=integration ./...

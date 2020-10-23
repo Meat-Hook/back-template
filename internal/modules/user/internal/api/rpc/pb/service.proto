@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = ".;pb";
+package grpc;
+
+service User {
+  rpc User (RequestUser) returns (UserInfo);
+}
+
+message RequestUser {
+  int64 id = 1;
+}
+
+message UserInfo {
+  int64     id = 1;
+  string  name = 2;
+  string email = 3;
+}
