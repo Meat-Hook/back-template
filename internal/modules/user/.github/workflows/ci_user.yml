@@ -9,12 +9,12 @@ on:
       - 'go.mod'
       - 'go.sum'
     branches:
-      - master
+      - main
   pull_request:
     paths-ignore:
       - 'README.adoc'
     branches:
-      - master
+      - main
 
 jobs:
   lint:
