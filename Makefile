@@ -1,5 +1,17 @@
-users-db-sql-init = `cat init/init-users-db.sql`
+export GOOS=linux
+
+init:
+	chmod +x ./builds.sh && ./builds.sh
+	docker-compose up --build -d
+	sleep 5
+	chmod +x ./init.sh && ./init.sh
 
 dev-env:
 	docker-compose up --build -d
-	docker exec -it user-db cockroach sql --insecure --execute="$(users-sql-init)"
+
+restart:
+	docker-compose down
+	docker-compose up -d
+
+prepare-depends:
+	./init.sh

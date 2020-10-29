@@ -3,11 +3,12 @@ option go_package = ".;pb";
 package grpc;
 
 service User {
-  rpc User (RequestUser) returns (UserInfo);
+  rpc Access (RequestAccess) returns (UserInfo);
 }
 
-message RequestUser {
-  int64 id = 1;
+message RequestAccess {
+  string email    = 1;
+  string password = 2;
 }
 
 message UserInfo {

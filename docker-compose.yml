@@ -8,14 +8,51 @@ volumes:
 
 services:
 
-  user-db-main:
+  user-db:
     container_name: user-db
     image: cockroachdb/cockroach:v20.1.7
+    restart: always
     ports:
       - "26257:26257"
-      - "8080:8080"
+      - "3500:8080"
     volumes:
-      - ./volume/user-db1-data:/cockroach/cockroach-data
-    command: start-single-node --insecure
-    networks:
-      - user-modules
+      - "./volume/user-db-data:/cockroach/cockroach-data"
+    command:
+      - "start-single-node"
+      - "--insecure"
+
+  nats:
+    image: "nats:2.1.4" # This is the latest version at the moment.
+    container_name: nats
+    restart: always
+    ports:
+      - "4222:4222"
+
+  user-service:
+    build:
+      context: ./internal/modules/user
+      dockerfile: Dockerfile
+    image: user-service
+    container_name: user-service
+    restart: always
+    command: "./user --discovery consul:8500"
+    ports:
+      - "8080:8080"
+
+  consul:
+    container_name: consul
+    image: consul:1.8.5
+    restart: always
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+    volumes:
+      - "./volume/consul-data:/consul/data"
+    command:
+      - "agent"
+      - "-client=0.0.0.0"
+      - "-server"
+      - "-bootstrap-expect=1"
+      - "-ui"

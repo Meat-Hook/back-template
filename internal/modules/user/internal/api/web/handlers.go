@@ -34,7 +34,7 @@ func (svc *service) verificationUsername(params operations.VerificationUsernameP
 	switch {
 	case err == nil:
 		return operations.NewVerificationUsernameNoContent()
-	case errors.Is(err, app.ErrEmailExist):
+	case errors.Is(err, app.ErrUsernameExist):
 		return operations.NewVerificationUsernameDefault(http.StatusConflict).WithPayload(apiError(err.Error()))
 	default:
 		return operations.NewVerificationUsernameDefault(http.StatusInternalServerError).

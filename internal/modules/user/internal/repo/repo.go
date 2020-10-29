@@ -1,3 +1,4 @@
+// Package repo contains wrapper for database abstraction.
 package repo
 
 import (

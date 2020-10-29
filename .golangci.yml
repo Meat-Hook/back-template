@@ -1,0 +1,20 @@
+run:
+  tests: false
+  skip-dirs:
+    - generated
+    - mock
+    - migration
+  skip-files:
+    - main.go
+
+linters-settings:
+  lll:
+    line-length: 150
+  maligned:
+    suggest-new: true
+
+linters:
+  enable-all: true
+  disable:
+    - wsl
+  fast: false

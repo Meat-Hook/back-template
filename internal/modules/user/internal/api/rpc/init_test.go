@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
+	librpc "github.com/Meat-Hook/back-template/internal/libs/rpc"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
 	"github.com/golang/mock/gomock"
@@ -29,7 +30,7 @@ func start(t *testing.T) (pb.UserClient, *Mockusers, *require.Assertions) {
 	mockApp := NewMockusers(ctrl)
 	t.Cleanup(ctrl.Finish)
 
-	server := rpc.New(mockApp, zerolog.New(os.Stdout))
+	server := rpc.New(mockApp, librpc.Server(zerolog.New(os.Stdout)))
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	r.Nil(err)

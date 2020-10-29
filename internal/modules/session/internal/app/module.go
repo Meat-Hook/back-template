@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"net"
-	"strings"
 )
 
 // Errors.
@@ -104,8 +103,6 @@ type (
 
 // Login generate new session and return user info.
 func (m *Module) Login(ctx context.Context, email, password string, origin Origin) (*User, *Token, error) {
-	email = strings.ToLower(email)
-
 	user, err := m.user.Access(ctx, email, password)
 	if err != nil {
 		return nil, nil, err
@@ -133,13 +130,13 @@ func (m *Module) Login(ctx context.Context, email, password string, origin Origi
 }
 
 // Logout remove user session.
-func (m *Module) Logout(ctx context.Context, auth Session) error {
-	return m.session.Delete(ctx, auth.ID)
+func (m *Module) Logout(ctx context.Context, session Session) error {
+	return m.session.Delete(ctx, session.ID)
 }
 
 // Session get user session by access token.
-func (m *Module) Session(ctx context.Context, token Token) (*Session, error) {
-	subject, err := m.auth.Subject(token.Access)
+func (m *Module) Session(ctx context.Context, accessToken string) (*Session, error) {
+	subject, err := m.auth.Subject(accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +146,7 @@ func (m *Module) Session(ctx context.Context, token Token) (*Session, error) {
 		return nil, err
 	}
 
-	if token.Access != session.Token.Access {
+	if accessToken != session.Token.Access {
 		return nil, ErrUnknownToken
 	}
 
@@ -157,8 +154,8 @@ func (m *Module) Session(ctx context.Context, token Token) (*Session, error) {
 }
 
 // Refresh access token by refresh token.
-func (m *Module) Refresh(ctx context.Context, token Token, origin Origin) (*Token, error) {
-	subject, err := m.auth.Subject(token.Refresh)
+func (m *Module) Refresh(ctx context.Context, refreshToken string, origin Origin) (*Token, error) {
+	subject, err := m.auth.Subject(refreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +163,10 @@ func (m *Module) Refresh(ctx context.Context, token Token, origin Origin) (*Toke
 	session, err := m.session.ByID(ctx, subject.SessionID)
 	if err != nil {
 		return nil, err
+	}
+
+	if refreshToken != session.Token.Access {
+		return nil, ErrUnknownToken
 	}
 
 	err = m.session.Delete(ctx, session.ID)

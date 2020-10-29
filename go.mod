@@ -25,6 +25,10 @@ require (
 	github.com/lib/pq v1.8.0
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
+	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	github.com/o1egl/paseto v1.0.0 // indirect
+	github.com/o1egl/paseto/v2 v2.1.1 // indirect
 	github.com/ory/dockertest/v3 v3.6.2
 	github.com/prometheus/client_golang v1.8.0
 	github.com/rs/xid v1.2.1
@@ -32,9 +36,12 @@ require (
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
+	github.com/urfave/cli v1.22.1 // indirect
+	github.com/urfave/cli/v2 v2.2.0
 	go.mongodb.org/mongo-driver v1.4.2 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	golang.org/x/sys v0.0.0-20201020230747-6e5568b54d1a // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20201021134325-0d71844de594 // indirect

@@ -1,6 +1,7 @@
 package web_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -8,13 +9,34 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/client"
+	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/client/operations"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/restapi/operations"
+	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/restapi"
+	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+var (
+	errAny = errors.New("any error")
+
+	user = app.User{
+		ID:    1,
+		Email: "email",
+		Name:  "username",
+	}
+
+	session = app.Session{
+		ID:     "id",
+		UserID: user.ID,
+	}
+
+	token      = "token"
+	apiKeyAuth = httptransport.APIKeyAuth("Cookie", "header", "authKey="+token)
 )
 
 func TestMain(m *testing.M) {
@@ -23,14 +45,15 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (string, *Mockapplication, *client.ServiceUser) {
+func start(t *testing.T) (string, *Mockapplication, *client.ServiceUser, *require.Assertions) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMockapplication(ctrl)
 
 	log := zerolog.New(os.Stdout)
-	server, err := web.New(mockApp, log, web.Config{})
+	m := metrics.HTTP(t.Name(), restapi.FlatSwaggerJSON)
+	server, err := web.New(mockApp, log, &m, web.Config{})
 	assert.NoError(t, err, "web.New")
 	assert.NoError(t, server.Listen(), "server.Listen")
 
@@ -49,7 +72,7 @@ func start(t *testing.T) (string, *Mockapplication, *client.ServiceUser) {
 	transport := httptransport.New(url, client.DefaultBasePath, client.DefaultSchemes)
 	c := client.New(transport, nil)
 
-	return url, mockApp, c
+	return url, mockApp, c, require.New(t)
 }
 
 // APIError returns model.Error with given msg.

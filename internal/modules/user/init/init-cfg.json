@@ -1,0 +1,26 @@
+{
+  "db": {
+    "name": "user_db",
+    "user": "service_user",
+    "password": "",
+    "host": "user-db",
+    "port": 26257
+  },
+  "http": {
+    "port": 8080
+  },
+  "grpc": {
+    "port": 8085
+  },
+  "metric": {
+    "port": 10001
+  },
+  "nats": {
+    "host": "nats",
+    "port": 4222
+  },
+  "session_svc": {
+    "host": "session-service",
+    "port": 8095
+  }
+}

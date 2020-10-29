@@ -38,18 +38,22 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 	errCanceled := status.Error(codes.Canceled, context.Canceled.Error())
 	errInternal := status.Error(codes.Internal, errAny.Error())
 
+	const (
+		email = `email@mail.com`
+		pass  = `pass`
+	)
+
 	testCases := map[string]struct {
-		userID  int
 		user    *app.User
 		want    *pb.UserInfo
 		appErr  error
 		wantErr error
 	}{
-		"success":   {user.ID, &user, &rpcUser, nil, nil},
-		"not_found": {2, nil, nil, app.ErrNotFound, errNotFound},
-		"deadline":  {3, nil, nil, context.DeadlineExceeded, errDeadline},
-		"canceled":  {4, nil, nil, context.Canceled, errCanceled},
-		"internal":  {5, nil, nil, errAny, errInternal},
+		"success":   {&user, &rpcUser, nil, nil},
+		"not_found": {nil, nil, app.ErrNotFound, errNotFound},
+		"deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
+		"canceled":  {nil, nil, context.Canceled, errCanceled},
+		"internal":  {nil, nil, errAny, errInternal},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
@@ -58,9 +62,12 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
-			mockApp.EXPECT().UserByID(gomock.Any(), app.Session{}, tc.userID).Return(tc.user, tc.appErr)
+			mockApp.EXPECT().Access(gomock.Any(), email, pass).Return(tc.user, tc.appErr)
 
-			res, err := c.User(ctx, &pb.RequestUser{Id: int64(tc.userID)})
+			res, err := c.Access(ctx, &pb.RequestAccess{
+				Email:    email,
+				Password: pass,
+			})
 			if err != nil {
 				assert.Equal(tc.wantErr.Error(), err.Error())
 			} else {

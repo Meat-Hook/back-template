@@ -23,8 +23,7 @@ func Recovery(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				metrics.PanicsTotal.Inc()
 				logger := zerolog.Ctx(r.Context())
-				logger.Info().Msgf("%v JOPPPAAAA", err)
-				logger.Info().Interface(log.Err, err).Msg("panic")
+				logger.Error().Msgf("panic with error: %v", err)
 
 				w.WriteHeader(http.StatusInternalServerError)
 			}
@@ -77,4 +76,20 @@ func AccessLog(metric *metrics.API) func(http.Handler) http.Handler {
 			}
 		})
 	}
+}
+
+// Health it must be the last middleware.
+// Needed to check for health from the discovery service.
+func Health(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		const health = `/health`
+		if r.URL.Path != health {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		logger := zerolog.Ctx(r.Context())
+		w.WriteHeader(http.StatusOK)
+		logger.Info().Msg("handled discovery checker")
+	})
 }
