@@ -1,4 +1,5 @@
 #!/bin/sh
+
 for service in ./internal/modules/*; do
   initFile=$service/init/init.sh
   chmod +x $initFile
