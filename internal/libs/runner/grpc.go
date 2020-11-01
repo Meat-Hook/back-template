@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// GRPC run grpc server.
 func GRPC(ctx context.Context, logger zerolog.Logger, srv *grpc.Server, ip net.IP, port int) func() error {
 	return func() error {
 		ln, err := net.Listen("tcp", net.JoinHostPort(ip.String(), strconv.Itoa(port)))

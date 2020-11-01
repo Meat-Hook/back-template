@@ -18,7 +18,7 @@ type Client struct {
 }
 
 // New build and returns new client to microservice session.
-func New(conn *grpc.ClientConn) *Client {
+func New(conn grpc.ClientConnInterface) *Client {
 	return &Client{conn: pb.NewSessionClient(conn)}
 }
 

@@ -20,7 +20,7 @@ func MethodsOf(v interface{}) []string {
 	if typ.Kind() != reflect.Ptr {
 		panic("require pointer to interface")
 	}
-	//typ = typ.Elem()
+
 	methods := make([]string, typ.NumMethod())
 	for i := 0; i < typ.NumMethod(); i++ {
 		methods[i] = typ.Method(i).Name
@@ -33,6 +33,7 @@ func MethodsOf(v interface{}) []string {
 func CallerMethodName() string {
 	pc, _, _, _ := runtime.Caller(2)
 	names := strings.Split(runtime.FuncForPC(pc).Name(), ".")
+
 	return names[len(names)-1]
 }
 
@@ -41,5 +42,6 @@ func CallerPkg() string {
 	pc, _, _, _ := runtime.Caller(2)
 	names := strings.Split(runtime.FuncForPC(pc).Name(), "/")
 	pkg := names[len(names)-1]
+
 	return pkg[:strings.Index(pkg, ".")]
 }

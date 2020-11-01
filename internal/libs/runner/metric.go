@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Metric run metric for collect service metric.
 func Metric(ctx context.Context, logger zerolog.Logger, ip net.IP, port int) func() error {
 	return func() error {
 		http.Handle("/metrics", promhttp.Handler())

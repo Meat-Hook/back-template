@@ -11,13 +11,6 @@ import (
 
 var _ app.Auth = &Auth{}
 
-const (
-	iss = `session-service`
-
-	access  = `-access`
-	refresh = `-refresh`
-)
-
 // Auth is an implements app.Auth.
 // Responsible for working with authorization tokens, be it cookies or jwt.
 type Auth struct {

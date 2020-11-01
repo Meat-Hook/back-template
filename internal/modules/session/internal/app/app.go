@@ -129,10 +129,12 @@ func (m *Module) Login(ctx context.Context, email, password string, origin Origi
 	}
 
 	session := Session{
-		UserID: user.ID,
-		ID:     sessionID,
-		Origin: origin,
-		Token:  *token,
+		ID:        sessionID,
+		Origin:    origin,
+		Token:     *token,
+		UserID:    user.ID,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 	}
 
 	err = m.session.Save(ctx, session)

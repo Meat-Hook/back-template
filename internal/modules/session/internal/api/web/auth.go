@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	cookieTokenName        = "authKey"
-	authTimeout            = 250 * time.Millisecond
+	cookieTokenName = "authKey"
+	authTimeout     = 250 * time.Millisecond
 )
 
 func (svc *service) cookieKeyAuth(raw string) (*app.Session, error) {
@@ -34,7 +34,7 @@ func (svc *service) cookieKeyAuth(raw string) (*app.Session, error) {
 func parseToken(raw string, name string) string {
 	header := http.Header{}
 	header.Add("Cookie", raw)
-	request := http.Request{Header: header}
+	request := http.Request{Header: header} // nolint:exhaustivestruct
 	cookieKey, err := request.Cookie(name)
 	if err != nil {
 		return ""
@@ -45,12 +45,18 @@ func parseToken(raw string, name string) string {
 
 func generateCookie(token string) *http.Cookie {
 	cookie := &http.Cookie{
-		Name:     cookieTokenName,
-		Value:    token,
-		Secure:   true,
-		Path:     "/",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		Name:       cookieTokenName,
+		Value:      token,
+		Path:       "/",
+		Domain:     "",
+		Expires:    time.Time{},
+		RawExpires: "",
+		MaxAge:     0,
+		Secure:     true,
+		HttpOnly:   true,
+		SameSite:   http.SameSiteLaxMode,
+		Raw:        "",
+		Unparsed:   nil,
 	}
 
 	return cookie

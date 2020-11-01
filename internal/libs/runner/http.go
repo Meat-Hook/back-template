@@ -14,6 +14,7 @@ type swagger interface {
 	Shutdown() error
 }
 
+// HTTP run http server.
 func HTTP(ctx context.Context, logger zerolog.Logger, srv swagger, ip net.IP, port int) func() error {
 	return func() error {
 		errc := make(chan error, 1)

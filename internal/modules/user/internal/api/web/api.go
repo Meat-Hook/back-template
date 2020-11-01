@@ -4,7 +4,6 @@ package web
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"path"
 
@@ -92,10 +91,11 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	}
 
 	server.SetHandler(globalMiddlewares(api.Serve(nil)))
+
 	return server, nil
 }
 
-func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger, net.IP) {
+func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger) {
 	ctx := r.Context()
 	userID := 0
 	if session != nil {
@@ -103,6 +103,6 @@ func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolo
 	}
 
 	logger := zerolog.Ctx(r.Context()).With().Int(log.User, userID).Logger()
-	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
-	return ctx, logger, net.ParseIP(remoteIP)
+
+	return ctx, logger
 }

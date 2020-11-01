@@ -70,9 +70,9 @@ func AccessLog(metric *metrics.API) func(http.Handler) http.Handler {
 
 			logger := zerolog.Ctx(r.Context())
 			if m.Code < http.StatusInternalServerError {
-				logger.Info().Int(log.Code, m.Code).Msg("success")
+				logger.Info().Int(log.Code, m.Code).Dur(log.Duration, m.Duration).Msg("success")
 			} else {
-				logger.Warn().Int(log.Code, m.Code).Msg("failed to handle")
+				logger.Warn().Int(log.Code, m.Code).Dur(log.Duration, m.Duration).Msg("failed to handle")
 			}
 		})
 	}
@@ -85,6 +85,7 @@ func Health(next http.Handler) http.Handler {
 		const health = `/health`
 		if r.URL.Path != health {
 			next.ServeHTTP(w, r)
+
 			return
 		}
 

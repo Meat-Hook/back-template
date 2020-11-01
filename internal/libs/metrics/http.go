@@ -61,7 +61,7 @@ func HTTP(service string, swagger json.RawMessage) (metric API) {
 
 	// Initialized with codes returned by swagger and middleware
 	// after metrics middleware (accessLog).
-	codeLabels := [4]int{ // nolint:gochecknoglobals
+	codeLabels := [4]int{
 		http.StatusBadRequest,
 		http.StatusUnauthorized,
 		http.StatusForbidden,

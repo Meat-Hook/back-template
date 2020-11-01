@@ -209,13 +209,11 @@ func start(c *cli.Context) error {
 		return fmt.Errorf("build external api: %w", err)
 	}
 
-	services := runner.New(
+	return runner.Start(
 		runner.GRPC(c.Context, logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, serverIP.IP, cfg.GRPC.Port),
 		runner.HTTP(c.Context, logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, serverIP.IP, cfg.HTTP.Port),
 		runner.Metric(c.Context, logger.With().Str(log.Name, "Metric").Logger(), serverIP.IP, cfg.Metric.Port),
 	)
-
-	return services.Run(c.Context)
 }
 
 func forceShutdown(ctx context.Context) {

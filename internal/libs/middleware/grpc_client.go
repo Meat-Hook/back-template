@@ -18,6 +18,7 @@ import (
 func UnaryClientLogger(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	logger := newLogger(ctx, method)
 	ctx = logger.WithContext(ctx)
+
 	return invoker(ctx, method, req, reply, cc, opts...)
 }
 
@@ -25,6 +26,7 @@ func UnaryClientLogger(ctx context.Context, method string, req, reply interface{
 func StreamClientLogger(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	logger := newLogger(ctx, method)
 	ctx = logger.WithContext(ctx)
+
 	return streamer(ctx, desc, cc, method, opts...)
 }
 
@@ -33,6 +35,7 @@ func UnaryClientAccessLog(ctx context.Context, method string, req, reply interfa
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	logger := zerolog.Ctx(ctx)
 	logHandler(logger, err)
+
 	return err
 }
 
@@ -42,6 +45,7 @@ func StreamClientAccessLog(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.
 	logger.Info().Msg("started")
 	clientStream, err := streamer(ctx, desc, cc, method, opts...)
 	logHandler(logger, err)
+
 	return clientStream, err
 }
 

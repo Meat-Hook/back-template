@@ -69,7 +69,9 @@ func (s session) convert() *app.Session {
 		Token: app.Token{
 			Value: s.Token,
 		},
-		UserID: s.UserID,
+		UserID:    s.UserID,
+		CreatedAt: s.CreatedAt,
+		UpdatedAt: s.UpdatedAt,
 	}
 }
 
@@ -83,7 +85,7 @@ func inet(ip net.IP) (*pgtype.Inet, error) {
 	} else {
 		err := inet.Set(ip)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("inet set: %w", err)
 		}
 	}
 
@@ -127,6 +129,7 @@ func (r *Repo) ByID(ctx context.Context, sessionID string) (s *app.Session, err 
 		}
 
 		s = res.convert()
+
 		return nil
 	})
 	if err != nil {

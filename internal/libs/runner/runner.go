@@ -1,26 +1,22 @@
+// Package runner need for start server application.
 package runner
 
 import (
-	"context"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 )
 
-type Runner struct {
-	runners []func() error
-}
+const (
+	shutdownTimeout = time.Second * 15
+)
 
-func New(runners ...func() error) *Runner {
-	return &Runner{
-		runners: runners,
-	}
-}
+// Start application services.
+func Start(services ...func() error) error {
+	group := errgroup.Group{}
 
-func (r *Runner) Run(ctx context.Context) error {
-	group, ctx := errgroup.WithContext(ctx)
-
-	for i := range r.runners {
-		group.Go(r.runners[i])
+	for i := range services {
+		group.Go(services[i])
 	}
 
 	return group.Wait()

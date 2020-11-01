@@ -71,7 +71,10 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 		accesslog := middleware.AccessLog(m)
 		redocOpts := swag_middleware.RedocOpts{
 			BasePath: swaggerSpec.BasePath(),
+			Path:     "",
 			SpecURL:  path.Join(swaggerSpec.BasePath(), "/swagger.json"),
+			RedocURL: "",
+			Title:    "",
 		}
 
 		return xffmw.Handler(createLog(middleware.Recovery(accesslog(middleware.Health(
@@ -80,6 +83,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	}
 
 	server.SetHandler(globalMiddlewares(api.Serve(nil)))
+
 	return server, nil
 }
 
@@ -92,5 +96,6 @@ func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolo
 
 	logger := zerolog.Ctx(r.Context()).With().Int(log.User, userID).Logger()
 	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
+
 	return ctx, logger, net.ParseIP(remoteIP)
 }
