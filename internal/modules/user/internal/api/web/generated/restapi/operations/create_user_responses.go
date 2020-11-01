@@ -26,7 +26,7 @@ type CreateUserOK struct {
 	/*
 	  In: Body
 	*/
-	Payload models.UserID `json:"body,omitempty"`
+	Payload *CreateUserOKBody `json:"body,omitempty"`
 }
 
 // NewCreateUserOK creates CreateUserOK with default headers values
@@ -36,13 +36,13 @@ func NewCreateUserOK() *CreateUserOK {
 }
 
 // WithPayload adds the payload to the create user o k response
-func (o *CreateUserOK) WithPayload(payload models.UserID) *CreateUserOK {
+func (o *CreateUserOK) WithPayload(payload *CreateUserOKBody) *CreateUserOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the create user o k response
-func (o *CreateUserOK) SetPayload(payload models.UserID) {
+func (o *CreateUserOK) SetPayload(payload *CreateUserOKBody) {
 	o.Payload = payload
 }
 
@@ -50,9 +50,11 @@ func (o *CreateUserOK) SetPayload(payload models.UserID) {
 func (o *CreateUserOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	payload := o.Payload
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
 	}
 }
 

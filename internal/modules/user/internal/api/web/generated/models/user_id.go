@@ -12,7 +12,7 @@ import (
 // UserID user ID
 //
 // swagger:model UserID
-type UserID int32
+type UserID int64
 
 // Validate validates this user ID
 func (m UserID) Validate(formats strfmt.Registry) error {

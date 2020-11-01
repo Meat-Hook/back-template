@@ -1,3 +1,4 @@
+// Package repo contains wrapper for database abstraction.
 package repo
 
 import (
@@ -30,8 +31,8 @@ type (
 	}
 )
 
-func convert(u app.User) user {
-	return user{
+func convert(u app.User) *user {
+	return &user{
 		ID:        u.ID,
 		Email:     u.Email,
 		Name:      u.Name,
@@ -148,6 +149,7 @@ func (r *Repo) ByID(ctx context.Context, id int) (u *app.User, err error) {
 		}
 
 		u = res.convert()
+
 		return nil
 	})
 	if err != nil {
@@ -169,6 +171,7 @@ func (r *Repo) ByEmail(ctx context.Context, email string) (u *app.User, err erro
 		}
 
 		u = res.convert()
+
 		return nil
 	})
 	if err != nil {
@@ -190,6 +193,7 @@ func (r *Repo) ByUsername(ctx context.Context, username string) (u *app.User, er
 		}
 
 		u = res.convert()
+
 		return nil
 	})
 	if err != nil {

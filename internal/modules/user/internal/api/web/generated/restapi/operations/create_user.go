@@ -8,7 +8,12 @@ package operations
 import (
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+
+	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 )
 
 // CreateUserHandlerFunc turns a function with the right signature into a create user handler
@@ -55,4 +60,41 @@ func (o *CreateUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// CreateUserOKBody create user o k body
+//
+// swagger:model CreateUserOKBody
+type CreateUserOKBody struct {
+
+	// id
+	ID models.UserID `json:"id,omitempty"`
+}
+
+// Validate validates this create user o k body
+func (o *CreateUserOKBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CreateUserOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CreateUserOKBody) UnmarshalBinary(b []byte) error {
+	var res CreateUserOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

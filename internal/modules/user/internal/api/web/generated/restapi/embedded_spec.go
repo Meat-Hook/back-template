@@ -71,7 +71,7 @@ func init() {
         "parameters": [
           {
             "type": "integer",
-            "format": "int32",
+            "format": "int64",
             "name": "id",
             "in": "query"
           }
@@ -106,7 +106,12 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/UserID"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/definitions/UserID"
+                }
+              }
             }
           },
           "default": {
@@ -358,7 +363,7 @@ func init() {
     },
     "UserID": {
       "type": "integer",
-      "format": "int32"
+      "format": "int64"
     },
     "Username": {
       "type": "string",
@@ -448,7 +453,7 @@ func init() {
         "parameters": [
           {
             "type": "integer",
-            "format": "int32",
+            "format": "int64",
             "name": "id",
             "in": "query"
           }
@@ -486,7 +491,12 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/UserID"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/definitions/UserID"
+                }
+              }
             }
           },
           "default": {
@@ -757,7 +767,7 @@ func init() {
     },
     "UserID": {
       "type": "integer",
-      "format": "int32"
+      "format": "int64"
     },
     "Username": {
       "type": "string",

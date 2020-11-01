@@ -19,6 +19,7 @@ const (
 	Duration      = `duration`
 	Host          = `host`
 	Port          = `port`
+	Name          = `name`
 )
 
 // WarnIfFail logs if callback finished with error.

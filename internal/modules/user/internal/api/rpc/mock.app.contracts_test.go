@@ -34,17 +34,17 @@ func (m *Mockusers) EXPECT() *MockusersMockRecorder {
 	return m.recorder
 }
 
-// UserByID mocks base method
-func (m *Mockusers) UserByID(ctx context.Context, session app.Session, id int) (*app.User, error) {
+// Access mocks base method
+func (m *Mockusers) Access(ctx context.Context, email, password string) (*app.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserByID", ctx, session, id)
+	ret := m.ctrl.Call(m, "Access", ctx, email, password)
 	ret0, _ := ret[0].(*app.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UserByID indicates an expected call of UserByID
-func (mr *MockusersMockRecorder) UserByID(ctx, session, id interface{}) *gomock.Call {
+// Access indicates an expected call of Access
+func (mr *MockusersMockRecorder) Access(ctx, email, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserByID", reflect.TypeOf((*Mockusers)(nil).UserByID), ctx, session, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Access", reflect.TypeOf((*Mockusers)(nil).Access), ctx, email, password)
 }

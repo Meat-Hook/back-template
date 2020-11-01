@@ -11,7 +11,7 @@ import (
 )
 
 func (svc *service) verificationEmail(params operations.VerificationEmailParams) operations.VerificationEmailResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
+	ctx, log := fromRequest(params.HTTPRequest, nil)
 
 	err := svc.app.VerificationEmail(ctx, string(params.Args.Email))
 	defer logging(log, err)
@@ -27,14 +27,14 @@ func (svc *service) verificationEmail(params operations.VerificationEmailParams)
 }
 
 func (svc *service) verificationUsername(params operations.VerificationUsernameParams) operations.VerificationUsernameResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
+	ctx, log := fromRequest(params.HTTPRequest, nil)
 
 	err := svc.app.VerificationUsername(ctx, string(params.Args.Username))
 	defer logging(log, err)
 	switch {
 	case err == nil:
 		return operations.NewVerificationUsernameNoContent()
-	case errors.Is(err, app.ErrEmailExist):
+	case errors.Is(err, app.ErrUsernameExist):
 		return operations.NewVerificationUsernameDefault(http.StatusConflict).WithPayload(apiError(err.Error()))
 	default:
 		return operations.NewVerificationUsernameDefault(http.StatusInternalServerError).
@@ -43,7 +43,7 @@ func (svc *service) verificationUsername(params operations.VerificationUsernameP
 }
 
 func (svc *service) createUser(params operations.CreateUserParams) operations.CreateUserResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
+	ctx, log := fromRequest(params.HTTPRequest, nil)
 
 	id, err := svc.app.CreateUser(
 		ctx,
@@ -54,7 +54,7 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 	defer logging(log, err)
 	switch {
 	case err == nil:
-		return operations.NewCreateUserOK().WithPayload(models.UserID(id))
+		return operations.NewCreateUserOK().WithPayload(&operations.CreateUserOKBody{ID: models.UserID(id)})
 	case errors.Is(err, app.ErrEmailExist):
 		return operations.NewCreateUserDefault(http.StatusConflict).WithPayload(apiError(err.Error()))
 	case errors.Is(err, app.ErrUsernameExist):
@@ -66,7 +66,7 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 }
 
 func (svc *service) getUser(params operations.GetUserParams, session *app.Session) operations.GetUserResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	getUserID := session.UserID
 	if params.ID != nil {
@@ -87,7 +87,7 @@ func (svc *service) getUser(params operations.GetUserParams, session *app.Sessio
 }
 
 func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.Session) operations.DeleteUserResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.DeleteUser(ctx, *session)
 	defer logging(log, err)
@@ -101,7 +101,7 @@ func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.
 }
 
 func (svc *service) updatePassword(params operations.UpdatePasswordParams, session *app.Session) operations.UpdatePasswordResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.UpdatePassword(ctx, *session, string(params.Args.Old), string(params.Args.New))
 	defer logging(log, err)
@@ -118,7 +118,7 @@ func (svc *service) updatePassword(params operations.UpdatePasswordParams, sessi
 }
 
 func (svc *service) updateUsername(params operations.UpdateUsernameParams, session *app.Session) operations.UpdateUsernameResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.UpdateUsername(ctx, *session, string(params.Args.Username))
 	defer logging(log, err)
@@ -138,7 +138,7 @@ func (svc *service) updateUsername(params operations.UpdateUsernameParams, sessi
 }
 
 func (svc *service) getUsers(params operations.GetUsersParams, session *app.Session) operations.GetUsersResponder {
-	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	page := app.SearchParams{
 		Limit:  uint(params.Limit),

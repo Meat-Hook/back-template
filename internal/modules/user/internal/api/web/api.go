@@ -4,7 +4,6 @@ package web
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"path"
 
@@ -47,10 +46,8 @@ type (
 	}
 )
 
-const serviceName = `user`
-
 // New returns Swagger server configured to listen on the TCP network.
-func New(module application, logger zerolog.Logger, cfg Config) (*restapi.Server, error) {
+func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) (*restapi.Server, error) {
 	svc := &service{
 		app: module,
 	}
@@ -60,9 +57,9 @@ func New(module application, logger zerolog.Logger, cfg Config) (*restapi.Server
 		return nil, fmt.Errorf("load embedded swagger spec: %w", err)
 	}
 
-	m := metrics.HTTP(serviceName, restapi.FlatSwaggerJSON)
 	api := operations.NewServiceUserAPI(swaggerSpec)
-	api.Logger = logger.Info().Msgf
+	swaggerLogger := logger.With().Str(log.Name, "swagger").Logger()
+	api.Logger = swaggerLogger.Printf
 	api.CookieKeyAuth = svc.cookieKeyAuth
 
 	api.VerificationEmailHandler = operations.VerificationEmailHandlerFunc(svc.verificationEmail)
@@ -82,16 +79,15 @@ func New(module application, logger zerolog.Logger, cfg Config) (*restapi.Server
 	globalMiddlewares := func(handler http.Handler) http.Handler {
 		xffmw, _ := xff.Default()
 		createLog := middleware.CreateLogger(logger.With())
-		accesslog := middleware.AccessLog(&m)
+		accesslog := middleware.AccessLog(m)
 		redocOpts := swag_middleware.RedocOpts{
 			BasePath: swaggerSpec.BasePath(),
 			SpecURL:  path.Join(swaggerSpec.BasePath(), "/swagger.json"),
 		}
 
-		return xffmw.Handler(createLog(middleware.Recovery(accesslog(
+		return xffmw.Handler(createLog(middleware.Recovery(accesslog(middleware.Health(
 			swag_middleware.Spec(swaggerSpec.BasePath(), restapi.FlatSwaggerJSON,
-				swag_middleware.Redoc(redocOpts,
-					handler))))))
+				swag_middleware.Redoc(redocOpts, handler)))))))
 	}
 
 	server.SetHandler(globalMiddlewares(api.Serve(nil)))
@@ -99,7 +95,7 @@ func New(module application, logger zerolog.Logger, cfg Config) (*restapi.Server
 	return server, nil
 }
 
-func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger, net.IP) {
+func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger) {
 	ctx := r.Context()
 	userID := 0
 	if session != nil {
@@ -107,6 +103,6 @@ func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolo
 	}
 
 	logger := zerolog.Ctx(r.Context()).With().Int(log.User, userID).Logger()
-	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
-	return ctx, logger, net.ParseIP(remoteIP)
+
+	return ctx, logger
 }

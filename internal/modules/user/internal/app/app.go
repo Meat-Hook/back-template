@@ -1,3 +1,4 @@
+// Package app contains all logic of the microservice.
 package app
 
 import (
@@ -59,12 +60,6 @@ type (
 		Send(ctx context.Context, contact string, msg Message) error
 	}
 
-	// Code module for generated random code.
-	Code interface {
-		// Generate random code of a specified length.
-		Generate(length int) string
-	}
-
 	// Auth module for get user session by token.
 	Auth interface {
 		// Session returns user session by his token.
@@ -109,18 +104,16 @@ type (
 		user         Repo
 		hash         Hasher
 		notification Notification
-		code         Code
 		auth         Auth
 	}
 )
 
 // New build and returns new Module for working with user info.
-func New(r Repo, h Hasher, n Notification, c Code, a Auth) *Module {
+func New(r Repo, h Hasher, n Notification, a Auth) *Module {
 	return &Module{
 		user:         r,
 		hash:         h,
 		notification: n,
-		code:         c,
 		auth:         a,
 	}
 }

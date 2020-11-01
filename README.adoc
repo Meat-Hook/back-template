@@ -1,0 +1,6 @@
+= Back-template.
+
+== Для старта нужно
+* make init
+* документация модуля user - http://localhost:8080/user/api/v1/docs
+* документация модуля session - http://localhost:8090/session/api/v1/docs

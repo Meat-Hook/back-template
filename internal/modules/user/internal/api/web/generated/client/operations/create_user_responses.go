@@ -9,8 +9,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 )
@@ -51,21 +53,23 @@ func NewCreateUserOK() *CreateUserOK {
 OK
 */
 type CreateUserOK struct {
-	Payload models.UserID
+	Payload *CreateUserOKBody
 }
 
 func (o *CreateUserOK) Error() string {
 	return fmt.Sprintf("[POST /user][%d] createUserOK  %+v", 200, o.Payload)
 }
 
-func (o *CreateUserOK) GetPayload() models.UserID {
+func (o *CreateUserOK) GetPayload() *CreateUserOKBody {
 	return o.Payload
 }
 
 func (o *CreateUserOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(CreateUserOKBody)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
@@ -111,5 +115,42 @@ func (o *CreateUserDefault) readResponse(response runtime.ClientResponse, consum
 		return err
 	}
 
+	return nil
+}
+
+/*CreateUserOKBody create user o k body
+swagger:model CreateUserOKBody
+*/
+type CreateUserOKBody struct {
+
+	// id
+	ID models.UserID `json:"id,omitempty"`
+}
+
+// Validate validates this create user o k body
+func (o *CreateUserOKBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CreateUserOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CreateUserOKBody) UnmarshalBinary(b []byte) error {
+	var res CreateUserOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

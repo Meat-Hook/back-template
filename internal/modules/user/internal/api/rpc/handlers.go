@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// User handler for getting user info to another microservice.
-func (a *api) User(ctx context.Context, req *pb.RequestUser) (*pb.UserInfo, error) {
-	info, err := a.app.UserByID(ctx, app.Session{}, int(req.Id))
+// Access check user access by email and pass.
+func (a *api) Access(ctx context.Context, req *pb.RequestAccess) (*pb.UserInfo, error) {
+	info, err := a.app.Access(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, apiError(err)
 	}
@@ -37,6 +37,8 @@ func apiError(err error) error {
 	switch {
 	case errors.Is(err, app.ErrNotFound):
 		code = codes.NotFound
+	case errors.Is(err, app.ErrNotValidPassword):
+		code = codes.InvalidArgument
 	case errors.Is(err, context.DeadlineExceeded):
 		code = codes.DeadlineExceeded
 	case errors.Is(err, context.Canceled):

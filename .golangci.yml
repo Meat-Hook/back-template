@@ -1,0 +1,40 @@
+run:
+  tests: false
+  skip-dirs:
+    - generated
+    - mock
+    - migration
+  skip-files:
+    - main.go
+
+linters-settings:
+  lll:
+    line-length: 190
+  maligned:
+    suggest-new: true
+
+linters:
+  enable-all: true
+  disable:
+    - wsl
+    - wrapcheck
+    - gomnd
+    - exhaustivestruct
+    - exhaustive
+    - errorlint
+    - interfacer
+    - dogsled
+  fast: false
+
+issues:
+  exclude-rules:
+    - path: main.go
+      linters:
+        - gochecknoglobals
+    - path: internal/libs/metrics
+      linters:
+        - gochecknoglobals
+        - funlen
+    - linters:
+        - lll
+      source: "^//go:generate "

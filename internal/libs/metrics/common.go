@@ -6,10 +6,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-var (
-	// PanicsTotal contains metrics for rates of panic.
-	PanicsTotal struct{ prometheus.Counter }
-)
+// PanicsTotal contains metrics for rates of panic.
+var PanicsTotal struct{ prometheus.Counter }
 
 // InitMetrics must be called once before using this package.
 // It registers and initializes metrics used by this package.
