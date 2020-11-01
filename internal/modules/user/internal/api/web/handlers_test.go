@@ -139,7 +139,7 @@ func TestService_GetUser(t *testing.T) {
 			mockApp.EXPECT().UserByID(gomock.Any(), session, tc.arg).Return(tc.user, tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
-			params := operations.NewGetUserParams().WithID(swag.Int32(int32(tc.arg)))
+			params := operations.NewGetUserParams().WithID(swag.Int64(int64(tc.arg)))
 			res, err := client.Operations.GetUser(params, apiKeyAuth)
 			if tc.wantErr == nil {
 				assert.Nil(err)
