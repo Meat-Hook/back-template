@@ -146,7 +146,7 @@ func start(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("get config: %w", err)
 	}
-	logger.Info().Interface("key", cfg).Msg("jopa")
+
 	host, err := os.Hostname()
 	if err != nil {
 		return fmt.Errorf("os hostname: %w", err)

@@ -1,3 +1,4 @@
+// Package discovery this is wrapper for consul.
 package discovery
 
 import (
@@ -15,11 +16,13 @@ import (
 )
 
 type (
+	// Discovery client for register and deregister and search service.
 	Discovery struct {
 		consul *api.Client
 	}
 )
 
+// New build and returns new Discovery client.
 func New(addr string) (*Discovery, error) {
 	cfg := api.DefaultConfig()
 	cfg.Address = addr
@@ -32,6 +35,7 @@ func New(addr string) (*Discovery, error) {
 	return &Discovery{consul: consul}, nil
 }
 
+// Register service in consul.
 func (c *Discovery) Register(serviceName, id string, ip net.IP, httpPort int, tags ...string) error {
 	agent := c.consul.Agent()
 
@@ -63,6 +67,7 @@ func (c *Discovery) Register(serviceName, id string, ip net.IP, httpPort int, ta
 	return nil
 }
 
+// Deregister service from consul.
 func (c *Discovery) Deregister(id string) error {
 	agent := c.consul.Agent()
 
@@ -74,20 +79,12 @@ func (c *Discovery) Deregister(id string) error {
 	return nil
 }
 
-func (c *Discovery) ServiceAddr(id string) (string, error) {
-	srv, _, err := c.consul.Agent().Service(id, nil)
-	if err != nil {
-		return "", fmt.Errorf("get service info by id: %s err: %w", id, err)
-	}
-
-	return srv.Address, nil
-}
-
 // Errors.
 var (
 	ErrCfgNotFound = errors.New("config not found")
 )
 
+// Config gets configuration from consul and unmarshal in val.
 func (c *Discovery) Config(ctx context.Context, serviceName string, val interface{}) error {
 	q := &api.QueryOptions{}
 	q.WithContext(ctx)
@@ -107,4 +104,14 @@ func (c *Discovery) Config(ctx context.Context, serviceName string, val interfac
 	}
 
 	return nil
+}
+
+// ServiceAddr
+func (c *Discovery) ServiceAddr(id string) (string, error) {
+	srv, _, err := c.consul.Agent().Service(id, nil)
+	if err != nil {
+		return "", fmt.Errorf("get service info by id: %s err: %w", id, err)
+	}
+
+	return net.JoinHostPort(srv.Address, strconv.Itoa(srv.Port)), nil
 }
