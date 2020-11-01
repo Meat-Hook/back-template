@@ -105,13 +105,3 @@ func (c *Discovery) Config(ctx context.Context, serviceName string, val interfac
 
 	return nil
 }
-
-// ServiceAddr
-func (c *Discovery) ServiceAddr(id string) (string, error) {
-	srv, _, err := c.consul.Agent().Service(id, nil)
-	if err != nil {
-		return "", fmt.Errorf("get service info by id: %s err: %w", id, err)
-	}
-
-	return net.JoinHostPort(srv.Address, strconv.Itoa(srv.Port)), nil
-}
