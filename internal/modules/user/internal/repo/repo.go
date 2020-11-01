@@ -31,8 +31,8 @@ type (
 	}
 )
 
-func convert(u app.User) user {
-	return user{
+func convert(u app.User) *user {
+	return &user{
 		ID:        u.ID,
 		Email:     u.Email,
 		Name:      u.Name,

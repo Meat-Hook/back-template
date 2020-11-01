@@ -37,6 +37,8 @@ func apiError(err error) error {
 	switch {
 	case errors.Is(err, app.ErrNotFound):
 		code = codes.NotFound
+	case errors.Is(err, app.ErrNotValidPassword):
+		code = codes.InvalidArgument
 	case errors.Is(err, context.DeadlineExceeded):
 		code = codes.DeadlineExceeded
 	case errors.Is(err, context.Canceled):

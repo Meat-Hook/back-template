@@ -34,7 +34,7 @@ type GetUserParams struct {
 	/*
 	  In: query
 	*/
-	ID *int32
+	ID *int64
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -72,9 +72,9 @@ func (o *GetUserParams) bindID(rawData []string, hasKey bool, formats strfmt.Reg
 		return nil
 	}
 
-	value, err := swag.ConvertInt32(raw)
+	value, err := swag.ConvertInt64(raw)
 	if err != nil {
-		return errors.InvalidType("id", "query", "int32", raw)
+		return errors.InvalidType("id", "query", "int64", raw)
 	}
 	o.ID = &value
 

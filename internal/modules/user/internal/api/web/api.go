@@ -47,10 +47,6 @@ type (
 	}
 )
 
-const (
-	serviceName = `user`
-)
-
 // New returns Swagger server configured to listen on the TCP network.
 func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) (*restapi.Server, error) {
 	svc := &service{

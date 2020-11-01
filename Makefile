@@ -10,8 +10,5 @@ dev-env:
 	docker-compose up --build -d
 
 restart:
-	docker-compose down
+	docker-compose stop
 	docker-compose up -d
-
-prepare-depends:
-	./init.sh

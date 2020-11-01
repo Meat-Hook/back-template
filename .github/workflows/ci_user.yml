@@ -3,16 +3,12 @@ name: CI_USER
 on:
   push:
     paths:
-
-    paths-ignore:
-      - 'README.adoc'
-      - 'go.mod'
-      - 'go.sum'
+      - 'internal/modules/user/*'
     branches:
       - main
   pull_request:
-    paths-ignore:
-      - 'README.adoc'
+    paths:
+      - 'internal/modules/user/*'
     branches:
       - main
 
@@ -24,7 +20,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v1
         with:
-          version: v1.31
+          version: v1.32
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   test:
@@ -40,4 +36,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Start test.
-        run: time go test -race -tags=integration ./...
+        run: time go test -race ./internal/modules/user/...

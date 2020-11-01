@@ -1,38 +1,39 @@
+// Package client provide to internal method of service session.
 package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/rpc/pb"
+	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
+// Client to session microservice.
 type Client struct {
 	conn pb.SessionClient
 }
 
-type Config struct {
-	Host string
-	Port int
+// New build and returns new client to microservice session.
+func New(conn *grpc.ClientConn) *Client {
+	return &Client{conn: pb.NewSessionClient(conn)}
 }
 
-func New(conn *grpc.ClientConn) (*Client, error) {
-	return &Client{conn: pb.NewSessionClient(conn)}, nil
-}
-
+// Session contains main session info.
 type Session struct {
 	ID     string
 	UserID int
 }
 
+// Errors.
 var (
-	ErrNotFound = errors.New("not found")
+	ErrNotFound = app.ErrNotFound
 )
 
+// Session get user session by his auth token.
 func (c *Client) Session(ctx context.Context, token string) (*Session, error) {
 	res, err := c.conn.Session(ctx, &pb.RequestSession{
 		Token: token,

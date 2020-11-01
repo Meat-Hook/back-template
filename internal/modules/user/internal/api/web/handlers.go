@@ -54,7 +54,7 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 	defer logging(log, err)
 	switch {
 	case err == nil:
-		return operations.NewCreateUserOK().WithPayload(models.UserID(id))
+		return operations.NewCreateUserOK().WithPayload(&operations.CreateUserOKBody{ID: models.UserID(id)})
 	case errors.Is(err, app.ErrEmailExist):
 		return operations.NewCreateUserDefault(http.StatusConflict).WithPayload(apiError(err.Error()))
 	case errors.Is(err, app.ErrUsernameExist):

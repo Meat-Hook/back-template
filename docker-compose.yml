@@ -1,12 +1,36 @@
 version: '3.8'
 
-networks:
-  user-modules:
-
-volumes:
-  user-data:
-
 services:
+
+  consul:
+    container_name: consul
+    image: consul:1.8.5
+    restart: always
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+    volumes:
+      - "./volume/consul-data:/consul/data"
+    command:
+      - "agent"
+      - "-client=0.0.0.0"
+      - "-server"
+      - "-bootstrap-expect=1"
+      - "-ui"
+
+  user-service:
+    build:
+      context: ./internal/modules/user
+      dockerfile: Dockerfile
+    image: user-service
+    container_name: user-service
+    restart: always
+    command: "./user --discovery consul:8500"
+    ports:
+      - "8080:8080"
+      - "10001:10001"
 
   user-db:
     container_name: user-db
@@ -28,31 +52,27 @@ services:
     ports:
       - "4222:4222"
 
-  user-service:
+  session-service:
     build:
-      context: ./internal/modules/user
+      context: ./internal/modules/session
       dockerfile: Dockerfile
-    image: user-service
-    container_name: user-service
+    image: session-service
+    container_name: session-service
     restart: always
-    command: "./user --discovery consul:8500"
+    command: "./session --discovery consul:8500"
     ports:
-      - "8080:8080"
+      - "8090:8090"
+      - "10002:10002"
 
-  consul:
-    container_name: consul
-    image: consul:1.8.5
+  session-db:
+    container_name: session-db
+    image: cockroachdb/cockroach:v20.1.7
     restart: always
     ports:
-      - "8400:8400"
-      - "8500:8500"
-      - "8600:8600"
-      - "8600:8600/udp"
+      - "25555:26257"
+      - "3505:8080"
     volumes:
-      - "./volume/consul-data:/consul/data"
+      - "./volume/session-db-data:/cockroach/cockroach-data"
     command:
-      - "agent"
-      - "-client=0.0.0.0"
-      - "-server"
-      - "-bootstrap-expect=1"
-      - "-ui"
+      - "start-single-node"
+      - "--insecure"

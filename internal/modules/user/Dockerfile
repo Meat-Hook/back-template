@@ -1,5 +1,5 @@
 FROM alpine
 
-COPY ./bin/user /
+COPY ./bin/ /
 
 CMD /user

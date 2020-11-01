@@ -188,10 +188,10 @@ func start(c *cli.Context) error {
 	defer natsConn.Close()
 
 	grpcConn, err := librpc.Client(c.Context, net.JoinHostPort(cfg.SessionSvc.Host, strconv.Itoa(cfg.SessionSvc.Port)))
-	sessionSvcClient, err := session.New(grpcConn)
 	if err != nil {
-		return fmt.Errorf("build session service client: %w", err)
+		return fmt.Errorf("build lib rpc: %w", err)
 	}
+	sessionSvcClient := session.New(grpcConn)
 
 	r := repo.New(db, &dbMetric)
 	hasher := hash.New()

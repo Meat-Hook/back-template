@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-//go:generate mockgen -source=../internal/api/rpc/pb/service.pb.go -destination mock.app.contracts_test.go -package client_test
+//go:generate mockgen -source=../internal/api/rpc/pb/user.pb.go -destination mock.app.contracts_test.go -package client_test
 
 var (
 	ctx = context.Background()
@@ -43,8 +43,7 @@ func start(t *testing.T) (*client.Client, *MockUserServer, *require.Assertions) 
 	conn, err := librpc.Client(ctx, ln.Addr().String())
 	r.Nil(err)
 
-	svc, err := client.New(conn)
-	r.Nil(err)
+	svc := client.New(conn)
 
 	return svc, mock, r
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net"
+	"time"
 )
 
 // Errors.
@@ -60,10 +61,9 @@ type (
 		New() string
 	}
 
-	// Token contains access and refresh token.
+	// Token contains auth token.
 	Token struct {
-		Access  string
-		Refresh string
+		Value string
 	}
 
 	// Subject contains info to be saved in token.
@@ -90,6 +90,9 @@ type (
 		Origin Origin
 		Token  Token
 		UserID int
+
+		CreatedAt time.Time
+		UpdatedAt time.Time
 	}
 
 	// Module contains business logic for user methods.
@@ -100,6 +103,16 @@ type (
 		id      ID
 	}
 )
+
+// New build and returns new session module.
+func New(r Repo, u Users, a Auth, id ID) *Module {
+	return &Module{
+		session: r,
+		user:    u,
+		auth:    a,
+		id:      id,
+	}
+}
 
 // Login generate new session and return user info.
 func (m *Module) Login(ctx context.Context, email, password string, origin Origin) (*User, *Token, error) {
@@ -116,6 +129,7 @@ func (m *Module) Login(ctx context.Context, email, password string, origin Origi
 	}
 
 	session := Session{
+		UserID: user.ID,
 		ID:     sessionID,
 		Origin: origin,
 		Token:  *token,
@@ -135,8 +149,8 @@ func (m *Module) Logout(ctx context.Context, session Session) error {
 }
 
 // Session get user session by access token.
-func (m *Module) Session(ctx context.Context, accessToken string) (*Session, error) {
-	subject, err := m.auth.Subject(accessToken)
+func (m *Module) Session(ctx context.Context, token string) (*Session, error) {
+	subject, err := m.auth.Subject(token)
 	if err != nil {
 		return nil, err
 	}
@@ -144,52 +158,7 @@ func (m *Module) Session(ctx context.Context, accessToken string) (*Session, err
 	session, err := m.session.ByID(ctx, subject.SessionID)
 	if err != nil {
 		return nil, err
-	}
-
-	if accessToken != session.Token.Access {
-		return nil, ErrUnknownToken
 	}
 
 	return session, nil
-}
-
-// Refresh access token by refresh token.
-func (m *Module) Refresh(ctx context.Context, refreshToken string, origin Origin) (*Token, error) {
-	subject, err := m.auth.Subject(refreshToken)
-	if err != nil {
-		return nil, err
-	}
-
-	session, err := m.session.ByID(ctx, subject.SessionID)
-	if err != nil {
-		return nil, err
-	}
-
-	if refreshToken != session.Token.Access {
-		return nil, ErrUnknownToken
-	}
-
-	err = m.session.Delete(ctx, session.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	sessionID := m.id.New()
-	newToken, err := m.auth.Token(Subject{SessionID: sessionID})
-	if err != nil {
-		return nil, err
-	}
-
-	newSession := Session{
-		ID:     sessionID,
-		Origin: origin,
-		Token:  *newToken,
-	}
-
-	err = m.session.Save(ctx, newSession)
-	if err != nil {
-		return nil, err
-	}
-
-	return newToken, nil
 }

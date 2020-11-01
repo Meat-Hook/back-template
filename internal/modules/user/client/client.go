@@ -6,7 +6,10 @@ import (
 	"fmt"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
+	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Client to user microservice.
@@ -15,8 +18,8 @@ type Client struct {
 }
 
 // New build and returns new client to microservice user.
-func New(conn *grpc.ClientConn) (*Client, error) {
-	return &Client{conn: pb.NewUserClient(conn)}, nil
+func New(conn *grpc.ClientConn) *Client {
+	return &Client{conn: pb.NewUserClient(conn)}
 }
 
 // User contains main user info.
@@ -26,6 +29,12 @@ type User struct {
 	Name  string
 }
 
+// Errors.
+var (
+	ErrNotFound     = app.ErrNotFound
+	ErrNotValidPass = app.ErrNotValidPassword
+)
+
 // Access get user info by his email and pass.
 // Needed for user auth.
 func (c *Client) Access(ctx context.Context, email, pass string) (*User, error) {
@@ -33,7 +42,12 @@ func (c *Client) Access(ctx context.Context, email, pass string) (*User, error) 
 		Email:    email,
 		Password: pass,
 	})
-	if err != nil {
+	switch {
+	case status.Code(err) == codes.NotFound:
+		return nil, fmt.Errorf("%w: %s", ErrNotFound, err)
+	case status.Code(err) == codes.InvalidArgument:
+		return nil, fmt.Errorf("%w: %s", ErrNotValidPass, err)
+	case err != nil:
 		return nil, fmt.Errorf("access: %w", err)
 	}
 

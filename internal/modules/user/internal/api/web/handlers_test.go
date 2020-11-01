@@ -81,13 +81,13 @@ func TestService_CreateUser(t *testing.T) {
 	testCases := map[string]struct {
 		id      int
 		appErr  error
-		want    models.UserID
+		want    *operations.CreateUserOKBody
 		wantErr *models.Error
 	}{
-		"success":        {1, nil, 1, nil},
-		"email_exist":    {0, app.ErrEmailExist, 0, APIError(app.ErrEmailExist.Error())},
-		"username_exist": {0, app.ErrUsernameExist, 0, APIError(app.ErrUsernameExist.Error())},
-		"internal_error": {0, errAny, 0, APIError("Internal Server Error")},
+		"success":        {1, nil, &operations.CreateUserOKBody{ID: 1}, nil},
+		"email_exist":    {0, app.ErrEmailExist, nil, APIError(app.ErrEmailExist.Error())},
+		"username_exist": {0, app.ErrUsernameExist, nil, APIError(app.ErrUsernameExist.Error())},
+		"internal_error": {0, errAny, nil, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {

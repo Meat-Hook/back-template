@@ -1,0 +1,25 @@
+{
+  "db": {
+    "name": "session_db",
+    "user": "service_session",
+    "password": "root",
+    "host": "session-db",
+    "port": 26257
+  },
+  "http": {
+    "port": 8090
+  },
+  "grpc": {
+    "port": 8095
+  },
+  "metric": {
+    "port": 10002
+  },
+  "auth": {
+    "key": "super-duper-secret-key-qwertyuio"
+  },
+  "user_svc": {
+    "host": "user-service",
+    "port": 8085
+  }
+}
