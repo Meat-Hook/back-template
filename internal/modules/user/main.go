@@ -174,7 +174,8 @@ func start(c *cli.Context) error {
 	// init database connection
 	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
 	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable", cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name))
+		"password=%s dbname=%s sslmode=disable", cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
+		cfg.DB.Password, cfg.DB.Name))
 	if err != nil {
 		return fmt.Errorf("DB connect: %w", err)
 	}

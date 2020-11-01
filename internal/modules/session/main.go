@@ -221,8 +221,7 @@ func forceShutdown(ctx context.Context) {
 
 var _ app.ID = &idGen{}
 
-type idGen struct {
-}
+type idGen struct{}
 
 // New for implements app.ID.
 func (i idGen) New() string {
