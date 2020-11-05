@@ -21,7 +21,6 @@ type (
 	// Repo interface for user data repository.
 	Repo interface {
 		// Save adds to the new user in repository.
-		// This method is also required to create a notifying hoard.
 		// Errors: ErrEmailExist, ErrUsernameExist, unknown.
 		Save(context.Context, User) (id int, err error)
 		// Update update user info.
