@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 sql_init=$(cat ./internal/modules/session/init/init-db.sql)
 docker exec -it session-db cockroach sql --insecure --execute="$sql_init"
