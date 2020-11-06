@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 for service in ./internal/modules/*; do
   IFS='/' read -r -a path <<<"$service"

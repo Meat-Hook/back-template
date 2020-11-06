@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 for service in ./internal/modules/*; do
   initFile=$service/init/init.sh

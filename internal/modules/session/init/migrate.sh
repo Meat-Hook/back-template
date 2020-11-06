@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cfg_json=$(cat ./internal/modules/session/init/init-cfg.json)
 curl -X PUT -H "Content-Type: application/json" -d "$cfg_json" http://localhost:8500/v1/kv/config/session

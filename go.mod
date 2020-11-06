@@ -47,13 +47,14 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli/v2 v2.3.0
+	go.mongodb.org/mongo-driver v1.4.3 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
+	golang.org/x/sys v0.0.0-20201106081118-db71ae66460a // indirect
 	golang.org/x/text v0.3.4 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20201030142918-24207fddd1c3 // indirect
-	google.golang.org/grpc v1.33.1
+	google.golang.org/genproto v0.0.0-20201106154455-f9bfe239b0ba // indirect
+	google.golang.org/grpc v1.33.2
 	google.golang.org/protobuf v1.25.0
 )
