@@ -81,7 +81,7 @@ func main() {
 		Description:          "Microservice for working with user info.",
 		Commands:             []*cli.Command{version},
 		Flags:                []cli.Flag{discoveryFlg},
-		Version:              doc.Version(),
+		Version:              doc.Spec().Info.Version,
 		EnableBashCompletion: true,
 		BashComplete:         cli.DefaultAppComplete,
 		Action:               start,
@@ -157,8 +157,13 @@ func start(c *cli.Context) error {
 		return fmt.Errorf("resolve ip addr: %w", err)
 	}
 
-	serviceID := name + "-" + host
-	err = discoveryClient.Register(name, serviceID, serverIP.IP, cfg.HTTP.Port)
+	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to parse app doc")
+	}
+
+	serviceID := name + ":" + doc.Spec().Info.Version
+	err = discoveryClient.Register(name, serviceID, serverIP.IP, cfg.HTTP.Port, doc.Spec().Info.Version)
 	if err != nil {
 		return fmt.Errorf("register service: %w", err)
 	}
