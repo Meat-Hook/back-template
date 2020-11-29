@@ -1,26 +1,25 @@
 {
   "db": {
     "name": "user_db",
-    "user": "service_user",
+    "user": "user_service",
     "password": "root",
-    "host": "user-db",
+    "host": "user-db.service.consul",
     "port": 26257
   },
   "http": {
-    "port": 8080
+    "port": 20001
   },
   "grpc": {
-    "port": 8085
+    "port": 20002
   },
   "metric": {
-    "port": 10001
+    "port": 20003
   },
   "nats": {
     "host": "nats",
     "port": 4222
   },
   "session_svc": {
-    "host": "session-service",
     "port": 8095
   }
 }

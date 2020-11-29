@@ -114,7 +114,7 @@ func (s *Server) Logf(f string, args ...interface{}) {
 }
 
 // Fatalf logs message either via defined user logger or via system one if no user logger is defined.
-// Exits with non-zero status after printing
+// Exits with non-valid status after printing
 func (s *Server) Fatalf(f string, args ...interface{}) {
 	if s.api != nil && s.api.Logger != nil {
 		s.api.Logger(f, args...)

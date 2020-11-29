@@ -6,9 +6,10 @@ package rpc_test
 
 import (
 	context "context"
+	reflect "reflect"
+
 	app "github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // Mocksessions is a mock of sessions interface

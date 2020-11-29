@@ -2,23 +2,21 @@ version: '3.8'
 
 services:
 
-  consul:
-    container_name: consul
-    image: consul:1.8.5
-    restart: always
-    ports:
-      - "8400:8400"
-      - "8500:8500"
-      - "8600:8600"
-      - "8600:8600/udp"
-    volumes:
-      - "./volume/consul-data:/consul/data"
-    command:
-      - "agent"
-      - "-client=0.0.0.0"
-      - "-server"
-      - "-bootstrap-expect=1"
-      - "-ui"
+#  consul:
+#    container_name: consul
+#    image: consul:1.8.5
+#    restart: always
+#    ports:
+#      - "8400:8400"
+#      - "8500:8500"
+#      - "8600:8600"
+#      - "8600:8600/udp"
+#    volumes:
+#      - "./volume/consul-data:/consul/data"
+#    command:
+#      - "agent"
+#      - "-dev"
+#      - "-client=0.0.0.0"
 
   user-service:
     build:
@@ -54,7 +52,7 @@ services:
 
   session-service:
     build:
-      context: ./internal/modules/session
+      context: internal/modules/session
       dockerfile: Dockerfile
     image: session-service
     container_name: session-service

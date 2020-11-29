@@ -10,7 +10,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/repo"
 )
 
-func TestRepo_Smoke(t *testing.T) {
+func TestRepo_GreenCase(t *testing.T) {
 	t.Parallel()
 
 	db, assert := start(t)

@@ -1,5 +1,5 @@
 FROM alpine
 
-COPY ./bin/ /
+COPY bin /
 
 CMD /session

@@ -20,6 +20,7 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+	github.com/hashicorp/consul v1.8.5
 	github.com/hashicorp/consul/api v1.7.0
 	github.com/hashicorp/go-hclog v0.14.1 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.0 // indirect
@@ -27,6 +28,7 @@ require (
 	github.com/hashicorp/go-sockaddr v1.0.2 // indirect
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/hashicorp/nomad/api v0.0.0-20201115152218-974039ba8bf6 // indirect
 	github.com/hashicorp/serf v0.9.5 // indirect
 	github.com/jackc/pgtype v1.6.1
 	github.com/jessevdk/go-flags v1.4.0
@@ -57,4 +59,5 @@ require (
 	google.golang.org/genproto v0.0.0-20201106154455-f9bfe239b0ba // indirect
 	google.golang.org/grpc v1.33.2
 	google.golang.org/protobuf v1.25.0
+	gopkg.in/ini.v1 v1.62.0
 )

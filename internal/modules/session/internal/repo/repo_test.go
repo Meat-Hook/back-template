@@ -12,7 +12,7 @@ import (
 	"github.com/rs/xid"
 )
 
-func TestRepo_Smoke(t *testing.T) {
+func TestRepo_GreenCase(t *testing.T) {
 	t.Parallel()
 
 	db, assert := start(t)

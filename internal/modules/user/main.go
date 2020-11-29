@@ -7,11 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/discovery"
 	"github.com/Meat-Hook/back-template/internal/libs/hash"
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
@@ -34,14 +32,7 @@ import (
 )
 
 var (
-	logger = zerolog.New(os.Stdout)
-
-	discoveryFlg = &cli.StringFlag{
-		Name:     "discovery",
-		Usage:    "service discovery address for get config",
-		EnvVars:  []string{"DISCOVERY"},
-		Required: true,
-	}
+	logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 
 	author1 = &cli.Author{
 		Name:  "Edgar Sipki",
@@ -76,12 +67,14 @@ func main() {
 	}
 
 	application := &cli.App{
-		Name:                 filepath.Base(os.Args[0]),
-		HelpName:             filepath.Base(os.Args[0]),
-		Usage:                "Microservice for working with user info.",
-		Description:          "Microservice for working with user info.",
-		Commands:             []*cli.Command{version},
-		Flags:                []cli.Flag{discoveryFlg},
+		Name:        filepath.Base(os.Args[0]),
+		HelpName:    filepath.Base(os.Args[0]),
+		Usage:       "Microservice for working with user info.",
+		Description: "Microservice for working with user info.",
+		Commands:    []*cli.Command{version},
+		Flags: []cli.Flag{
+			DBName, DBPass, DBUser, DBPort, DBHost, Nats,
+		},
 		Version:              doc.Spec().Info.Version,
 		EnableBashCompletion: true,
 		BashComplete:         cli.DefaultAppComplete,
@@ -93,7 +86,7 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM)
+	signal.Notify(signals, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM)
 	go func() { <-signals; cancel() }()
 	go forceShutdown(ctx)
 
@@ -103,52 +96,70 @@ func main() {
 	}
 }
 
-type config struct {
-	DB struct {
-		Name     string `json:"name"`
-		User     string `json:"user"`
-		Password string `json:"password"`
-		Host     string `json:"host"`
-		Port     int    `json:"port"`
-	} `json:"db"`
-	HTTP struct {
-		Port int `json:"port"`
-	} `json:"http"`
-	GRPC struct {
-		Port int `json:"port"`
-	} `json:"grpc"`
-	Metric struct {
-		Port int `json:"port"`
-	} `json:"metric"`
-	Nats struct {
-		Host string `json:"host"`
-		Port int    `json:"port"`
-	} `json:"nats"`
-	SessionSvc struct {
-		Host string `json:"host"`
-		Port int    `json:"port"`
-	} `json:"session_svc"`
-}
+// Standards ports.
+const (
+	WebServerPort    = 8080
+	GRPCServerPort   = 3000
+	MetricServerPort = 9080
+)
+
+var (
+	DBName = &cli.StringFlag{
+		Name:     "db-name",
+		Aliases:  []string{"n"},
+		Usage:    "database name",
+		EnvVars:  []string{"DB_NAME"},
+		Value:    "postgres",
+		Required: true,
+	}
+	DBUser = &cli.StringFlag{
+		Name:     "db-user",
+		Aliases:  []string{"u"},
+		Usage:    "database user",
+		EnvVars:  []string{"DB_USER"},
+		Value:    "root",
+		Required: true,
+	}
+	DBPass = &cli.StringFlag{
+		Name:     "db-pass",
+		Aliases:  []string{"p"},
+		Usage:    "database password",
+		EnvVars:  []string{"DB_PASS"},
+		Value:    "root",
+		Required: true,
+	}
+	DBHost = &cli.StringFlag{
+		Name:     "db-host",
+		Aliases:  []string{"H"},
+		Usage:    "database host",
+		EnvVars:  []string{"DB_HOST"},
+		Value:    "localhost",
+		Required: true,
+	}
+	DBPort = &cli.IntFlag{
+		Name:     "db-port",
+		Aliases:  []string{"P"},
+		Usage:    "database port",
+		EnvVars:  []string{"DB_PORT"},
+		Value:    5432,
+		Required: true,
+	}
+	Nats = &cli.StringFlag{
+		Name:     "nats",
+		Usage:    "nats server address",
+		EnvVars:  []string{"NATS"},
+		Value:    "localhost:4222",
+		Required: true,
+	}
+)
 
 const (
-	name     = `user`
-	dbDriver = `postgres`
+	name       = `user`
+	sessionSrv = `session.service.consul` + ":" + "3000"
+	dbDriver   = `postgres`
 )
 
 func start(c *cli.Context) error {
-	// init config
-	discoveryClient, err := discovery.New(c.String(discoveryFlg.Name))
-	if err != nil {
-		return fmt.Errorf("init discovery: %w", err)
-	}
-
-	// build config
-	cfg := config{}
-	err = discoveryClient.Config(c.Context, name, &cfg)
-	if err != nil {
-		return fmt.Errorf("get config: %w", err)
-	}
-
 	host, err := os.Hostname()
 	if err != nil {
 		return fmt.Errorf("os hostname: %w", err)
@@ -158,42 +169,29 @@ func start(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("resolve ip addr: %w", err)
 	}
-
-	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to parse app doc")
-	}
-
-	serviceID := name + ":" + doc.Spec().Info.Version
-	err = discoveryClient.Register(name, serviceID, serverIP.IP, cfg.HTTP.Port, doc.Spec().Info.Version)
-	if err != nil {
-		return fmt.Errorf("register service: %w", err)
-	}
-	defer func() {
-		err := discoveryClient.Deregister(serviceID)
-		if err != nil {
-			logger.Error().Err(err).Str("id", serviceID).Msg("deregister service")
-		}
-	}()
+	logger.Info().Strs("env", os.Environ()).Msg("AAAAAAAAAA")
+	logger.Info().Str("str", fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable", c.String(DBHost.Name), c.Int(DBPort.Name), c.String(DBUser.Name),
+		c.String(DBPass.Name), c.String(DBName.Name))).Msg("str")
 
 	// init database connection
 	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
 	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable", cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.Password, cfg.DB.Name))
+		"password=%s dbname=%s sslmode=disable", c.String(DBHost.Name), c.Int(DBPort.Name), c.String(DBUser.Name),
+		c.String(DBPass.Name), c.String(DBName.Name)))
 	if err != nil {
 		return fmt.Errorf("DB connect: %w", err)
 	}
 	defer log.WarnIfFail(logger, db.Close)
 
-	natsConn, err := nats.Connect(net.JoinHostPort(cfg.Nats.Host, strconv.Itoa(cfg.Nats.Port)))
+	natsConn, err := nats.Connect(c.String(Nats.Name))
 	if err != nil {
 		return fmt.Errorf("nats connect: %w", err)
 	}
 	defer log.WarnIfFail(logger, natsConn.Drain)
 	defer natsConn.Close()
 
-	grpcConn, err := librpc.Client(c.Context, net.JoinHostPort(cfg.SessionSvc.Host, strconv.Itoa(cfg.SessionSvc.Port)))
+	grpcConn, err := librpc.Client(c.Context, sessionSrv)
 	if err != nil {
 		return fmt.Errorf("build lib rpc: %w", err)
 	}
@@ -209,16 +207,16 @@ func start(c *cli.Context) error {
 	internalAPI := rpc.New(module, librpc.Server(logger))
 	externalAPI, err := web.New(module, logger, &apiMetric, web.Config{
 		Host: serverIP.IP.String(),
-		Port: cfg.HTTP.Port,
+		Port: WebServerPort,
 	})
 	if err != nil {
 		return fmt.Errorf("build external api: %w", err)
 	}
 
 	return runner.Start(
-		runner.GRPC(c.Context, logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, serverIP.IP, cfg.GRPC.Port),
-		runner.HTTP(c.Context, logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, serverIP.IP, cfg.HTTP.Port),
-		runner.Metric(c.Context, logger.With().Str(log.Name, "Metric").Logger(), serverIP.IP, cfg.Metric.Port),
+		runner.GRPC(c.Context, logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, serverIP.IP, GRPCServerPort),
+		runner.HTTP(c.Context, logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, serverIP.IP, WebServerPort),
+		runner.Metric(c.Context, logger.With().Str(log.Name, "Metric").Logger(), serverIP.IP, MetricServerPort),
 	)
 }
 

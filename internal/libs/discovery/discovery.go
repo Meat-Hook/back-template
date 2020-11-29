@@ -36,8 +36,8 @@ func New(addr string) (*Discovery, error) {
 }
 
 // Register service in consul.
-func (c *Discovery) Register(serviceName, id string, ip net.IP, httpPort int, tags ...string) error {
-	agent := c.consul.Agent()
+func (d *Discovery) Register(serviceName, id string, ip net.IP, httpPort int, tags ...string) error {
+	agent := d.consul.Agent()
 
 	host := net.JoinHostPort(ip.String(), strconv.Itoa(httpPort))
 	externalAPICheck := &api.AgentServiceCheck{
@@ -68,8 +68,8 @@ func (c *Discovery) Register(serviceName, id string, ip net.IP, httpPort int, ta
 }
 
 // Deregister service from consul.
-func (c *Discovery) Deregister(id string) error {
-	agent := c.consul.Agent()
+func (d *Discovery) Deregister(id string) error {
+	agent := d.consul.Agent()
 
 	err := agent.ServiceDeregister(id)
 	if err != nil {
@@ -85,11 +85,11 @@ var (
 )
 
 // Config gets configuration from consul and unmarshal in val.
-func (c *Discovery) Config(ctx context.Context, serviceName string, val interface{}) error {
+func (d *Discovery) Config(ctx context.Context, serviceName string, val interface{}) error {
 	q := &api.QueryOptions{}
 	q.WithContext(ctx)
 	key := fmt.Sprintf("config/%s", serviceName)
-	kv, _, err := c.consul.KV().Get(key, q)
+	kv, _, err := d.consul.KV().Get(key, q)
 	if err != nil {
 		return fmt.Errorf("get kv from discovery: %w by key: %s", err, key)
 	}

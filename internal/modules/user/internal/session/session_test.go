@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/internal/modules/session/client"
 	session "github.com/Meat-Hook/back-template/internal/modules/session/client"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 )
@@ -35,7 +34,7 @@ func TestClient_Session(t *testing.T) {
 		"err_any":       {"notValidToken", nil, errAny},
 	}
 
-	mock.EXPECT().Session(ctx, "validToken").Return(&client.Session{
+	mock.EXPECT().Session(ctx, "validToken").Return(&session.Session{
 		ID:     sessionInfo.ID,
 		UserID: sessionInfo.UserID,
 	}, nil)

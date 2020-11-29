@@ -123,13 +123,13 @@ type config struct {
 		Port int `json:"port"`
 	} `json:"metric"`
 	UserSvc struct {
-		Host string `json:"host"`
-		Port int    `json:"port"`
+		Port int `json:"port"`
 	} `json:"user_svc"`
 }
 
 const (
 	name     = `session`
+	userSrv  = `user-service`
 	dbDriver = `postgres`
 )
 
@@ -183,7 +183,7 @@ func start(c *cli.Context) error {
 	}
 	defer log.WarnIfFail(logger, db.Close)
 
-	grpcConn, err := librpc.Client(c.Context, net.JoinHostPort(cfg.UserSvc.Host, strconv.Itoa(cfg.UserSvc.Port)))
+	grpcConn, err := librpc.Client(c.Context, net.JoinHostPort(userSrv, strconv.Itoa(cfg.UserSvc.Port)))
 	if err != nil {
 		return fmt.Errorf("build lib rpc: %w", err)
 	}

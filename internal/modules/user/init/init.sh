@@ -1,6 +1,10 @@
 #!/bin/bash
 
-sql_init=$(cat ./internal/modules/user/init/init-db.sql)
-docker exec -it user-db cockroach sql --insecure --execute="$sql_init"
-chmod +x ./internal/modules/user/init/migrate.sh
-./internal/modules/user/init/migrate.sh
+cfg_json=$(cat ./internal/modules/user/init/init-cfg.json)
+curl -X PUT -H "Content-Type: application/json" -d $(cat ./internal/modules/user/init/init-cfg.json) http://localhost:8500/v1/kv/config/user
+migrate run --db-port 26257 --dir ./internal/modules/user/migrate --operation up --db-pass "" --db-user user_service --db-name user_db
+
+curl -X PUT -H Content-Type: application/json -d $cfg_json http://localhost:8500/v1/kv/config/user
+cat ${meta.pwd}/internal/modules/user/init/init-cfg.json
+
+curl -X PUT -H "Content-Type: application/json" -d $(cat ./internal/modules/user/init/init-cfg.json) http://localhost:8500/v1/kv/config/user
