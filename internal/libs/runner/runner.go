@@ -11,6 +11,13 @@ const (
 	shutdownTimeout = time.Second * 15
 )
 
+// Standard ports.
+const (
+	WebServerPort    = 8080
+	GRPCServerPort   = 8090
+	MetricServerPort = 8100
+)
+
 // Start application services.
 func Start(services ...func() error) error {
 	group := errgroup.Group{}

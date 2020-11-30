@@ -13,16 +13,16 @@ import (
 )
 
 // Metric run metric for collect service metric.
-func Metric(ctx context.Context, logger zerolog.Logger, ip net.IP, port int) func() error {
+func Metric(ctx context.Context, logger zerolog.Logger, host string, port int) func() error {
 	return func() error {
 		http.Handle("/metrics", promhttp.Handler())
 		srv := &http.Server{
-			Addr: net.JoinHostPort(ip.String(), strconv.Itoa(port)),
+			Addr: net.JoinHostPort(host, strconv.Itoa(port)),
 		}
 
 		errc := make(chan error, 1)
 		go func() { errc <- srv.ListenAndServe() }()
-		logger.Info().IPAddr(log.Host, ip).Int(log.Port, port).Msg("started")
+		logger.Info().Str(log.Host, host).Int(log.Port, port).Msg("started")
 		defer logger.Info().Msg("shutdown")
 
 		select {

@@ -3,7 +3,6 @@ package runner
 import (
 	"context"
 	"fmt"
-	"net"
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/rs/zerolog"
@@ -15,11 +14,11 @@ type swagger interface {
 }
 
 // HTTP run http server.
-func HTTP(ctx context.Context, logger zerolog.Logger, srv swagger, ip net.IP, port int) func() error {
+func HTTP(ctx context.Context, logger zerolog.Logger, srv swagger, host string, port int) func() error {
 	return func() error {
 		errc := make(chan error, 1)
 		go func() { errc <- srv.Serve() }()
-		logger.Info().IPAddr(log.Host, ip).Int(log.Port, port).Msg("started")
+		logger.Info().Str(log.Host, host).Int(log.Port, port).Msg("started")
 		defer logger.Info().Msg("shutdown")
 
 		select {
