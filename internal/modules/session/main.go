@@ -32,67 +32,6 @@ import (
 var (
 	logger = zerolog.New(os.Stdout)
 
-	author1 = &cli.Author{
-		Name:  "Edgar Sipki",
-		Email: "edo7796@yahoo.com",
-	}
-
-	team = []*cli.Author{author1}
-
-	version = &cli.Command{
-		Name:         "version",
-		Aliases:      []string{"v"},
-		Usage:        "Get service version.",
-		Description:  "Command for getting service version.",
-		BashComplete: cli.DefaultAppComplete,
-		Action: func(context *cli.Context) error {
-			doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
-			if err != nil {
-				logger.Fatal().Err(err).Msg("failed to get app version")
-			}
-
-			logger.Info().Str("version", doc.Version()).Send()
-
-			return nil
-		},
-	}
-)
-
-func main() {
-	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to get app version")
-	}
-
-	application := &cli.App{
-		Name:                 filepath.Base(os.Args[0]),
-		HelpName:             filepath.Base(os.Args[0]),
-		Usage:                "Microservice for working with user info.",
-		Description:          "Microservice for working with user info.",
-		Commands:             []*cli.Command{version},
-		Flags:                []cli.Flag{discoveryFlg},
-		Version:              doc.Spec().Info.Version,
-		EnableBashCompletion: true,
-		BashComplete:         cli.DefaultAppComplete,
-		Action:               start,
-		Authors:              team,
-		Writer:               os.Stdout,
-		ErrWriter:            os.Stderr,
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM)
-	go func() { <-signals; cancel() }()
-	go forceShutdown(ctx)
-
-	err = application.RunContext(logger.WithContext(ctx), os.Args)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("service shutdown")
-	}
-}
-
-var (
 	DBName = &cli.StringFlag{
 		Name:     "db-name",
 		Aliases:  []string{"n"},
@@ -169,7 +108,71 @@ var (
 		Required:   true,
 		HasBeenSet: true,
 	}
+
+	author1 = &cli.Author{
+		Name:  "Edgar Sipki",
+		Email: "edo7796@yahoo.com",
+	}
+
+	team = []*cli.Author{author1}
+
+	version = &cli.Command{
+		Name:         "version",
+		Aliases:      []string{"v"},
+		Usage:        "Get service version.",
+		Description:  "Command for getting service version.",
+		BashComplete: cli.DefaultAppComplete,
+		Action: func(context *cli.Context) error {
+			doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
+			if err != nil {
+				logger.Fatal().Err(err).Msg("failed to get app version")
+			}
+
+			logger.Info().Str("version", doc.Version()).Send()
+
+			return nil
+		},
+	}
 )
+
+func main() {
+	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to get app version")
+	}
+
+	application := &cli.App{
+		Name:        filepath.Base(os.Args[0]),
+		HelpName:    filepath.Base(os.Args[0]),
+		Usage:       "Microservice for working with user info.",
+		Description: "Microservice for working with user info.",
+		Commands:    []*cli.Command{version},
+		Flags: []cli.Flag{
+			DBName, DBPass, DBUser, DBPort, DBHost, AuthKey,
+			UserSrv, Host, GRPCPort, HTTPPort, MetricPort,
+		},
+		Version:              doc.Spec().Info.Version,
+		EnableBashCompletion: true,
+		BashComplete:         cli.DefaultAppComplete,
+		Action:               start,
+		Authors:              team,
+		Writer:               os.Stdout,
+		ErrWriter:            os.Stderr,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM)
+	go func() { <-signals; cancel() }()
+	go forceShutdown(ctx)
+
+	err = application.RunContext(logger.WithContext(ctx), os.Args)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("service shutdown")
+	}
+}
+
+var ()
 
 const (
 	name     = `session`
