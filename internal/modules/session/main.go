@@ -3,15 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/discovery"
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	librpc "github.com/Meat-Hook/back-template/internal/libs/rpc"
@@ -35,11 +32,81 @@ import (
 var (
 	logger = zerolog.New(os.Stdout)
 
-	discoveryFlg = &cli.StringFlag{
-		Name:     "discovery",
-		Usage:    "service discovery address for get config",
-		EnvVars:  []string{"DISCOVERY"},
+	DBName = &cli.StringFlag{
+		Name:     "db-name",
+		Aliases:  []string{"n"},
+		Usage:    "database name",
+		EnvVars:  []string{"DB_NAME"},
 		Required: true,
+	}
+	DBUser = &cli.StringFlag{
+		Name:     "db-user",
+		Aliases:  []string{"u"},
+		Usage:    "database user",
+		EnvVars:  []string{"DB_USER"},
+		Required: true,
+	}
+	DBPass = &cli.StringFlag{
+		Name:     "db-pass",
+		Aliases:  []string{"p"},
+		Usage:    "database password",
+		EnvVars:  []string{"DB_PASS"},
+		Required: true,
+	}
+	DBHost = &cli.StringFlag{
+		Name:     "db-host",
+		Aliases:  []string{"H"},
+		Usage:    "database host",
+		EnvVars:  []string{"DB_HOST"},
+		Required: true,
+	}
+	DBPort = &cli.IntFlag{
+		Name:     "db-port",
+		Aliases:  []string{"P"},
+		Usage:    "database port",
+		EnvVars:  []string{"DB_PORT"},
+		Required: true,
+	}
+	UserSrv = &cli.StringFlag{
+		Name:     "user-srv",
+		Usage:    "user server address",
+		EnvVars:  []string{"USER_SRV"},
+		Required: true,
+	}
+	Host = &cli.StringFlag{
+		Name:    "hostname",
+		Usage:   "service hostname",
+		EnvVars: []string{"HOSTNAME"},
+	}
+	AuthKey = &cli.StringFlag{
+		Name:     "auth-key",
+		Usage:    "key for encrypt and decrypt tokens",
+		EnvVars:  []string{"AUTH_KEY"},
+		Required: true,
+	}
+	GRPCPort = &cli.IntFlag{
+		Name:       "grpc-port",
+		Usage:      "grpc service port",
+		EnvVars:    []string{"GRPC_PORT"},
+		Value:      runner.GRPCServerPort,
+		Required:   true,
+		HasBeenSet: true,
+	}
+	HTTPPort = &cli.IntFlag{
+		Name:       "http-port",
+		Usage:      "http service port",
+		EnvVars:    []string{"HTTP_PORT"},
+		Value:      runner.WebServerPort,
+		Required:   true,
+		HasBeenSet: true,
+	}
+	MetricPort = &cli.IntFlag{
+		Name:       "metric-port",
+		Usage:      "grpc service port",
+		EnvVars:    []string{"METRIC_PORT"},
+		Value:      runner.MetricServerPort,
+		Required:   true,
+		HasBeenSet: true,
 	}
 
 	author1 = &cli.Author{
@@ -75,12 +142,15 @@ func main() {
 	}
 
 	application := &cli.App{
-		Name:                 filepath.Base(os.Args[0]),
-		HelpName:             filepath.Base(os.Args[0]),
-		Usage:                "Microservice for working with user info.",
-		Description:          "Microservice for working with user info.",
-		Commands:             []*cli.Command{version},
-		Flags:                []cli.Flag{discoveryFlg},
+		Name:        filepath.Base(os.Args[0]),
+		HelpName:    filepath.Base(os.Args[0]),
+		Usage:       "Microservice for working with user info.",
+		Description: "Microservice for working with user info.",
+		Commands:    []*cli.Command{version},
+		Flags: []cli.Flag{
+			DBName, DBPass, DBUser, DBPort, DBHost, AuthKey,
+			UserSrv, Host, GRPCPort, HTTPPort, MetricPort,
+		},
 		Version:              doc.Spec().Info.Version,
 		EnableBashCompletion: true,
 		BashComplete:         cli.DefaultAppComplete,
@@ -102,31 +172,7 @@ func main() {
 	}
 }
 
-type config struct {
-	DB struct {
-		Name     string `json:"name"`
-		User     string `json:"user"`
-		Password string `json:"password"`
-		Host     string `json:"host"`
-		Port     int    `json:"port"`
-	} `json:"db"`
-	HTTP struct {
-		Port int `json:"port"`
-	} `json:"http"`
-	GRPC struct {
-		Port int `json:"port"`
-	} `json:"grpc"`
-	Auth struct {
-		Key string `json:"key"`
-	} `json:"auth"`
-	Metric struct {
-		Port int `json:"port"`
-	} `json:"metric"`
-	UserSvc struct {
-		Host string `json:"host"`
-		Port int    `json:"port"`
-	} `json:"user_svc"`
-}
+var ()
 
 const (
 	name     = `session`
@@ -134,80 +180,50 @@ const (
 )
 
 func start(c *cli.Context) error {
-	// init config
-	discoveryClient, err := discovery.New(c.String(discoveryFlg.Name))
-	if err != nil {
-		return fmt.Errorf("init discovery: %w", err)
-	}
-
-	// build config
-	cfg := config{}
-	err = discoveryClient.Config(c.Context, name, &cfg)
-	if err != nil {
-		return fmt.Errorf("get config: %w", err)
-	}
-
 	host, err := os.Hostname()
 	if err != nil {
 		return fmt.Errorf("os hostname: %w", err)
 	}
 
-	serverIP, err := net.ResolveIPAddr("ip4", host)
-	if err != nil {
-		return fmt.Errorf("resolve ip addr: %w", err)
+	if val := c.String(Host.Name); val != "" {
+		host = val
 	}
-
-	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to parse app doc")
-	}
-
-	serviceID := name + ":" + doc.Spec().Info.Version
-	err = discoveryClient.Register(name, serviceID, serverIP.IP, cfg.HTTP.Port, doc.Spec().Info.Version)
-	if err != nil {
-		return fmt.Errorf("register service: %w", err)
-	}
-	defer func() {
-		err := discoveryClient.Deregister(serviceID)
-		if err != nil {
-			logger.Error().Err(err).Str("id", serviceID).Msg("deregister service")
-		}
-	}()
 
 	// init database connection
 	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
 	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable", cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name))
+		"password=%s dbname=%s sslmode=disable", c.String(DBHost.Name), c.Int(DBPort.Name), c.String(DBUser.Name),
+		c.String(DBPass.Name), c.String(DBName.Name)))
 	if err != nil {
 		return fmt.Errorf("DB connect: %w", err)
 	}
 	defer log.WarnIfFail(logger, db.Close)
 
-	grpcConn, err := librpc.Client(c.Context, net.JoinHostPort(cfg.UserSvc.Host, strconv.Itoa(cfg.UserSvc.Port)))
+	grpcConn, err := librpc.Client(c.Context, c.String(UserSrv.Name))
 	if err != nil {
 		return fmt.Errorf("build lib rpc: %w", err)
 	}
 	usersSvcClient := users.New(grpcConn)
 
 	r := repo.New(db, &dbMetric)
-	auth := auth.New(cfg.Auth.Key)
+	auth := auth.New(c.String(AuthKey.Name))
 
 	module := app.New(r, wrapper.New(usersSvcClient), auth, idGen{})
 
 	apiMetric := metrics.HTTP(name, restapi.FlatSwaggerJSON)
 	internalAPI := rpc.New(module, librpc.Server(logger))
 	externalAPI, err := web.New(module, logger, &apiMetric, web.Config{
-		Host: serverIP.IP.String(),
-		Port: cfg.HTTP.Port,
+		Host: host,
+		Port: c.Int(HTTPPort.Name),
 	})
 	if err != nil {
 		return fmt.Errorf("build external api: %w", err)
 	}
 
 	return runner.Start(
-		runner.GRPC(c.Context, logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, serverIP.IP, cfg.GRPC.Port),
-		runner.HTTP(c.Context, logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, serverIP.IP, cfg.HTTP.Port),
-		runner.Metric(c.Context, logger.With().Str(log.Name, "Metric").Logger(), serverIP.IP, cfg.Metric.Port),
+		runner.GRPC(c.Context, logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, host, c.Int(GRPCPort.Name)),
+		runner.HTTP(c.Context, logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, host, c.Int(HTTPPort.Name)),
+		runner.Metric(c.Context, logger.With().Str(log.Name, "Metric").Logger(), host, c.Int(MetricPort.Name)),
 	)
 }
 

@@ -2,24 +2,6 @@ version: '3.8'
 
 services:
 
-  consul:
-    container_name: consul
-    image: consul:1.8.5
-    restart: always
-    ports:
-      - "8400:8400"
-      - "8500:8500"
-      - "8600:8600"
-      - "8600:8600/udp"
-    volumes:
-      - "./volume/consul-data:/consul/data"
-    command:
-      - "agent"
-      - "-client=0.0.0.0"
-      - "-server"
-      - "-bootstrap-expect=1"
-      - "-ui"
-
   user-service:
     build:
       context: ./internal/modules/user
@@ -27,10 +9,17 @@ services:
     image: user-service
     container_name: user-service
     restart: always
-    command: "./user --discovery consul:8500"
+    command: "./user"
+    environment:
+      - "DB_NAME=postgres"
+      - "DB_USER=root"
+      - "DB_PASS=root"
+      - "DB_HOST=user-db"
+      - "DB_PORT=26257"
+      - "NATS=nats:4222"
+      - "SESSION_SRV=session-service:3000"
     ports:
       - "8080:8080"
-      - "10001:10001"
 
   user-db:
     container_name: user-db
@@ -59,10 +48,17 @@ services:
     image: session-service
     container_name: session-service
     restart: always
-    command: "./session --discovery consul:8500"
+    command: "./session"
+    environment:
+      - "DB_NAME=postgres"
+      - "DB_USER=root"
+      - "DB_PASS=root"
+      - "DB_HOST=session-db"
+      - "DB_PORT=26257"
+      - "AUTH_KEY=super-duper-secret-key"
+      - "USER_SRV=user-service:3000"
     ports:
-      - "8090:8090"
-      - "10002:10002"
+      - "8081:8080"
 
   session-db:
     container_name: session-db
