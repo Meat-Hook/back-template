@@ -6,7 +6,7 @@ reauired:
 == Для старта нужно
 * make init
 * документация модуля user - http://localhost:8080/user/api/v1/docs
-* документация модуля session - http://localhost:8090/session/api/v1/docs
+* документация модуля session - http://localhost:8081/session/api/v1/docs
 
 
 Для запуска потом нужно использовать в дальнейшем
@@ -15,4 +15,4 @@ reauired:
 
 Для остановки
 
-* make dev-env-stop
+* make dev-env-down
