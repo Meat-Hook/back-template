@@ -1,6 +1,6 @@
 = Back-template.
 
-reauired:
+required:
   Для запуска должен стоять github.com/Meat-Hook/migrate
 
 == Для старта нужно
