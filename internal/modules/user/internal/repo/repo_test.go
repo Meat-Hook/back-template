@@ -19,7 +19,7 @@ func TestRepo_Smoke(t *testing.T) {
 	r := repo.New(db, &m)
 
 	user := app.User{
-		ID:        1,
+		ID:        0,
 		Email:     "email@gmail.com",
 		Name:      "username",
 		PassHash:  []byte("pass"),
@@ -29,7 +29,8 @@ func TestRepo_Smoke(t *testing.T) {
 
 	id, err := r.Save(ctx, user)
 	assert.Nil(err)
-	assert.Equal(user.ID, id)
+	assert.NotNil(id)
+	user.ID = id
 
 	user.Name = "new_username"
 	err = r.Update(ctx, user)
