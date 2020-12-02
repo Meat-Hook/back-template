@@ -3,6 +3,7 @@ package repo_test
 import (
 	"context"
 	"fmt"
+	"github.com/ory/dockertest/v3/docker"
 	"testing"
 	"time"
 
@@ -30,26 +31,29 @@ func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
 	pool, err := dockertest.NewPool("")
 	r.Nil(err)
 
-	resource, err := pool.Run("postgres", "latest", []string{
-		"POSTGRES_USER=postgres",
-		"POSTGRES_DB=postgres",
-		"POSTGRES_PASSWORD=postgres",
+	opt := &dockertest.RunOptions{
+		Repository:   "cockroachdb/cockroach",
+		Tag:          "v20.1.7",
+		Cmd:          []string{"start-single-node", "--insecure"},
+	}
+
+	resource, err := pool.RunWithOptions(opt, func(cfg *docker.HostConfig) {
+		cfg.AutoRemove = true
 	})
 	r.Nil(err)
 
 	var db *sqlx.DB
-	if err := pool.Retry(func() error {
-		str := fmt.Sprintf("host=localhost port=%s user=postgres "+
-			"password=postgres dbname=postgres sslmode=disable", resource.GetPort("5432/tcp"))
+	err = pool.Retry(func() error {
+		str := fmt.Sprintf("host=localhost port=%s user=root "+
+			"password=root dbname=postgres sslmode=disable", resource.GetPort("26257/tcp"))
 		db, err = sqlx.Connect("postgres", str)
 		if err != nil {
 			return err
 		}
 
 		return nil
-	}); err != nil {
-		r.Nil(err)
-	}
+	})
+	r.Nil(err)
 
 	t.Cleanup(func() {
 		err = pool.Purge(resource)
