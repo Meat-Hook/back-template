@@ -6,9 +6,10 @@ package rpc_test
 
 import (
 	context "context"
+	reflect "reflect"
+
 	app "github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // Mockusers is a mock of users interface

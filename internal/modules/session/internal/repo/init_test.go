@@ -3,7 +3,6 @@ package repo_test
 import (
 	"context"
 	"fmt"
-	"github.com/ory/dockertest/v3/docker"
 	"testing"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -32,9 +32,9 @@ func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
 	r.Nil(err)
 
 	opt := &dockertest.RunOptions{
-		Repository:   "cockroachdb/cockroach",
-		Tag:          "v20.1.7",
-		Cmd:          []string{"start-single-node", "--insecure"},
+		Repository: "cockroachdb/cockroach",
+		Tag:        "v20.1.7",
+		Cmd:        []string{"start-single-node", "--insecure"},
 	}
 
 	resource, err := pool.RunWithOptions(opt, func(cfg *docker.HostConfig) {

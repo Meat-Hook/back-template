@@ -18,6 +18,7 @@ services:
       - "DB_PORT=26257"
       - "NATS=nats:4222"
       - "SESSION_SRV=session-service:3000"
+      - "MIGRATE=true"
     ports:
       - "8080:8080"
 
@@ -57,6 +58,7 @@ services:
       - "DB_PORT=26257"
       - "AUTH_KEY=super-duper-secret-key"
       - "USER_SRV=user-service:3000"
+      - "MIGRATE=true"
     ports:
       - "8081:8080"
 

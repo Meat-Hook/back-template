@@ -11,6 +11,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/internal/libs/migrater"
 	librpc "github.com/Meat-Hook/back-template/internal/libs/rpc"
 	"github.com/Meat-Hook/back-template/internal/libs/runner"
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/rpc"
@@ -108,6 +109,22 @@ var (
 		Required:   true,
 		HasBeenSet: true,
 	}
+	Migrate = &cli.BoolFlag{
+		Name:       "migrate",
+		Usage:      "start automatic migrate to database",
+		EnvVars:    []string{"MIGRATE"},
+		Value:      false,
+		Required:   true,
+		HasBeenSet: true,
+	}
+	MigrateDir = &cli.StringFlag{
+		Name:       "migrate-dir",
+		Usage:      "path to database migration",
+		EnvVars:    []string{"MIGRATE_DIR"},
+		Value:      "migrate/",
+		Required:   true,
+		HasBeenSet: true,
+	}
 
 	author1 = &cli.Author{
 		Name:  "Edgar Sipki",
@@ -150,6 +167,7 @@ func main() {
 		Flags: []cli.Flag{
 			DBName, DBPass, DBUser, DBPort, DBHost, AuthKey,
 			UserSrv, Host, GRPCPort, HTTPPort, MetricPort,
+			Migrate, MigrateDir,
 		},
 		Version:              doc.Spec().Info.Version,
 		EnableBashCompletion: true,
@@ -198,6 +216,13 @@ func start(c *cli.Context) error {
 		return fmt.Errorf("DB connect: %w", err)
 	}
 	defer log.WarnIfFail(logger, db.Close)
+
+	if c.Bool(Migrate.Name) {
+		err := migrater.Auto(c.Context, db.DB, c.String(MigrateDir.Name), logger)
+		if err != nil {
+			return fmt.Errorf("start auto migration: %w", err)
+		}
+	}
 
 	grpcConn, err := librpc.Client(c.Context, c.String(UserSrv.Name))
 	if err != nil {
