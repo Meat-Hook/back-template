@@ -6,10 +6,9 @@ package app_test
 
 import (
 	context "context"
-	reflect "reflect"
-
 	app "github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockRepo is a mock of Repo interface

@@ -6,10 +6,9 @@ package users_test
 
 import (
 	context "context"
-	reflect "reflect"
-
 	client "github.com/Meat-Hook/back-template/internal/modules/user/client"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockuserSvc is a mock of userSvc interface
