@@ -18,10 +18,6 @@ func TestService_Login(t *testing.T) {
 	_, mockApp, client, assert := start(t)
 
 	var (
-		origin = app.Origin{
-			IP:        net.ParseIP("::1"),
-			UserAgent: "Go-http-client/1.1",
-		}
 		token = app.Token{
 			Value: "token",
 		}
@@ -53,7 +49,7 @@ func TestService_Login(t *testing.T) {
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
-			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, origin).Return(tc.user, tc.token, tc.appErr)
+			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, gomock.Any()).Return(tc.user, tc.token, tc.appErr)
 
 			params := operations.NewLoginParams().
 				WithArgs(&models.LoginParam{

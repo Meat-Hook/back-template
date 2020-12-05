@@ -27,7 +27,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "Microservice for managing user session.",
-    "title": "Service session.",
+    "title": "Session service.",
     "version": "0.1.0"
   },
   "basePath": "/session/api/v1",
@@ -190,7 +190,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "Microservice for managing user session.",
-    "title": "Service session.",
+    "title": "Session service.",
     "version": "0.1.0"
   },
   "basePath": "/session/api/v1",

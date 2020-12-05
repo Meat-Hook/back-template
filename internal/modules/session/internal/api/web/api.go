@@ -52,7 +52,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 		return nil, fmt.Errorf("load embedded swagger spec: %w", err)
 	}
 
-	api := operations.NewServiceSessionAPI(swaggerSpec)
+	api := operations.NewSessionServiceAPI(swaggerSpec)
 	swaggerLogger := logger.With().Str(log.Name, "swagger").Logger()
 	api.Logger = swaggerLogger.Printf
 	api.CookieKeyAuth = svc.cookieKeyAuth
