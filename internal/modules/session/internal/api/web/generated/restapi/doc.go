@@ -6,7 +6,7 @@
 //  Schemes:
 //    http
 //  Host: localhost
-//  BasePath: /session/api/v1
+//  BasePath: /api/session/v1
 //  Version: 0.1.0
 //
 //  Consumes:
