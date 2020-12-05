@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Default service session HTTP client.
+// Default session service HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -27,14 +27,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http"}
 
-// NewHTTPClient creates a new service session HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *ServiceSession {
+// NewHTTPClient creates a new session service HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *SessionService {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new service session HTTP client,
+// NewHTTPClientWithConfig creates a new session service HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *ServiceSession {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *SessionService {
 	// ensure nullable parameters have default
 	if cfg == nil {
 		cfg = DefaultTransportConfig()
@@ -45,14 +45,14 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Ser
 	return New(transport, formats)
 }
 
-// New creates a new service session client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *ServiceSession {
+// New creates a new session service client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *SessionService {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
 	}
 
-	cli := new(ServiceSession)
+	cli := new(SessionService)
 	cli.Transport = transport
 	cli.Operations = operations.New(transport, formats)
 	return cli
@@ -97,15 +97,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// ServiceSession is a client for service session
-type ServiceSession struct {
+// SessionService is a client for session service
+type SessionService struct {
 	Operations operations.ClientService
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *ServiceSession) SetTransport(transport runtime.ClientTransport) {
+func (c *SessionService) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Operations.SetTransport(transport)
 }

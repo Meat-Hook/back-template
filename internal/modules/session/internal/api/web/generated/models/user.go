@@ -16,6 +16,11 @@ import (
 // swagger:model User
 type User struct {
 
+	// email
+	// Required: true
+	// Format: email
+	Email Email `json:"email"`
+
 	// id
 	// Required: true
 	ID UserID `json:"id"`
@@ -23,16 +28,15 @@ type User struct {
 	// username
 	// Required: true
 	Username Username `json:"username"`
-
-	// email
-	// Required: true
-	// Format: email
-	Email Email `json:"email"`
 }
 
 // Validate validates this user
 func (m *User) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateEmail(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
@@ -42,13 +46,21 @@ func (m *User) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateEmail(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *User) validateEmail(formats strfmt.Registry) error {
+
+	if err := m.Email.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("email")
+		}
+		return err
+	}
+
 	return nil
 }
 
@@ -69,18 +81,6 @@ func (m *User) validateUsername(formats strfmt.Registry) error {
 	if err := m.Username.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("username")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *User) validateEmail(formats strfmt.Registry) error {
-
-	if err := m.Email.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("email")
 		}
 		return err
 	}

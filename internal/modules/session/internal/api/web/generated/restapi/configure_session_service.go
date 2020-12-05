@@ -13,13 +13,13 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 )
 
-//go:generate swagger generate server --target ../../generated --name ServiceSession --spec ../../../../../../../../../../../../../../var/folders/8m/ql24vlxd54x78711p7fm6zvr0000gn/T/swagger.yml832041109 --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders
+//go:generate swagger generate server --target ../../generated --name SessionService --spec ../../../../../../../../../../../../../../var/folders/8m/ql24vlxd54x78711p7fm6zvr0000gn/T/swagger.yml234306466 --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders
 
-func configureFlags(api *operations.ServiceSessionAPI) {
+func configureFlags(api *operations.SessionServiceAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations.ServiceSessionAPI) http.Handler {
+func configureAPI(api *operations.SessionServiceAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
