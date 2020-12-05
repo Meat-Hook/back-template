@@ -23,7 +23,7 @@ jobs:
           version: v1.32
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: lint
     steps:
       - name: Install Go 1.15
