@@ -10,7 +10,7 @@ consumes:
 produces:
   - application/json
 
-basePath: /session/api/v1
+basePath: /api/session/v1
 
 security:
   - cookieKey: [ ]
