@@ -11,8 +11,8 @@ required:
 
 Для запуска потом нужно использовать в дальнейшем
 
-* make dev-env-up
+* ./builds.sh && docker-compose up --build
 
 Для остановки
 
-* make dev-env-down
+* docker-compose down
