@@ -30,7 +30,7 @@ func init() {
     "title": "Service user.",
     "version": "0.1.0"
   },
-  "basePath": "/api/user/v1",
+  "basePath": "/user/api/v1",
   "paths": {
     "/email/verification": {
       "post": {
@@ -409,7 +409,7 @@ func init() {
     "title": "Service user.",
     "version": "0.1.0"
   },
-  "basePath": "/api/user/v1",
+  "basePath": "/user/api/v1",
   "paths": {
     "/email/verification": {
       "post": {

@@ -39,7 +39,7 @@ func (o *UpdateUsernameURL) Build() (*url.URL, error) {
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/api/user/v1"
+		_basePath = "/user/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

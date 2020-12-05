@@ -30,7 +30,7 @@ func init() {
     "title": "Service session.",
     "version": "0.1.0"
   },
-  "basePath": "/api/session/v1",
+  "basePath": "/session/api/v1",
   "paths": {
     "/login": {
       "post": {
@@ -193,7 +193,7 @@ func init() {
     "title": "Service session.",
     "version": "0.1.0"
   },
-  "basePath": "/api/session/v1",
+  "basePath": "/session/api/v1",
   "paths": {
     "/login": {
       "post": {

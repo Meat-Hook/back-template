@@ -13,7 +13,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 )
 
-//go:generate swagger generate server --target ../../generated --name ServiceSession --spec ../../../../../../../../../../../../../../var/folders/8m/ql24vlxd54x78711p7fm6zvr0000gn/T/swagger.yml355337531 --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders
+//go:generate swagger generate server --target ../../generated --name ServiceSession --spec ../../../../../../../../../../../../../../var/folders/8m/ql24vlxd54x78711p7fm6zvr0000gn/T/swagger.yml832041109 --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders
 
 func configureFlags(api *operations.ServiceSessionAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
