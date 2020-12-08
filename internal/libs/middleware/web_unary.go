@@ -37,8 +37,10 @@ func Recovery(next http.Handler) http.Handler {
 func CreateLogger(builder zerolog.Context) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+
 			newLogger := builder.
-				IPAddr(log.IP, net.ParseIP(r.RemoteAddr)).
+				IPAddr(log.IP, net.ParseIP(ip)).
 				Str(log.HTTPMethod, r.Method).
 				Str(log.Func, r.URL.Path).
 				Str(log.Request, xid.New().String()).
