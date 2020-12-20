@@ -13,8 +13,8 @@ import (
 )
 
 // Metric run metric for collect service metric.
-func Metric(ctx context.Context, logger zerolog.Logger, host string, port int) func() error {
-	return func() error {
+func Metric(logger zerolog.Logger, host string, port int) func(context.Context) error {
+	return func(ctx context.Context) error {
 		http.Handle("/metrics", promhttp.Handler())
 		srv := &http.Server{
 			Addr: net.JoinHostPort(host, strconv.Itoa(port)),
@@ -31,10 +31,10 @@ func Metric(ctx context.Context, logger zerolog.Logger, host string, port int) f
 				return fmt.Errorf("failed to listen http server: %w", err)
 			}
 		case <-ctx.Done():
-			ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+			ctxDone, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 			defer cancel()
 
-			err := srv.Shutdown(ctx)
+			err := srv.Shutdown(ctxDone)
 			if err != nil {
 				return fmt.Errorf("failed to shutdown http server: %w", err)
 			}
