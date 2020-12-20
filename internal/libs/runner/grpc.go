@@ -12,8 +12,8 @@ import (
 )
 
 // GRPC run grpc server.
-func GRPC(ctx context.Context, logger zerolog.Logger, srv *grpc.Server, host string, port int) func() error {
-	return func() error {
+func GRPC(logger zerolog.Logger, srv *grpc.Server, host string, port int) func(context.Context) error {
+	return func(ctx context.Context) error {
 		ln, err := net.Listen("tcp", net.JoinHostPort(host, strconv.Itoa(port)))
 		if err != nil {
 			return fmt.Errorf("listen grpc: %w", err)

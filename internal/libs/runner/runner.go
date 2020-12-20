@@ -2,6 +2,7 @@
 package runner
 
 import (
+	"context"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -19,11 +20,14 @@ const (
 )
 
 // Start application services.
-func Start(services ...func() error) error {
-	group := errgroup.Group{}
+func Start(ctx context.Context, services ...func(context.Context) error) error {
+	group, groupCtx := errgroup.WithContext(ctx)
 
 	for i := range services {
-		group.Go(services[i])
+		i := i
+		group.Go(func() error {
+			return services[i](groupCtx)
+		})
 	}
 
 	return group.Wait()

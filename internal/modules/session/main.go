@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	logger = zerolog.New(os.Stdout)
+	logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 
 	DBName = &cli.StringFlag{
 		Name:     "db-name",
@@ -190,8 +190,6 @@ func main() {
 	}
 }
 
-var ()
-
 const (
 	name     = `session`
 	dbDriver = `postgres`
@@ -246,9 +244,10 @@ func start(c *cli.Context) error {
 	}
 
 	return runner.Start(
-		runner.GRPC(c.Context, logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, host, c.Int(GRPCPort.Name)),
-		runner.HTTP(c.Context, logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, host, c.Int(HTTPPort.Name)),
-		runner.Metric(c.Context, logger.With().Str(log.Name, "Metric").Logger(), host, c.Int(MetricPort.Name)),
+		c.Context,
+		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, host, c.Int(GRPCPort.Name)),
+		runner.HTTP(logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, host, c.Int(HTTPPort.Name)),
+		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), host, c.Int(MetricPort.Name)),
 	)
 }
 

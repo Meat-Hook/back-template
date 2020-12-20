@@ -14,8 +14,8 @@ type swagger interface {
 }
 
 // HTTP run http server.
-func HTTP(ctx context.Context, logger zerolog.Logger, srv swagger, host string, port int) func() error {
-	return func() error {
+func HTTP(logger zerolog.Logger, srv swagger, host string, port int) func(context.Context) error {
+	return func(ctx context.Context) error {
 		errc := make(chan error, 1)
 		go func() { errc <- srv.Serve() }()
 		logger.Info().Str(log.Host, host).Int(log.Port, port).Msg("started")
