@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net"
 	"net/http"
 	"strconv"
@@ -14,7 +15,7 @@ import (
 // Metric run metric for collect service metric.
 func Metric(logger zerolog.Logger, host string, port int) func(context.Context) error {
 	return func(ctx context.Context) error {
-		//http.Handle("/metrics", promhttp.Handler())
+		http.Handle("/metrics", promhttp.Handler())
 		srv := &http.Server{
 			Addr: net.JoinHostPort(host, strconv.Itoa(port)),
 		}
