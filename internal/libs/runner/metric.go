@@ -3,12 +3,12 @@ package runner
 import (
 	"context"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net"
 	"net/http"
 	"strconv"
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 )
 
