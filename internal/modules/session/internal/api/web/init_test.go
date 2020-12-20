@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (string, *Mockapplication, *client.ServiceSession, *require.Assertions) {
+func start(t *testing.T) (string, *Mockapplication, *client.SessionService, *require.Assertions) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
