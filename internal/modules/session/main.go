@@ -247,7 +247,7 @@ func start(c *cli.Context) error {
 		c.Context,
 		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, host, c.Int(GRPCPort.Name)),
 		runner.HTTP(logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, host, c.Int(HTTPPort.Name)),
-		//runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), host, c.Int(MetricPort.Name)),
+		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), host, c.Int(MetricPort.Name)),
 	)
 }
 
