@@ -4,10 +4,8 @@ required:
   Для запуска должен стоять github.com/Meat-Hook/migrate
 
 == Для старта нужно
-* make init
 * документация модуля user - http://localhost:8080/user/api/v1/docs
 * документация модуля session - http://localhost:8081/session/api/v1/docs
-
 
 Для запуска потом нужно использовать в дальнейшем
 
