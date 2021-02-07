@@ -13,7 +13,7 @@ func apiError(txt string) *models.Error {
 	}
 }
 
-func logging(log zerolog.Logger, err error) {
+func logs(log zerolog.Logger, err error) {
 	if err != nil {
 		log.Error().Err(err).Send()
 	}

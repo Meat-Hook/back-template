@@ -14,7 +14,7 @@ func (svc *service) verificationEmail(params operations.VerificationEmailParams)
 	ctx, log := fromRequest(params.HTTPRequest, nil)
 
 	err := svc.app.VerificationEmail(ctx, string(params.Args.Email))
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewVerificationEmailNoContent()
@@ -30,7 +30,7 @@ func (svc *service) verificationUsername(params operations.VerificationUsernameP
 	ctx, log := fromRequest(params.HTTPRequest, nil)
 
 	err := svc.app.VerificationUsername(ctx, string(params.Args.Username))
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewVerificationUsernameNoContent()
@@ -51,7 +51,7 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 		string(params.Args.Username),
 		string(params.Args.Password),
 	)
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewCreateUserOK().WithPayload(&operations.CreateUserOKBody{ID: models.UserID(id)})
@@ -74,7 +74,7 @@ func (svc *service) getUser(params operations.GetUserParams, session *app.Sessio
 	}
 
 	u, err := svc.app.UserByID(ctx, *session, getUserID)
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewGetUserOK().WithPayload(User(u))
@@ -90,7 +90,7 @@ func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.
 	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.DeleteUser(ctx, *session)
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewDeleteUserNoContent()
@@ -104,7 +104,7 @@ func (svc *service) updatePassword(params operations.UpdatePasswordParams, sessi
 	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.UpdatePassword(ctx, *session, string(params.Args.Old), string(params.Args.New))
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewUpdatePasswordNoContent()
@@ -121,7 +121,7 @@ func (svc *service) updateUsername(params operations.UpdateUsernameParams, sessi
 	ctx, log := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.UpdateUsername(ctx, *session, string(params.Args.Username))
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewUpdateUsernameNoContent()
@@ -146,7 +146,7 @@ func (svc *service) getUsers(params operations.GetUsersParams, session *app.Sess
 	}
 
 	u, total, err := svc.app.ListUserByUsername(ctx, *session, params.Username, page)
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewGetUsersOK().WithPayload(&operations.GetUsersOKBody{
