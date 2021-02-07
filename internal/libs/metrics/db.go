@@ -13,8 +13,7 @@ type Database struct {
 	callDuration *prometheus.HistogramVec
 }
 
-// DB registers and returns common repo metrics used by all
-// services (namespace).
+// DB registers and returns common repo metrics used by all services (namespace).
 func DB(service string, registerMethods ...string) (metric Database) {
 	const subsystem = "repo"
 

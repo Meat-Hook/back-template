@@ -43,7 +43,7 @@ func CreateLogger(builder zerolog.Context) func(http.Handler) http.Handler {
 				IPAddr(log.IP, net.ParseIP(ip)).
 				Str(log.HTTPMethod, r.Method).
 				Str(log.Func, r.URL.Path).
-				Str(log.Request, xid.New().String()).
+				Stringer(log.Request, xid.New()).
 				Logger()
 
 			r = r.WithContext(newLogger.WithContext(r.Context()))
@@ -72,9 +72,9 @@ func AccessLog(metric *metrics.API) func(http.Handler) http.Handler {
 
 			logger := zerolog.Ctx(r.Context())
 			if m.Code < http.StatusInternalServerError {
-				logger.Info().Int(log.Code, m.Code).Dur(log.Duration, m.Duration).Msg("success")
+				logger.Info().Int(log.Code, m.Code).Stringer(log.Duration, m.Duration).Msg("success")
 			} else {
-				logger.Warn().Int(log.Code, m.Code).Dur(log.Duration, m.Duration).Msg("failed to handle")
+				logger.Warn().Int(log.Code, m.Code).Stringer(log.Duration, m.Duration).Msg("failed to handle")
 			}
 		})
 	}

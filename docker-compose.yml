@@ -2,6 +2,18 @@ version: '3.8'
 
 services:
 
+  prometheus:
+    image: prom/prometheus:v2.24.1
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - "./volume/prometheus-data:/prometheus/"
+      - "./config/prometheus/:/etc/prometheus/"
+    restart: always
+
   user-service:
     build:
       context: ./internal/modules/user
@@ -21,10 +33,11 @@ services:
       - "MIGRATE=true"
     ports:
       - "8080:8080"
+      - "8100:8100"
 
   user-db:
     container_name: user-db
-    image: cockroachdb/cockroach:v20.1.7
+    image: cockroachdb/cockroach:v20.2.4
     restart: always
     ports:
       - "26257:26257"
@@ -61,10 +74,11 @@ services:
       - "MIGRATE=true"
     ports:
       - "8081:8080"
+      - "8101:8100"
 
   session-db:
     container_name: session-db
-    image: cockroachdb/cockroach:v20.1.7
+    image: cockroachdb/cockroach:v20.2.4
     restart: always
     ports:
       - "25555:26257"

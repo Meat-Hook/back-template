@@ -20,7 +20,7 @@ func (svc *service) login(params operations.LoginParams) operations.LoginRespond
 	}
 
 	u, token, err := svc.app.Login(ctx, string(params.Args.Email), string(params.Args.Password), origin)
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewLoginOK().WithPayload(User(u)).
@@ -39,7 +39,7 @@ func (svc *service) logout(params operations.LogoutParams, session *app.Session)
 	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.Logout(ctx, *session)
-	defer logging(log, err)
+	defer logs(log, err)
 	switch {
 	case err == nil:
 		return operations.NewLogoutNoContent()
@@ -64,7 +64,7 @@ func apiError(txt string) *models.Error {
 	}
 }
 
-func logging(log zerolog.Logger, err error) {
+func logs(log zerolog.Logger, err error) {
 	if err != nil {
 		log.Error().Err(err).Send()
 	}

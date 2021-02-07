@@ -15,7 +15,11 @@ import (
 // Metric run metric for collect service metric.
 func Metric(logger zerolog.Logger, host string, port int) func(context.Context) error {
 	return func(ctx context.Context) error {
-		http.Handle("/metrics", promhttp.Handler())
+		handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer logger.Debug().Msg("collect metrics")
+			promhttp.Handler().ServeHTTP(w, r)
+		}))
+		http.Handle("/metrics", handler)
 		srv := &http.Server{
 			Addr: net.JoinHostPort(host, strconv.Itoa(port)),
 		}

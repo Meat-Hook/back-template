@@ -104,7 +104,7 @@ var (
 	}
 	MetricPort = &cli.IntFlag{
 		Name:       "metric-port",
-		Usage:      "grpc service port",
+		Usage:      "metric service port",
 		EnvVars:    []string{"METRIC_PORT"},
 		Value:      runner.MetricServerPort,
 		Required:   true,

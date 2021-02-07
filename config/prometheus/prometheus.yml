@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 10s
+  scrape_timeout: 5s
+  evaluation_interval: 1m
+
+  external_labels:
+    environment: 'dev'
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    scrape_timeout: 2s
+    static_configs:
+      - targets: [ 'prometheus:9090' ]
+
+  - job_name: 'user-service'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'user-service:8100' ]
+
+  - job_name: 'session-service'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'session-service:8100' ]
