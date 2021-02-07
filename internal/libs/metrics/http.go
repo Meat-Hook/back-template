@@ -2,6 +2,11 @@ package metrics
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/go-openapi/loads"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -49,37 +54,37 @@ func HTTP(service string, swagger json.RawMessage) (metric API) {
 	)
 	prometheus.DefaultRegisterer.MustRegister(metric.ReqDuration)
 
-	//document, err := loads.Analyzed(swagger, "")
-	//if err != nil {
-	//	panic(fmt.Errorf("analyzed swagger: %w", err))
-	//}
+	document, err := loads.Analyzed(swagger, "")
+	if err != nil {
+		panic(fmt.Errorf("analyzed swagger: %w", err))
+	}
 
 	// Initialized with codes returned by swagger and middleware
 	// after metrics middleware (accessLog).
-	//codeLabels := [4]int{
-	//	http.StatusBadRequest,
-	//	http.StatusUnauthorized,
-	//	http.StatusForbidden,
-	//	http.StatusUnprocessableEntity,
-	//}
+	codeLabels := [4]int{
+		http.StatusBadRequest,
+		http.StatusUnauthorized,
+		http.StatusForbidden,
+		http.StatusUnprocessableEntity,
+	}
 
-	//for method, resources := range document.Analyzer.Operations() {
-	//	for resource, op := range resources {
-	//		codes := append([]int{}, codeLabels[:]...)
-	//		for code := range op.Responses.StatusCodeResponses {
-	//			codes = append(codes, code)
-	//		}
-	//		for _, code := range codes {
-	//			l := prometheus.Labels{
-	//				ResourceLabel: resource,
-	//				MethodLabel:   method,
-	//				CodeLabel:     strconv.Itoa(code),
-	//			}
-	//			metric.ReqTotal.With(l)
-	//			metric.ReqDuration.With(l)
-	//		}
-	//	}
-	//}
+	for method, resources := range document.Analyzer.Operations() {
+		for resource, op := range resources {
+			codes := append([]int{}, codeLabels[:]...)
+			for code := range op.Responses.StatusCodeResponses {
+				codes = append(codes, code)
+			}
+			for _, code := range codes {
+				l := prometheus.Labels{
+					ResourceLabel: resource,
+					MethodLabel:   method,
+					CodeLabel:     strconv.Itoa(code),
+				}
+				metric.ReqTotal.With(l)
+				metric.ReqDuration.With(l)
+			}
+		}
+	}
 
 	return metric
 }

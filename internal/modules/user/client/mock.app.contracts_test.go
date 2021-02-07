@@ -6,10 +6,11 @@ package client_test
 
 import (
 	context "context"
+	reflect "reflect"
+
 	pb "github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
-	reflect "reflect"
 )
 
 // MockUserClient is a mock of UserClient interface
