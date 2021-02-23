@@ -95,8 +95,7 @@ func init() {
       ],
       "properties": {
         "message": {
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         }
       }
     },
@@ -108,11 +107,9 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 0,
           "$ref": "#/definitions/Email"
         },
         "password": {
-          "x-order": 1,
           "$ref": "#/definitions/Password"
         }
       }
@@ -132,22 +129,19 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 2,
           "$ref": "#/definitions/Email"
         },
         "id": {
-          "x-order": 0,
           "$ref": "#/definitions/UserID"
         },
         "username": {
-          "x-order": 1,
           "$ref": "#/definitions/Username"
         }
       }
     },
     "UserID": {
       "type": "integer",
-      "format": "int32"
+      "format": "int64"
     },
     "Username": {
       "type": "string",
@@ -264,8 +258,7 @@ func init() {
       ],
       "properties": {
         "message": {
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         }
       }
     },
@@ -277,11 +270,9 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 0,
           "$ref": "#/definitions/Email"
         },
         "password": {
-          "x-order": 1,
           "$ref": "#/definitions/Password"
         }
       }
@@ -301,22 +292,19 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 2,
           "$ref": "#/definitions/Email"
         },
         "id": {
-          "x-order": 0,
           "$ref": "#/definitions/UserID"
         },
         "username": {
-          "x-order": 1,
           "$ref": "#/definitions/Username"
         }
       }
     },
     "UserID": {
       "type": "integer",
-      "format": "int32"
+      "format": "int64"
     },
     "Username": {
       "type": "string",

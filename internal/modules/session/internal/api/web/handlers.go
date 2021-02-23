@@ -19,7 +19,7 @@ func (svc *service) login(params operations.LoginParams) operations.LoginRespond
 		UserAgent: params.HTTPRequest.Header.Get("User-Agent"),
 	}
 
-	u, token, err := svc.app.Login(ctx, string(params.Args.Email), string(params.Args.Password), origin)
+	u, token, err := svc.app.Login(ctx, string(*params.Args.Email), string(*params.Args.Password), origin)
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -51,10 +51,14 @@ func (svc *service) logout(params operations.LogoutParams, session *app.Session)
 
 // User conversion app.User => models.User.
 func User(u *app.User) *models.User {
+	id := models.UserID(u.ID)
+	username := models.Username(u.Name)
+	email := models.Email(u.Email)
+
 	return &models.User{
-		ID:       models.UserID(u.ID),
-		Username: models.Username(u.Name),
-		Email:    models.Email(u.Email),
+		ID:       &id,
+		Username: &username,
+		Email:    &email,
 	}
 }
 

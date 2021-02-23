@@ -46,7 +46,7 @@ func NewLogoutNoContent() *LogoutNoContent {
 	return &LogoutNoContent{}
 }
 
-/*LogoutNoContent handles this case with default header values.
+/* LogoutNoContent describes a response with status code 204, with default header values.
 
 The server successfully processed the request and is not returning any content.
 */
@@ -69,7 +69,7 @@ func NewLogoutDefault(code int) *LogoutDefault {
 	}
 }
 
-/*LogoutDefault handles this case with default header values.
+/* LogoutDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -87,7 +87,6 @@ func (o *LogoutDefault) Code() int {
 func (o *LogoutDefault) Error() string {
 	return fmt.Sprintf("[POST /logout][%d] logout default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *LogoutDefault) GetPayload() *models.Error {
 	return o.Payload
 }

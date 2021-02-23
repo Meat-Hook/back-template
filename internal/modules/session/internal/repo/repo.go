@@ -1,3 +1,5 @@
+// Package repo contains implements for app.Repo.
+// Provide session info to and from repository.
 package repo
 
 import (

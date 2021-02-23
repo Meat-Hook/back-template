@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/modules/session/client"
-	session "github.com/Meat-Hook/back-template/internal/modules/session/client"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 )
 
@@ -17,8 +16,6 @@ var (
 
 func TestClient_Session(t *testing.T) {
 	t.Parallel()
-
-	svc, mock, assert := start(t)
 
 	sessionInfo := &app.Session{
 		ID:     "id",
@@ -35,20 +32,28 @@ func TestClient_Session(t *testing.T) {
 		"err_any":       {"notValidToken", nil, errAny},
 	}
 
-	mock.EXPECT().Session(ctx, "validToken").Return(&client.Session{
-		ID:     sessionInfo.ID,
-		UserID: sessionInfo.UserID,
-	}, nil)
-	mock.EXPECT().Session(ctx, "notFoundToken").Return(nil, session.ErrNotFound)
-	mock.EXPECT().Session(ctx, "notValidToken").Return(nil, errAny)
-
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			svc, mock, assert := start(t)
+			mock.EXPECT().Session(ctx, tc.token).Return(convert(tc.want), tc.wantErr)
 
 			res, err := svc.Session(ctx, tc.token)
 			assert.Equal(tc.want, res)
-			assert.Equal(tc.wantErr, errors.Unwrap(err))
+			assert.ErrorIs(err, tc.wantErr)
 		})
+	}
+}
+
+func convert(want *app.Session) *client.Session {
+	if want == nil {
+		return nil
+	}
+
+	return &client.Session{
+		ID:     want.ID,
+		UserID: want.UserID,
 	}
 }

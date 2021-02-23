@@ -9,6 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	"github.com/golang/mock/gomock"
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -30,8 +31,6 @@ var (
 
 func TestService_GetUserByAuthToken(t *testing.T) {
 	t.Parallel()
-
-	c, mockApp, assert := start(t)
 
 	errNotFound := status.Error(codes.NotFound, app.ErrNotFound.Error())
 	errDeadline := status.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
@@ -56,25 +55,24 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 		"internal":  {nil, nil, errAny, errInternal},
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
-	defer cancel()
-
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			c, mockApp, assert := start(t)
+
 			mockApp.EXPECT().Access(gomock.Any(), email, pass).Return(tc.user, tc.appErr)
+
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
 
 			res, err := c.Access(ctx, &pb.RequestAccess{
 				Email:    email,
 				Password: pass,
 			})
-			if err != nil {
-				assert.Equal(tc.wantErr.Error(), err.Error())
-			} else {
-				assert.Equal(tc.want.Id, res.Id)
-				assert.Equal(tc.want.Email, res.Email)
-				assert.Equal(tc.want.Name, res.Name)
-			}
+			assert.ErrorIs(err, tc.wantErr)
+			assert.True(proto.Equal(tc.want, res))
 		})
 	}
 }

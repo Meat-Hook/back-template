@@ -31,7 +31,8 @@ func MethodsOf(v interface{}) []string {
 
 // CallerMethodName returns caller's method name for given stack depth.
 func CallerMethodName() string {
-	pc, _, _, _ := runtime.Caller(2)
+	const skipStack = 2
+	pc, _, _, _ := runtime.Caller(skipStack)
 	names := strings.Split(runtime.FuncForPC(pc).Name(), ".")
 
 	return names[len(names)-1]
@@ -39,7 +40,8 @@ func CallerMethodName() string {
 
 // CallerPkg returns caller's package name (from path) for given stack depth.
 func CallerPkg() string {
-	pc, _, _, _ := runtime.Caller(2)
+	const skipFunc = 2
+	pc, _, _, _ := runtime.Caller(skipFunc)
 	names := strings.Split(runtime.FuncForPC(pc).Name(), "/")
 	pkg := names[len(names)-1]
 

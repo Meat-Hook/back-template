@@ -86,7 +86,6 @@ func (o *GetUsersParams) BindRequest(r *http.Request, route *middleware.MatchedR
 	if err := o.bindUsername(qUsername, qhkUsername, route.Formats); err != nil {
 		res = append(res, err)
 	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -105,6 +104,7 @@ func (o *GetUsersParams) bindLimit(rawData []string, hasKey bool, formats strfmt
 
 	// Required: true
 	// AllowEmptyValue: false
+
 	if err := validate.RequiredString("limit", "query", raw); err != nil {
 		return err
 	}
@@ -127,6 +127,7 @@ func (o *GetUsersParams) bindOffset(rawData []string, hasKey bool, formats strfm
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetUsersParams()
 		return nil
@@ -153,10 +154,10 @@ func (o *GetUsersParams) bindUsername(rawData []string, hasKey bool, formats str
 
 	// Required: true
 	// AllowEmptyValue: false
+
 	if err := validate.RequiredString("username", "query", raw); err != nil {
 		return err
 	}
-
 	o.Username = raw
 
 	return nil

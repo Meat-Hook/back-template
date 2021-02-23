@@ -46,12 +46,13 @@ func NewLoginOK() *LoginOK {
 	return &LoginOK{}
 }
 
-/*LoginOK handles this case with default header values.
+/* LoginOK describes a response with status code 200, with default header values.
 
 OK
 */
 type LoginOK struct {
-	/*Session auth.
+
+	/* Session auth.
 	 */
 	SetCookie string
 
@@ -61,15 +62,18 @@ type LoginOK struct {
 func (o *LoginOK) Error() string {
 	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
 }
-
 func (o *LoginOK) GetPayload() *models.User {
 	return o.Payload
 }
 
 func (o *LoginOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	// response header Set-Cookie
-	o.SetCookie = response.GetHeader("Set-Cookie")
+	// hydrates response header Set-Cookie
+	hdrSetCookie := response.GetHeader("Set-Cookie")
+
+	if hdrSetCookie != "" {
+		o.SetCookie = hdrSetCookie
+	}
 
 	o.Payload = new(models.User)
 
@@ -88,7 +92,7 @@ func NewLoginDefault(code int) *LoginDefault {
 	}
 }
 
-/*LoginDefault handles this case with default header values.
+/* LoginDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -106,7 +110,6 @@ func (o *LoginDefault) Code() int {
 func (o *LoginDefault) Error() string {
 	return fmt.Sprintf("[POST /login][%d] login default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *LoginDefault) GetPayload() *models.Error {
 	return o.Payload
 }

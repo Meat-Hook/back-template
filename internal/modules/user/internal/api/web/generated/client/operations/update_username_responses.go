@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 )
@@ -48,7 +50,7 @@ func NewUpdateUsernameNoContent() *UpdateUsernameNoContent {
 	return &UpdateUsernameNoContent{}
 }
 
-/*UpdateUsernameNoContent handles this case with default header values.
+/* UpdateUsernameNoContent describes a response with status code 204, with default header values.
 
 The server successfully processed the request and is not returning any content.
 */
@@ -71,7 +73,7 @@ func NewUpdateUsernameDefault(code int) *UpdateUsernameDefault {
 	}
 }
 
-/*UpdateUsernameDefault handles this case with default header values.
+/* UpdateUsernameDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -89,7 +91,6 @@ func (o *UpdateUsernameDefault) Code() int {
 func (o *UpdateUsernameDefault) Error() string {
 	return fmt.Sprintf("[PATCH /user/username][%d] updateUsername default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *UpdateUsernameDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -113,7 +114,7 @@ type UpdateUsernameBody struct {
 
 	// username
 	// Required: true
-	Username models.Username `json:"username"`
+	Username *models.Username `json:"username"`
 }
 
 // Validate validates this update username body
@@ -132,11 +133,49 @@ func (o *UpdateUsernameBody) Validate(formats strfmt.Registry) error {
 
 func (o *UpdateUsernameBody) validateUsername(formats strfmt.Registry) error {
 
-	if err := o.Username.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("args" + "." + "username")
-		}
+	if err := validate.Required("args"+"."+"username", "body", o.Username); err != nil {
 		return err
+	}
+
+	if err := validate.Required("args"+"."+"username", "body", o.Username); err != nil {
+		return err
+	}
+
+	if o.Username != nil {
+		if err := o.Username.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "username")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this update username body based on the context it is used
+func (o *UpdateUsernameBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateUsername(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *UpdateUsernameBody) contextValidateUsername(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Username != nil {
+		if err := o.Username.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "username")
+			}
+			return err
+		}
 	}
 
 	return nil

@@ -23,23 +23,26 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
+
 // ClientService is the interface for Client methods
 type ClientService interface {
-	CreateUser(params *CreateUserParams) (*CreateUserOK, error)
+	CreateUser(params *CreateUserParams, opts ...ClientOption) (*CreateUserOK, error)
 
-	DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteUserNoContent, error)
+	DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteUserNoContent, error)
 
-	GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoWriter) (*GetUserOK, error)
+	GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUserOK, error)
 
-	GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInfoWriter) (*GetUsersOK, error)
+	GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUsersOK, error)
 
-	UpdatePassword(params *UpdatePasswordParams, authInfo runtime.ClientAuthInfoWriter) (*UpdatePasswordNoContent, error)
+	UpdatePassword(params *UpdatePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdatePasswordNoContent, error)
 
-	UpdateUsername(params *UpdateUsernameParams, authInfo runtime.ClientAuthInfoWriter) (*UpdateUsernameNoContent, error)
+	UpdateUsername(params *UpdateUsernameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateUsernameNoContent, error)
 
-	VerificationEmail(params *VerificationEmailParams) (*VerificationEmailNoContent, error)
+	VerificationEmail(params *VerificationEmailParams, opts ...ClientOption) (*VerificationEmailNoContent, error)
 
-	VerificationUsername(params *VerificationUsernameParams) (*VerificationUsernameNoContent, error)
+	VerificationUsername(params *VerificationUsernameParams, opts ...ClientOption) (*VerificationUsernameNoContent, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -47,13 +50,12 @@ type ClientService interface {
 /*
   CreateUser New user registration. If it is not sent to username, it will be the userID.
 */
-func (a *Client) CreateUser(params *CreateUserParams) (*CreateUserOK, error) {
+func (a *Client) CreateUser(params *CreateUserParams, opts ...ClientOption) (*CreateUserOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewCreateUserParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "createUser",
 		Method:             "POST",
 		PathPattern:        "/user",
@@ -64,7 +66,12 @@ func (a *Client) CreateUser(params *CreateUserParams) (*CreateUserOK, error) {
 		Reader:             &CreateUserReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -80,13 +87,12 @@ func (a *Client) CreateUser(params *CreateUserParams) (*CreateUserOK, error) {
 /*
   DeleteUser Deletion of your account.
 */
-func (a *Client) DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteUserNoContent, error) {
+func (a *Client) DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteUserNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDeleteUserParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "deleteUser",
 		Method:             "DELETE",
 		PathPattern:        "/user",
@@ -98,7 +104,12 @@ func (a *Client) DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAut
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -114,13 +125,12 @@ func (a *Client) DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAut
 /*
   GetUser Open user profile by id. If id not set returns self info.
 */
-func (a *Client) GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoWriter) (*GetUserOK, error) {
+func (a *Client) GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUserOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetUserParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getUser",
 		Method:             "GET",
 		PathPattern:        "/user",
@@ -132,7 +142,12 @@ func (a *Client) GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoW
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -148,13 +163,12 @@ func (a *Client) GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoW
 /*
   GetUsers User search.
 */
-func (a *Client) GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInfoWriter) (*GetUsersOK, error) {
+func (a *Client) GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUsersOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetUsersParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getUsers",
 		Method:             "GET",
 		PathPattern:        "/users",
@@ -166,7 +180,12 @@ func (a *Client) GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInf
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -182,13 +201,12 @@ func (a *Client) GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInf
 /*
   UpdatePassword Change password.
 */
-func (a *Client) UpdatePassword(params *UpdatePasswordParams, authInfo runtime.ClientAuthInfoWriter) (*UpdatePasswordNoContent, error) {
+func (a *Client) UpdatePassword(params *UpdatePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdatePasswordNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUpdatePasswordParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "updatePassword",
 		Method:             "PATCH",
 		PathPattern:        "/user/password",
@@ -200,7 +218,12 @@ func (a *Client) UpdatePassword(params *UpdatePasswordParams, authInfo runtime.C
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -216,13 +239,12 @@ func (a *Client) UpdatePassword(params *UpdatePasswordParams, authInfo runtime.C
 /*
   UpdateUsername Change username.
 */
-func (a *Client) UpdateUsername(params *UpdateUsernameParams, authInfo runtime.ClientAuthInfoWriter) (*UpdateUsernameNoContent, error) {
+func (a *Client) UpdateUsername(params *UpdateUsernameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateUsernameNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUpdateUsernameParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "updateUsername",
 		Method:             "PATCH",
 		PathPattern:        "/user/username",
@@ -234,7 +256,12 @@ func (a *Client) UpdateUsername(params *UpdateUsernameParams, authInfo runtime.C
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -250,13 +277,12 @@ func (a *Client) UpdateUsername(params *UpdateUsernameParams, authInfo runtime.C
 /*
   VerificationEmail verification email API
 */
-func (a *Client) VerificationEmail(params *VerificationEmailParams) (*VerificationEmailNoContent, error) {
+func (a *Client) VerificationEmail(params *VerificationEmailParams, opts ...ClientOption) (*VerificationEmailNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewVerificationEmailParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "verificationEmail",
 		Method:             "POST",
 		PathPattern:        "/email/verification",
@@ -267,7 +293,12 @@ func (a *Client) VerificationEmail(params *VerificationEmailParams) (*Verificati
 		Reader:             &VerificationEmailReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -283,13 +314,12 @@ func (a *Client) VerificationEmail(params *VerificationEmailParams) (*Verificati
 /*
   VerificationUsername verification username API
 */
-func (a *Client) VerificationUsername(params *VerificationUsernameParams) (*VerificationUsernameNoContent, error) {
+func (a *Client) VerificationUsername(params *VerificationUsernameParams, opts ...ClientOption) (*VerificationUsernameNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewVerificationUsernameParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "verificationUsername",
 		Method:             "POST",
 		PathPattern:        "/username/verification",
@@ -300,7 +330,12 @@ func (a *Client) VerificationUsername(params *VerificationUsernameParams) (*Veri
 		Reader:             &VerificationUsernameReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}

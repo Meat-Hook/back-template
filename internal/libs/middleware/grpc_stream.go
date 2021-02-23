@@ -1,22 +1,36 @@
 package middleware
 
 import (
+	"errors"
+
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
+// Errors.
+var (
+	ErrWithoutMD = errors.New("caller without metadata")
+)
+
 // MakeStreamServerLogger returns a new stream server interceptor that contains request logger.
-func MakeStreamServerLogger(logBuilder zerolog.Context) grpc.StreamServerInterceptor {
+func MakeStreamServerLogger(logger zerolog.Logger) grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := stream.Context()
-		l := newRPCLogger(ctx, logBuilder, info.FullMethod)
+
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return ErrWithoutMD
+		}
+
+		l, reqID := newRPCLogger(ctx, logger, md, info.FullMethod)
 		wrapped := grpc_middleware.WrapServerStream(stream)
-		wrapped.WrappedContext = l.WithContext(ctx)
+		wrapped.WrappedContext = l.WithContext(log.ReqIDWithCtx(ctx, reqID))
 
 		return handler(srv, wrapped)
 	}
@@ -43,7 +57,7 @@ func StreamServerRecover(srv interface{}, stream grpc.ServerStream, _ *grpc.Stre
 func StreamServerAccessLog(srv interface{}, stream grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
 	err = handler(srv, stream)
 	l := zerolog.Ctx(stream.Context())
-	RPCLogHandler(l, err)
+	rpcLogHandler(l, err)
 
 	return err
 }

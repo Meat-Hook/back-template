@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
@@ -47,7 +48,7 @@ func start(t *testing.T) (string, *Mockapplication, *client.SessionService, *req
 	mockApp := NewMockapplication(ctrl)
 
 	log := zerolog.New(os.Stdout)
-	m := metrics.HTTP(t.Name(), restapi.FlatSwaggerJSON)
+	m := metrics.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi.FlatSwaggerJSON)
 	server, err := web.New(mockApp, log, &m, web.Config{})
 	assert.NoError(t, err, "web.New")
 	assert.NoError(t, server.Listen(), "server.Listen")

@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -48,7 +49,7 @@ func NewCreateUserOK() *CreateUserOK {
 	return &CreateUserOK{}
 }
 
-/*CreateUserOK handles this case with default header values.
+/* CreateUserOK describes a response with status code 200, with default header values.
 
 OK
 */
@@ -59,7 +60,6 @@ type CreateUserOK struct {
 func (o *CreateUserOK) Error() string {
 	return fmt.Sprintf("[POST /user][%d] createUserOK  %+v", 200, o.Payload)
 }
-
 func (o *CreateUserOK) GetPayload() *CreateUserOKBody {
 	return o.Payload
 }
@@ -83,7 +83,7 @@ func NewCreateUserDefault(code int) *CreateUserDefault {
 	}
 }
 
-/*CreateUserDefault handles this case with default header values.
+/* CreateUserDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -101,7 +101,6 @@ func (o *CreateUserDefault) Code() int {
 func (o *CreateUserDefault) Error() string {
 	return fmt.Sprintf("[POST /user][%d] createUser default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *CreateUserDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -134,6 +133,32 @@ func (o *CreateUserOKBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// ContextValidate validate this create user o k body based on the context it is used
+func (o *CreateUserOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateID(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *CreateUserOKBody) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := o.ID.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("createUserOK" + "." + "id")
+		}
+		return err
+	}
+
 	return nil
 }
 

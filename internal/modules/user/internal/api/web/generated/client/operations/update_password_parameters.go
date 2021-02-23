@@ -18,56 +18,70 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 )
 
-// NewUpdatePasswordParams creates a new UpdatePasswordParams object
-// with the default values initialized.
+// NewUpdatePasswordParams creates a new UpdatePasswordParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewUpdatePasswordParams() *UpdatePasswordParams {
-	var ()
 	return &UpdatePasswordParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewUpdatePasswordParamsWithTimeout creates a new UpdatePasswordParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewUpdatePasswordParamsWithTimeout(timeout time.Duration) *UpdatePasswordParams {
-	var ()
 	return &UpdatePasswordParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewUpdatePasswordParamsWithContext creates a new UpdatePasswordParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewUpdatePasswordParamsWithContext(ctx context.Context) *UpdatePasswordParams {
-	var ()
 	return &UpdatePasswordParams{
-
 		Context: ctx,
 	}
 }
 
 // NewUpdatePasswordParamsWithHTTPClient creates a new UpdatePasswordParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewUpdatePasswordParamsWithHTTPClient(client *http.Client) *UpdatePasswordParams {
-	var ()
 	return &UpdatePasswordParams{
 		HTTPClient: client,
 	}
 }
 
-/*UpdatePasswordParams contains all the parameters to send to the API endpoint
-for the update password operation typically these are written to a http.Request
+/* UpdatePasswordParams contains all the parameters to send to the API endpoint
+   for the update password operation.
+
+   Typically these are written to a http.Request.
 */
 type UpdatePasswordParams struct {
 
-	/*Args*/
+	// Args.
 	Args *models.UpdatePassword
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the update password params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *UpdatePasswordParams) WithDefaults() *UpdatePasswordParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the update password params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *UpdatePasswordParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the update password params
@@ -121,7 +135,6 @@ func (o *UpdatePasswordParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
-
 	if o.Args != nil {
 		if err := r.SetBodyParam(o.Args); err != nil {
 			return err

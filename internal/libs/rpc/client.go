@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/middleware"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
@@ -22,13 +21,9 @@ func Client(ctx context.Context, addr string) (*grpc.ClientConn, error) {
 		}),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 			prometheus.UnaryClientInterceptor,
-			middleware.UnaryClientLogger,
-			middleware.UnaryClientAccessLog,
 		)),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(
 			prometheus.StreamClientInterceptor,
-			middleware.StreamClientLogger,
-			middleware.StreamClientAccessLog,
 		)),
 		grpc.WithReadBufferSize(68*1024),
 		grpc.WithInsecure(),

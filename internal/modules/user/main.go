@@ -32,7 +32,7 @@ import (
 )
 
 var (
-	logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	logger = zerolog.New(os.Stdout).Level(zerolog.InfoLevel).With().Caller().Timestamp().Logger()
 
 	DBName = &cli.StringFlag{
 		Name:     "db-name",

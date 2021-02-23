@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strconv"
@@ -50,7 +51,7 @@ func NewGetUsersOK() *GetUsersOK {
 	return &GetUsersOK{}
 }
 
-/*GetUsersOK handles this case with default header values.
+/* GetUsersOK describes a response with status code 200, with default header values.
 
 OK
 */
@@ -61,7 +62,6 @@ type GetUsersOK struct {
 func (o *GetUsersOK) Error() string {
 	return fmt.Sprintf("[GET /users][%d] getUsersOK  %+v", 200, o.Payload)
 }
-
 func (o *GetUsersOK) GetPayload() *GetUsersOKBody {
 	return o.Payload
 }
@@ -85,7 +85,7 @@ func NewGetUsersDefault(code int) *GetUsersDefault {
 	}
 }
 
-/*GetUsersDefault handles this case with default header values.
+/* GetUsersDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -103,7 +103,6 @@ func (o *GetUsersDefault) Code() int {
 func (o *GetUsersDefault) Error() string {
 	return fmt.Sprintf("[GET /users][%d] getUsers default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *GetUsersDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -154,7 +153,6 @@ func (o *GetUsersOKBody) Validate(formats strfmt.Registry) error {
 }
 
 func (o *GetUsersOKBody) validateTotal(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.Total) { // not required
 		return nil
 	}
@@ -167,7 +165,6 @@ func (o *GetUsersOKBody) validateTotal(formats strfmt.Registry) error {
 }
 
 func (o *GetUsersOKBody) validateUsers(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.Users) { // not required
 		return nil
 	}
@@ -189,6 +186,38 @@ func (o *GetUsersOKBody) validateUsers(formats strfmt.Registry) error {
 
 		if o.Users[i] != nil {
 			if err := o.Users[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("getUsersOK" + "." + "users" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get users o k body based on the context it is used
+func (o *GetUsersOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateUsers(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetUsersOKBody) contextValidateUsers(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(o.Users); i++ {
+
+		if o.Users[i] != nil {
+			if err := o.Users[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getUsersOK" + "." + "users" + "." + strconv.Itoa(i))
 				}

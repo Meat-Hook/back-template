@@ -6,12 +6,14 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 )
@@ -34,7 +36,7 @@ func NewVerificationUsername(ctx *middleware.Context, handler VerificationUserna
 	return &VerificationUsername{Context: ctx, Handler: handler}
 }
 
-/*VerificationUsername swagger:route POST /username/verification verificationUsername
+/* VerificationUsername swagger:route POST /username/verification verificationUsername
 
 VerificationUsername verification username API
 
@@ -50,14 +52,12 @@ func (o *VerificationUsername) ServeHTTP(rw http.ResponseWriter, r *http.Request
 		r = rCtx
 	}
 	var Params = NewVerificationUsernameParams()
-
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -69,7 +69,7 @@ type VerificationUsernameBody struct {
 
 	// username
 	// Required: true
-	Username models.Username `json:"username"`
+	Username *models.Username `json:"username"`
 }
 
 // Validate validates this verification username body
@@ -88,11 +88,49 @@ func (o *VerificationUsernameBody) Validate(formats strfmt.Registry) error {
 
 func (o *VerificationUsernameBody) validateUsername(formats strfmt.Registry) error {
 
-	if err := o.Username.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("args" + "." + "username")
-		}
+	if err := validate.Required("args"+"."+"username", "body", o.Username); err != nil {
 		return err
+	}
+
+	if err := validate.Required("args"+"."+"username", "body", o.Username); err != nil {
+		return err
+	}
+
+	if o.Username != nil {
+		if err := o.Username.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "username")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this verification username body based on the context it is used
+func (o *VerificationUsernameBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateUsername(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *VerificationUsernameBody) contextValidateUsername(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Username != nil {
+		if err := o.Username.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "username")
+			}
+			return err
+		}
 	}
 
 	return nil

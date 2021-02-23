@@ -15,8 +15,6 @@ import (
 func TestService_Login(t *testing.T) {
 	t.Parallel()
 
-	_, mockApp, client, assert := start(t)
-
 	var (
 		token = app.Token{
 			Value: "token",
@@ -36,25 +34,40 @@ func TestService_Login(t *testing.T) {
 		want        *models.User
 		wantErr     *models.Error
 	}{
-		"success": {user.Email, "password",
-			&user, &token, nil, web.User(&user), nil},
-		"err_not_found": {"notExist@email.com", "password",
-			nil, nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error())},
-		"err_not_valid_password": {user.Email, "notValidPass",
-			nil, nil, app.ErrNotValidPassword, nil, APIError(app.ErrNotValidPassword.Error())},
-		"err_internal": {"randomEmail@email.com", "notValidPass",
-			nil, nil, errAny, nil, APIError("Internal Server Error")},
+		"success": {
+			user.Email, "password",
+			&user, &token, nil, web.User(&user), nil,
+		},
+		"err_not_found": {
+			"notExist@email.com", "password",
+			nil, nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error()),
+		},
+		"err_not_valid_password": {
+			user.Email, "notValidPass",
+			nil, nil, app.ErrNotValidPassword, nil, APIError(app.ErrNotValidPassword.Error()),
+		},
+		"err_internal": {
+			"randomEmail@email.com", "notValidPass",
+			nil, nil, errAny, nil, APIError("Internal Server Error"),
+		},
 	}
 
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			_, mockApp, client, assert := start(t)
+
 			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, gomock.Any()).Return(tc.user, tc.token, tc.appErr)
+
+			email := models.Email(tc.email)
+			password := models.Password(tc.pass)
 
 			params := operations.NewLoginParams().
 				WithArgs(&models.LoginParam{
-					Email:    models.Email(tc.email),
-					Password: models.Password(tc.pass),
+					Email:    &email,
+					Password: &password,
 				})
 			res, err := client.Operations.Login(params)
 			if tc.wantErr == nil {
@@ -70,8 +83,6 @@ func TestService_Login(t *testing.T) {
 
 func TestService_Logout(t *testing.T) {
 	t.Parallel()
-
-	_, mockApp, client, assert := start(t)
 
 	session := app.Session{
 		ID: "id",
@@ -99,6 +110,10 @@ func TestService_Logout(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			_, mockApp, client, assert := start(t)
+
 			mockApp.EXPECT().Logout(gomock.Any(), session).Return(tc.appErr)
 			mockApp.EXPECT().Session(gomock.Any(), token).Return(&session, nil)
 

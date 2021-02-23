@@ -1,3 +1,3 @@
 package pb
 
-//go:generate protoc -I . user.proto --go_out=plugins=grpc:.
+//go:generate protoc --go_out=. --go-grpc_out=require_unimplemented_servers=false:. user.proto

@@ -4,16 +4,17 @@ import (
 	"context"
 	"net"
 	"path"
+	"strings"
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
-	"github.com/rs/xid"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 )
 
-func RPCLogHandler(l *zerolog.Logger, err error) {
+func rpcLogHandler(l *zerolog.Logger, err error) {
 	s := status.Convert(err)
 
 	code, msg := s.Code(), s.Message()
@@ -25,12 +26,15 @@ func RPCLogHandler(l *zerolog.Logger, err error) {
 	}
 }
 
-func newRPCLogger(ctx context.Context, logBuilder zerolog.Context, fullMethod string) zerolog.Logger {
-	reqID := xid.New()
+func newRPCLogger(ctx context.Context, logger zerolog.Logger, md metadata.MD, fullMethod string) (zerolog.Logger, string) {
+	reqID := log.UnknownID
+	if res := md.Get(log.ReqID); res != nil {
+		reqID = strings.Join(res, "")
+	}
 
-	l := logBuilder.
+	l := logger.With().
 		Str(log.Func, path.Base(fullMethod)).
-		Str(log.Request, reqID.String()).
+		Str(log.ReqID, reqID).
 		Logger()
 
 	if p, ok := peer.FromContext(ctx); ok {
@@ -42,5 +46,5 @@ func newRPCLogger(ctx context.Context, logBuilder zerolog.Context, fullMethod st
 		}
 	}
 
-	return l
+	return l, reqID
 }
