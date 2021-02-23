@@ -6,9 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // UpdatePassword update password
@@ -16,26 +19,26 @@ import (
 // swagger:model UpdatePassword
 type UpdatePassword struct {
 
-	// old
-	// Required: true
-	// Format: password
-	Old Password `json:"old"`
-
 	// new
 	// Required: true
 	// Format: password
-	New Password `json:"new"`
+	New *Password `json:"new"`
+
+	// old
+	// Required: true
+	// Format: password
+	Old *Password `json:"old"`
 }
 
 // Validate validates this update password
 func (m *UpdatePassword) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateOld(formats); err != nil {
+	if err := m.validateNew(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateNew(formats); err != nil {
+	if err := m.validateOld(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -45,25 +48,91 @@ func (m *UpdatePassword) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *UpdatePassword) validateOld(formats strfmt.Registry) error {
+func (m *UpdatePassword) validateNew(formats strfmt.Registry) error {
 
-	if err := m.Old.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("old")
-		}
+	if err := validate.Required("new", "body", m.New); err != nil {
 		return err
+	}
+
+	if err := validate.Required("new", "body", m.New); err != nil {
+		return err
+	}
+
+	if m.New != nil {
+		if err := m.New.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("new")
+			}
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (m *UpdatePassword) validateNew(formats strfmt.Registry) error {
+func (m *UpdatePassword) validateOld(formats strfmt.Registry) error {
 
-	if err := m.New.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("new")
-		}
+	if err := validate.Required("old", "body", m.Old); err != nil {
 		return err
+	}
+
+	if err := validate.Required("old", "body", m.Old); err != nil {
+		return err
+	}
+
+	if m.Old != nil {
+		if err := m.Old.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("old")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this update password based on the context it is used
+func (m *UpdatePassword) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateNew(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOld(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *UpdatePassword) contextValidateNew(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.New != nil {
+		if err := m.New.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("new")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *UpdatePassword) contextValidateOld(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Old != nil {
+		if err := m.Old.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("old")
+			}
+			return err
+		}
 	}
 
 	return nil

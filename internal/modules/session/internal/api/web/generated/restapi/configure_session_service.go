@@ -6,14 +6,13 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
-
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/web/generated/restapi/operations"
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 )
 
-//go:generate swagger generate server --target ../../generated --name SessionService --spec ../../../../../../../../../../../../../../var/folders/8m/ql24vlxd54x78711p7fm6zvr0000gn/T/swagger.yml234306466 --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders
+//go:generate swagger generate server --target ../../generated --name SessionService --spec ../../../../../swagger.yml --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders
 
 func configureFlags(api *operations.SessionServiceAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -49,6 +48,7 @@ func configureAPI(api *operations.SessionServiceAPI) http.Handler {
 	//
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
+
 	if api.LoginHandler == nil {
 		api.LoginHandler = operations.LoginHandlerFunc(func(params operations.LoginParams) operations.LoginResponder {
 			return operations.LoginNotImplemented()
@@ -75,18 +75,18 @@ func configureTLS(tlsConfig *tls.Config) {
 // As soon as server is initialized but not run yet, this function will be called.
 // If you need to modify a config, store server instance to stop it individually later, this is the place.
 // This function can be called multiple times, depending on the number of serving schemes.
-// scheme value will be set accordingly: "http", "https" or "unix"
+// scheme value will be set accordingly: "http", "https" or "unix".
 func configureServer(s *http.Server, scheme, addr string) {
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
-// The middleware executes after routing but before authentication, binding and validation
+// The middleware executes after routing but before authentication, binding and validation.
 func setupMiddlewares(handler http.Handler) http.Handler {
 	return handler
 }
 
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
-// So this is a good place to plug in a panic handling middleware, logging and metrics
+// So this is a good place to plug in a panic handling middleware, logging and metrics.
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	return handler
 }

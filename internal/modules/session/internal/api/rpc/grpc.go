@@ -23,8 +23,8 @@ type api struct {
 }
 
 // New register service by grpc.Server and register metrics.
-func New(app sessions, srv *grpc.Server) *grpc.Server {
-	pb.RegisterSessionServer(srv, &api{app: app})
+func New(applications sessions, srv *grpc.Server) *grpc.Server {
+	pb.RegisterSessionServer(srv, &api{app: applications})
 
 	prometheus.Register(srv)
 

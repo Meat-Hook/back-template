@@ -23,11 +23,14 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
+
 // ClientService is the interface for Client methods
 type ClientService interface {
-	Login(params *LoginParams) (*LoginOK, error)
+	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
 
-	Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter) (*LogoutNoContent, error)
+	Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*LogoutNoContent, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -35,13 +38,12 @@ type ClientService interface {
 /*
   Login Login for user.
 */
-func (a *Client) Login(params *LoginParams) (*LoginOK, error) {
+func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewLoginParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "login",
 		Method:             "POST",
 		PathPattern:        "/login",
@@ -52,7 +54,12 @@ func (a *Client) Login(params *LoginParams) (*LoginOK, error) {
 		Reader:             &LoginReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -68,13 +75,12 @@ func (a *Client) Login(params *LoginParams) (*LoginOK, error) {
 /*
   Logout Logout for user.
 */
-func (a *Client) Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter) (*LogoutNoContent, error) {
+func (a *Client) Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*LogoutNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewLogoutParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "logout",
 		Method:             "POST",
 		PathPattern:        "/logout",
@@ -86,7 +92,12 @@ func (a *Client) Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWri
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}

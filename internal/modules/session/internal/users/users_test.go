@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
-	user "github.com/Meat-Hook/back-template/internal/modules/user/client"
+	"github.com/Meat-Hook/back-template/internal/modules/user/client"
 )
 
 var (
@@ -16,8 +16,6 @@ var (
 
 func TestClient_Access(t *testing.T) {
 	t.Parallel()
-
-	svc, mock, assert := start(t)
 
 	userInfo := &app.User{
 		ID:    1,
@@ -36,23 +34,31 @@ func TestClient_Access(t *testing.T) {
 		"err_any":            {"emailNotValid", "", nil, errAny},
 	}
 
-	mock.EXPECT().Access(ctx, userInfo.Email, "pass").Return(&user.User{
-		ID:    1,
-		Email: userInfo.Email,
-		Name:  userInfo.Name,
-	}, nil)
-
-	mock.EXPECT().Access(ctx, "notFound@email.com", "pass").Return(nil, user.ErrNotFound)
-	mock.EXPECT().Access(ctx, userInfo.Email, "notValidPass").Return(nil, user.ErrNotValidPass)
-	mock.EXPECT().Access(ctx, "emailNotValid", "").Return(nil, errAny)
-
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			svc, mock, assert := start(t)
+
+			mock.EXPECT().Access(ctx, tc.email, tc.pass).
+				Return(convert(tc.want), tc.wantErr)
 
 			res, err := svc.Access(ctx, tc.email, tc.pass)
 			assert.Equal(tc.want, res)
-			assert.Equal(tc.wantErr, errors.Unwrap(err))
+			assert.ErrorIs(err, tc.wantErr)
 		})
+	}
+}
+
+func convert(want *app.User) *client.User {
+	if want == nil {
+		return nil
+	}
+
+	return &client.User{
+		ID:    want.ID,
+		Email: want.Email,
+		Name:  want.Name,
 	}
 }

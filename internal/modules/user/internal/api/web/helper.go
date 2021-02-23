@@ -32,9 +32,13 @@ func Users(u []app.User) []*models.User {
 
 // User conversion app.User => models.User.
 func User(u *app.User) *models.User {
+	id := models.UserID(u.ID)
+	username := models.Username(u.Name)
+	email := models.Email(u.Email)
+
 	return &models.User{
-		ID:       models.UserID(u.ID),
-		Username: models.Username(u.Name),
-		Email:    models.Email(u.Email),
+		ID:       &id,
+		Username: &username,
+		Email:    &email,
 	}
 }

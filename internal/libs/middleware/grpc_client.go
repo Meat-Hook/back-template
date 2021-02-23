@@ -15,11 +15,16 @@ import (
 )
 
 // UnaryClientLogger returns a new unary client interceptor that contains request logger.
-func UnaryClientLogger(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	logger := newLogger(ctx, method)
-	ctx = logger.WithContext(ctx)
+func UnaryClientLogger(logger zerolog.Logger) func(context.Context, string, interface{}, interface{}, *grpc.ClientConn, grpc.UnaryInvoker, ...grpc.CallOption) error {
+	return func(ctx context.Context, method string, req, reply interface{}, conn *grpc.ClientConn, invoker grpc.UnaryInvoker, option ...grpc.CallOption) error {
+		logger = logger.With().Str(log.Func, path.Base(method)).Logger()
 
-	return invoker(ctx, method, req, reply, cc, opts...)
+		if p, ok := peer.FromContext(ctx); ok {
+			logger = logger.With().IPAddr(log.IP, net.ParseIP(p.Addr.String())).Logger()
+		}
+
+		return invoker(ctx, method, req, reply, conn, option...)
+	}
 }
 
 // StreamClientLogger returns a new stream client interceptor that contains request logger.

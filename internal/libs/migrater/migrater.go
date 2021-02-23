@@ -1,3 +1,4 @@
+// Package migrater contains migrate module.
 package migrater
 
 import (
@@ -15,6 +16,7 @@ type wrapperForLog struct {
 	logger zerolog.Logger
 }
 
+// Info for implements logger.
 func (w wrapperForLog) Info(i ...interface{}) {
 	w.logger.Info().Msgf("%s", i)
 }

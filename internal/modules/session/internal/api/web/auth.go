@@ -34,7 +34,7 @@ func (svc *service) cookieKeyAuth(raw string) (*app.Session, error) {
 func parseToken(raw string, name string) string {
 	header := http.Header{}
 	header.Add("Cookie", raw)
-	request := http.Request{Header: header} // nolint:exhaustivestruct
+	request := http.Request{Header: header}
 	cookieKey, err := request.Cookie(name)
 	if err != nil {
 		return ""

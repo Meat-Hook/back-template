@@ -8,15 +8,21 @@ import (
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 // MakeUnaryServerLogger returns a new unary server interceptor that contains request logger.
-func MakeUnaryServerLogger(logBuilder zerolog.Context) grpc.UnaryServerInterceptor {
+func MakeUnaryServerLogger(logger zerolog.Logger) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
-		l := newRPCLogger(ctx, logBuilder, info.FullMethod)
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return nil, ErrWithoutMD
+		}
 
-		return handler(l.WithContext(ctx), req)
+		l, reqID := newRPCLogger(ctx, logger, md, info.FullMethod)
+
+		return handler(l.WithContext(log.ReqIDWithCtx(ctx, reqID)), req)
 	}
 }
 
@@ -42,7 +48,7 @@ func UnaryServerRecover(ctx context.Context, req interface{}, _ *grpc.UnaryServe
 func UnaryServerAccessLog(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
 	resp, err := handler(ctx, req)
 	l := zerolog.Ctx(ctx)
-	RPCLogHandler(l, err)
+	rpcLogHandler(l, err)
 
 	return resp, err
 }

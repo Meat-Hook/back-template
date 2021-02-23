@@ -1,15 +1,19 @@
 package client_test
 
 import (
-	"errors"
+	"context"
+	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/modules/user/client"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 var _ gomock.Matcher = &protoMatcher{}
@@ -23,7 +27,33 @@ func (p protoMatcher) Matches(x interface{}) bool {
 }
 
 func (p protoMatcher) String() string {
-	return p.value.String()
+	return fmt.Sprintf("%v", p.value.ProtoReflect())
+}
+
+type reqIDMatcher struct {
+	expect string
+}
+
+// Matches for implements gomock.Matcher.
+func (r reqIDMatcher) Matches(x interface{}) bool {
+	ctx, ok := x.(context.Context)
+	if !ok {
+		return false
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return false
+	}
+
+	reqID := strings.Join(md.Get(log.ReqID), "")
+
+	return r.expect == reqID
+}
+
+// String for implements gomock.Matcher.
+func (r reqIDMatcher) String() string {
+	return r.expect
 }
 
 func TestClient_Access(t *testing.T) {
@@ -50,7 +80,7 @@ func TestClient_Access(t *testing.T) {
 	}
 
 	// success
-	mock.EXPECT().Access(gomock.Any(), protoMatcher{value: &pb.RequestAccess{
+	mock.EXPECT().Access(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RequestAccess{
 		Email:    user.Email,
 		Password: pass,
 	}}).Return(&pb.UserInfo{
@@ -61,19 +91,15 @@ func TestClient_Access(t *testing.T) {
 
 	// err_any
 	mock.EXPECT().
-		Access(gomock.Any(), protoMatcher{value: &pb.RequestAccess{}}).
+		Access(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RequestAccess{}}).
 		Return(nil, errAny)
 
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
-
 			res, err := conn.Access(ctx, tc.email, tc.pass)
-			if err != nil {
-				assert.Equal(tc.wantErr.Error(), errors.Unwrap(err).Error())
-			} else {
-				assert.Nil(err)
-			}
+
+			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
 		})
 	}

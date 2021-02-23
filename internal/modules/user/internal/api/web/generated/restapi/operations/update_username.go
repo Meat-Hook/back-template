@@ -6,12 +6,14 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
@@ -35,7 +37,7 @@ func NewUpdateUsername(ctx *middleware.Context, handler UpdateUsernameHandler) *
 	return &UpdateUsername{Context: ctx, Handler: handler}
 }
 
-/*UpdateUsername swagger:route PATCH /user/username updateUsername
+/* UpdateUsername swagger:route PATCH /user/username updateUsername
 
 Change username.
 
@@ -51,7 +53,6 @@ func (o *UpdateUsername) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewUpdateUsernameParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,7 +72,6 @@ func (o *UpdateUsername) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -83,7 +83,7 @@ type UpdateUsernameBody struct {
 
 	// username
 	// Required: true
-	Username models.Username `json:"username"`
+	Username *models.Username `json:"username"`
 }
 
 // Validate validates this update username body
@@ -102,11 +102,49 @@ func (o *UpdateUsernameBody) Validate(formats strfmt.Registry) error {
 
 func (o *UpdateUsernameBody) validateUsername(formats strfmt.Registry) error {
 
-	if err := o.Username.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("args" + "." + "username")
-		}
+	if err := validate.Required("args"+"."+"username", "body", o.Username); err != nil {
 		return err
+	}
+
+	if err := validate.Required("args"+"."+"username", "body", o.Username); err != nil {
+		return err
+	}
+
+	if o.Username != nil {
+		if err := o.Username.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "username")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this update username body based on the context it is used
+func (o *UpdateUsernameBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateUsername(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *UpdateUsernameBody) contextValidateUsername(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Username != nil {
+		if err := o.Username.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "username")
+			}
+			return err
+		}
 	}
 
 	return nil

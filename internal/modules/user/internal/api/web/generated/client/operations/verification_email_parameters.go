@@ -16,56 +16,70 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewVerificationEmailParams creates a new VerificationEmailParams object
-// with the default values initialized.
+// NewVerificationEmailParams creates a new VerificationEmailParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewVerificationEmailParams() *VerificationEmailParams {
-	var ()
 	return &VerificationEmailParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewVerificationEmailParamsWithTimeout creates a new VerificationEmailParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewVerificationEmailParamsWithTimeout(timeout time.Duration) *VerificationEmailParams {
-	var ()
 	return &VerificationEmailParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewVerificationEmailParamsWithContext creates a new VerificationEmailParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewVerificationEmailParamsWithContext(ctx context.Context) *VerificationEmailParams {
-	var ()
 	return &VerificationEmailParams{
-
 		Context: ctx,
 	}
 }
 
 // NewVerificationEmailParamsWithHTTPClient creates a new VerificationEmailParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewVerificationEmailParamsWithHTTPClient(client *http.Client) *VerificationEmailParams {
-	var ()
 	return &VerificationEmailParams{
 		HTTPClient: client,
 	}
 }
 
-/*VerificationEmailParams contains all the parameters to send to the API endpoint
-for the verification email operation typically these are written to a http.Request
+/* VerificationEmailParams contains all the parameters to send to the API endpoint
+   for the verification email operation.
+
+   Typically these are written to a http.Request.
 */
 type VerificationEmailParams struct {
 
-	/*Args*/
+	// Args.
 	Args VerificationEmailBody
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the verification email params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *VerificationEmailParams) WithDefaults() *VerificationEmailParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the verification email params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *VerificationEmailParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the verification email params
@@ -119,7 +133,6 @@ func (o *VerificationEmailParams) WriteToRequest(r runtime.ClientRequest, reg st
 		return err
 	}
 	var res []error
-
 	if err := r.SetBodyParam(o.Args); err != nil {
 		return err
 	}

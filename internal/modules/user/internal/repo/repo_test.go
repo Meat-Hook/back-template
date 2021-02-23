@@ -1,7 +1,6 @@
 package repo_test
 
 import (
-	"errors"
 	"testing"
 	"time"
 
@@ -60,5 +59,5 @@ func TestRepo_Smoke(t *testing.T) {
 
 	res, err = r.ByID(ctx, user.ID)
 	assert.Nil(res)
-	assert.Equal(app.ErrNotFound, errors.Unwrap(err))
+	assert.ErrorIs(err, app.ErrNotFound)
 }

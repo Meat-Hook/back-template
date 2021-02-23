@@ -52,6 +52,8 @@ func TestClient_Send(t *testing.T) {
 }
 
 func start(t *testing.T) (*nats.Conn, *require.Assertions) {
+	t.Helper()
+
 	r := require.New(t)
 	pool, err := dockertest.NewPool("")
 	r.Nil(err)

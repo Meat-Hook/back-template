@@ -1,3 +1,4 @@
+// Package rpc contains rpc helpers.
 package rpc
 
 import (
@@ -24,13 +25,13 @@ func Server(logger zerolog.Logger) *grpc.Server {
 		}),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			prometheus.UnaryServerInterceptor,
-			middleware.MakeUnaryServerLogger(logger.With()),
+			middleware.MakeUnaryServerLogger(logger),
 			middleware.UnaryServerRecover,
 			middleware.UnaryServerAccessLog,
 		)),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			prometheus.StreamServerInterceptor,
-			middleware.MakeStreamServerLogger(logger.With()),
+			middleware.MakeStreamServerLogger(logger),
 			middleware.StreamServerRecover,
 			middleware.StreamServerAccessLog,
 		)),

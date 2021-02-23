@@ -46,7 +46,7 @@ func NewDeleteUserNoContent() *DeleteUserNoContent {
 	return &DeleteUserNoContent{}
 }
 
-/*DeleteUserNoContent handles this case with default header values.
+/* DeleteUserNoContent describes a response with status code 204, with default header values.
 
 The server successfully processed the request and is not returning any content.
 */
@@ -69,7 +69,7 @@ func NewDeleteUserDefault(code int) *DeleteUserDefault {
 	}
 }
 
-/*DeleteUserDefault handles this case with default header values.
+/* DeleteUserDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -87,7 +87,6 @@ func (o *DeleteUserDefault) Code() int {
 func (o *DeleteUserDefault) Error() string {
 	return fmt.Sprintf("[DELETE /user][%d] deleteUser default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *DeleteUserDefault) GetPayload() *models.Error {
 	return o.Payload
 }

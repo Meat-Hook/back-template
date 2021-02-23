@@ -16,56 +16,70 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewUpdateUsernameParams creates a new UpdateUsernameParams object
-// with the default values initialized.
+// NewUpdateUsernameParams creates a new UpdateUsernameParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewUpdateUsernameParams() *UpdateUsernameParams {
-	var ()
 	return &UpdateUsernameParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewUpdateUsernameParamsWithTimeout creates a new UpdateUsernameParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewUpdateUsernameParamsWithTimeout(timeout time.Duration) *UpdateUsernameParams {
-	var ()
 	return &UpdateUsernameParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewUpdateUsernameParamsWithContext creates a new UpdateUsernameParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewUpdateUsernameParamsWithContext(ctx context.Context) *UpdateUsernameParams {
-	var ()
 	return &UpdateUsernameParams{
-
 		Context: ctx,
 	}
 }
 
 // NewUpdateUsernameParamsWithHTTPClient creates a new UpdateUsernameParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewUpdateUsernameParamsWithHTTPClient(client *http.Client) *UpdateUsernameParams {
-	var ()
 	return &UpdateUsernameParams{
 		HTTPClient: client,
 	}
 }
 
-/*UpdateUsernameParams contains all the parameters to send to the API endpoint
-for the update username operation typically these are written to a http.Request
+/* UpdateUsernameParams contains all the parameters to send to the API endpoint
+   for the update username operation.
+
+   Typically these are written to a http.Request.
 */
 type UpdateUsernameParams struct {
 
-	/*Args*/
+	// Args.
 	Args UpdateUsernameBody
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the update username params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *UpdateUsernameParams) WithDefaults() *UpdateUsernameParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the update username params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *UpdateUsernameParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the update username params
@@ -119,7 +133,6 @@ func (o *UpdateUsernameParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
-
 	if err := r.SetBodyParam(o.Args); err != nil {
 		return err
 	}

@@ -41,6 +41,9 @@ func TestModule_Login(t *testing.T) {
 		token = app.Token{
 			Value: "token",
 		}
+		token2 = app.Token{
+			Value: "token2",
+		}
 		session = app.Session{
 			ID:     id,
 			Origin: origin,
@@ -50,7 +53,7 @@ func TestModule_Login(t *testing.T) {
 		errSaveSession = app.Session{
 			ID:     id2,
 			Origin: origin,
-			Token:  token,
+			Token:  token2,
 			UserID: user2.ID,
 		}
 	)
@@ -61,7 +64,7 @@ func TestModule_Login(t *testing.T) {
 	mocks.id.EXPECT().New().Return(id)
 	mocks.id.EXPECT().New().Return(id2)
 	mocks.auth.EXPECT().Token(app.Subject{SessionID: id}).Return(&token, nil)
-	mocks.auth.EXPECT().Token(app.Subject{SessionID: id2}).Return(&token, nil)
+	mocks.auth.EXPECT().Token(app.Subject{SessionID: id2}).Return(&token2, nil)
 	mocks.repo.EXPECT().Save(ctx, session).Return(nil)
 	mocks.repo.EXPECT().Save(ctx, errSaveSession).Return(errAny)
 
@@ -82,7 +85,7 @@ func TestModule_Login(t *testing.T) {
 			resUser, resToken, err := module.Login(ctx, tc.email, tc.password, origin)
 			assert.Equal(tc.want, resUser)
 			assert.Equal(tc.wantToken, resToken)
-			assert.Equal(tc.wantErr, err)
+			assert.ErrorIs(err, tc.wantErr)
 		})
 	}
 }
@@ -92,19 +95,17 @@ func TestModule_Logout(t *testing.T) {
 
 	module, mocks, assert := start(t)
 
-	var (
-		session = app.Session{
-			ID: "id",
-			Origin: app.Origin{
-				IP:        net.ParseIP("192.100.10.4"),
-				UserAgent: "UserAgent",
-			},
-			Token: app.Token{
-				Value: "token",
-			},
-			UserID: 1,
-		}
-	)
+	session := app.Session{
+		ID: "id",
+		Origin: app.Origin{
+			IP:        net.ParseIP("192.100.10.4"),
+			UserAgent: "UserAgent",
+		},
+		Token: app.Token{
+			Value: "token",
+		},
+		UserID: 1,
+	}
 
 	mocks.repo.EXPECT().Delete(ctx, session.ID).Return(nil)
 
@@ -171,7 +172,7 @@ func TestModule_Session(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			res, err := module.Session(ctx, tc.token)
 			assert.Equal(tc.want, res)
-			assert.Equal(tc.wantErr, err)
+			assert.ErrorIs(err, tc.wantErr)
 		})
 	}
 }

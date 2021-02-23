@@ -22,5 +22,5 @@ func TestAuth_TokenAndSubject(t *testing.T) {
 
 	res, err := a.Subject(appToken.Value)
 	r.Nil(err)
-	r.Equal(subject.SessionID, res.SessionID)
+	r.Equal(&subject, res)
 }

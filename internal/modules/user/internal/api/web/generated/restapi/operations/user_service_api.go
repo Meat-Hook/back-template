@@ -22,9 +22,9 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 )
 
-// NewServiceUserAPI creates a new ServiceUser instance
-func NewServiceUserAPI(spec *loads.Document) *ServiceUserAPI {
-	return &ServiceUserAPI{
+// NewUserServiceAPI creates a new UserService instance
+func NewUserServiceAPI(spec *loads.Document) *UserServiceAPI {
+	return &UserServiceAPI{
 		handlers:            make(map[string]map[string]http.Handler),
 		formats:             strfmt.Default,
 		defaultConsumes:     "application/json",
@@ -78,8 +78,8 @@ func NewServiceUserAPI(spec *loads.Document) *ServiceUserAPI {
 	}
 }
 
-/*ServiceUserAPI Microservice for managing user info. */
-type ServiceUserAPI struct {
+/*UserServiceAPI Microservice for managing user info. */
+type UserServiceAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
 	handlers        map[string]map[string]http.Handler
@@ -94,9 +94,11 @@ type ServiceUserAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
+
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
+
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -132,6 +134,7 @@ type ServiceUserAPI struct {
 	VerificationEmailHandler VerificationEmailHandler
 	// VerificationUsernameHandler sets the operation handler for the verification username operation
 	VerificationUsernameHandler VerificationUsernameHandler
+
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -152,52 +155,52 @@ type ServiceUserAPI struct {
 }
 
 // UseRedoc for documentation at /docs
-func (o *ServiceUserAPI) UseRedoc() {
+func (o *UserServiceAPI) UseRedoc() {
 	o.useSwaggerUI = false
 }
 
 // UseSwaggerUI for documentation at /docs
-func (o *ServiceUserAPI) UseSwaggerUI() {
+func (o *UserServiceAPI) UseSwaggerUI() {
 	o.useSwaggerUI = true
 }
 
 // SetDefaultProduces sets the default produces media type
-func (o *ServiceUserAPI) SetDefaultProduces(mediaType string) {
+func (o *UserServiceAPI) SetDefaultProduces(mediaType string) {
 	o.defaultProduces = mediaType
 }
 
 // SetDefaultConsumes returns the default consumes media type
-func (o *ServiceUserAPI) SetDefaultConsumes(mediaType string) {
+func (o *UserServiceAPI) SetDefaultConsumes(mediaType string) {
 	o.defaultConsumes = mediaType
 }
 
 // SetSpec sets a spec that will be served for the clients.
-func (o *ServiceUserAPI) SetSpec(spec *loads.Document) {
+func (o *UserServiceAPI) SetSpec(spec *loads.Document) {
 	o.spec = spec
 }
 
 // DefaultProduces returns the default produces media type
-func (o *ServiceUserAPI) DefaultProduces() string {
+func (o *UserServiceAPI) DefaultProduces() string {
 	return o.defaultProduces
 }
 
 // DefaultConsumes returns the default consumes media type
-func (o *ServiceUserAPI) DefaultConsumes() string {
+func (o *UserServiceAPI) DefaultConsumes() string {
 	return o.defaultConsumes
 }
 
 // Formats returns the registered string formats
-func (o *ServiceUserAPI) Formats() strfmt.Registry {
+func (o *UserServiceAPI) Formats() strfmt.Registry {
 	return o.formats
 }
 
 // RegisterFormat registers a custom format validator
-func (o *ServiceUserAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
+func (o *UserServiceAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
 	o.formats.Add(name, format, validator)
 }
 
-// Validate validates the registrations in the ServiceUserAPI
-func (o *ServiceUserAPI) Validate() error {
+// Validate validates the registrations in the UserServiceAPI
+func (o *UserServiceAPI) Validate() error {
 	var unregistered []string
 
 	if o.JSONConsumer == nil {
@@ -245,12 +248,12 @@ func (o *ServiceUserAPI) Validate() error {
 }
 
 // ServeErrorFor gets a error handler for a given operation id
-func (o *ServiceUserAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
+func (o *UserServiceAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
 	return o.ServeError
 }
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
-func (o *ServiceUserAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
+func (o *UserServiceAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
 		switch name {
@@ -266,13 +269,13 @@ func (o *ServiceUserAPI) AuthenticatorsFor(schemes map[string]spec.SecuritySchem
 }
 
 // Authorizer returns the registered authorizer
-func (o *ServiceUserAPI) Authorizer() runtime.Authorizer {
+func (o *UserServiceAPI) Authorizer() runtime.Authorizer {
 	return o.APIAuthorizer
 }
 
 // ConsumersFor gets the consumers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *ServiceUserAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
+func (o *UserServiceAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -289,7 +292,7 @@ func (o *ServiceUserAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Co
 
 // ProducersFor gets the producers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *ServiceUserAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
+func (o *UserServiceAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -305,7 +308,7 @@ func (o *ServiceUserAPI) ProducersFor(mediaTypes []string) map[string]runtime.Pr
 }
 
 // HandlerFor gets a http.Handler for the provided operation method and path
-func (o *ServiceUserAPI) HandlerFor(method, path string) (http.Handler, bool) {
+func (o *UserServiceAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	if o.handlers == nil {
 		return nil, false
 	}
@@ -320,8 +323,8 @@ func (o *ServiceUserAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	return h, ok
 }
 
-// Context returns the middleware context for the service user API
-func (o *ServiceUserAPI) Context() *middleware.Context {
+// Context returns the middleware context for the user service API
+func (o *UserServiceAPI) Context() *middleware.Context {
 	if o.context == nil {
 		o.context = middleware.NewRoutableContext(o.spec, o, nil)
 	}
@@ -329,7 +332,7 @@ func (o *ServiceUserAPI) Context() *middleware.Context {
 	return o.context
 }
 
-func (o *ServiceUserAPI) initHandlerCache() {
+func (o *UserServiceAPI) initHandlerCache() {
 	o.Context() // don't care about the result, just that the initialization happened
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
@@ -371,7 +374,7 @@ func (o *ServiceUserAPI) initHandlerCache() {
 
 // Serve creates a http handler to serve the API over HTTP
 // can be used directly in http.ListenAndServe(":8000", api.Serve(nil))
-func (o *ServiceUserAPI) Serve(builder middleware.Builder) http.Handler {
+func (o *UserServiceAPI) Serve(builder middleware.Builder) http.Handler {
 	o.Init()
 
 	if o.Middleware != nil {
@@ -384,24 +387,24 @@ func (o *ServiceUserAPI) Serve(builder middleware.Builder) http.Handler {
 }
 
 // Init allows you to just initialize the handler cache, you can then recompose the middleware as you see fit
-func (o *ServiceUserAPI) Init() {
+func (o *UserServiceAPI) Init() {
 	if len(o.handlers) == 0 {
 		o.initHandlerCache()
 	}
 }
 
 // RegisterConsumer allows you to add (or override) a consumer for a media type.
-func (o *ServiceUserAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
+func (o *UserServiceAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
 	o.customConsumers[mediaType] = consumer
 }
 
 // RegisterProducer allows you to add (or override) a producer for a media type.
-func (o *ServiceUserAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
+func (o *UserServiceAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
 	o.customProducers[mediaType] = producer
 }
 
 // AddMiddlewareFor adds a http middleware to existing handler
-func (o *ServiceUserAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
+func (o *UserServiceAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
 	um := strings.ToUpper(method)
 	if path == "/" {
 		path = ""

@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Recovery must be first middleware in http server.
 // go-swagger responders panic on error while writing response to client,
 // this shouldn't result in crash - unlike a real, reasonable panic.
 //
@@ -38,17 +39,19 @@ func CreateLogger(builder zerolog.Context) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			reqID := xid.New()
 
 			newLogger := builder.
 				IPAddr(log.IP, net.ParseIP(ip)).
 				Str(log.HTTPMethod, r.Method).
 				Str(log.Func, r.URL.Path).
-				Stringer(log.Request, xid.New()).
+				Stringer(log.ReqID, reqID).
 				Logger()
 
-			r = r.WithContext(newLogger.WithContext(r.Context()))
+			ctx := log.ReqIDWithCtx(r.Context(), reqID.String())
+			ctx = newLogger.WithContext(ctx)
 
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }

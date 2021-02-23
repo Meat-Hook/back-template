@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
@@ -45,14 +46,14 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (string, *Mockapplication, *client.ServiceUser, *require.Assertions) {
+func start(t *testing.T) (string, *Mockapplication, *client.UserService, *require.Assertions) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMockapplication(ctrl)
 
 	log := zerolog.New(os.Stdout)
-	m := metrics.HTTP(t.Name(), restapi.FlatSwaggerJSON)
+	m := metrics.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi.FlatSwaggerJSON)
 	server, err := web.New(mockApp, log, &m, web.Config{})
 	assert.NoError(t, err, "web.New")
 	assert.NoError(t, server.Listen(), "server.Listen")
@@ -83,6 +84,10 @@ func APIError(msg string) *models.Error {
 }
 
 func errPayload(err interface{}) *models.Error {
+	if err == nil {
+		return nil
+	}
+
 	switch err := err.(type) {
 	case *operations.VerificationEmailDefault:
 		return err.Payload

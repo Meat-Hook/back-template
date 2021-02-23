@@ -27,7 +27,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "Microservice for managing user info.",
-    "title": "Service user.",
+    "title": "User service.",
     "version": "0.1.0"
   },
   "basePath": "/user/api/v1",
@@ -285,15 +285,12 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 0,
           "$ref": "#/definitions/Email"
         },
         "password": {
-          "x-order": 2,
           "$ref": "#/definitions/Password"
         },
         "username": {
-          "x-order": 1,
           "$ref": "#/definitions/Username"
         }
       }
@@ -311,8 +308,7 @@ func init() {
       ],
       "properties": {
         "message": {
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         }
       }
     },
@@ -330,11 +326,9 @@ func init() {
       ],
       "properties": {
         "new": {
-          "x-order": 1,
           "$ref": "#/definitions/Password"
         },
         "old": {
-          "x-order": 0,
           "$ref": "#/definitions/Password"
         }
       }
@@ -348,15 +342,12 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 2,
           "$ref": "#/definitions/Email"
         },
         "id": {
-          "x-order": 0,
           "$ref": "#/definitions/UserID"
         },
         "username": {
-          "x-order": 1,
           "$ref": "#/definitions/Username"
         }
       }
@@ -406,7 +397,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "Microservice for managing user info.",
-    "title": "Service user.",
+    "title": "User service.",
     "version": "0.1.0"
   },
   "basePath": "/user/api/v1",
@@ -689,15 +680,12 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 0,
           "$ref": "#/definitions/Email"
         },
         "password": {
-          "x-order": 2,
           "$ref": "#/definitions/Password"
         },
         "username": {
-          "x-order": 1,
           "$ref": "#/definitions/Username"
         }
       }
@@ -715,8 +703,7 @@ func init() {
       ],
       "properties": {
         "message": {
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         }
       }
     },
@@ -734,11 +721,9 @@ func init() {
       ],
       "properties": {
         "new": {
-          "x-order": 1,
           "$ref": "#/definitions/Password"
         },
         "old": {
-          "x-order": 0,
           "$ref": "#/definitions/Password"
         }
       }
@@ -752,15 +737,12 @@ func init() {
       ],
       "properties": {
         "email": {
-          "x-order": 2,
           "$ref": "#/definitions/Email"
         },
         "id": {
-          "x-order": 0,
           "$ref": "#/definitions/UserID"
         },
         "username": {
-          "x-order": 1,
           "$ref": "#/definitions/Username"
         }
       }

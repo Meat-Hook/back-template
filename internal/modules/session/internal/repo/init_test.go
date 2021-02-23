@@ -22,11 +22,11 @@ const (
 	timeout    = time.Second * 5
 )
 
-var (
-	ctx context.Context
-)
+var ctx context.Context
 
 func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
+	t.Helper()
+
 	r := require.New(t)
 	pool, err := dockertest.NewPool("")
 	r.Nil(err)

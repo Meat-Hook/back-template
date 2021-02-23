@@ -5,10 +5,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -35,6 +37,10 @@ var (
 
 // Session get user session by his auth token.
 func (c *Client) Session(ctx context.Context, token string) (*Session, error) {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.MD{
+		log.ReqID: []string{log.ReqIDFromCtx(ctx)},
+	})
+
 	res, err := c.conn.Session(ctx, &pb.RequestSession{
 		Token: token,
 	})

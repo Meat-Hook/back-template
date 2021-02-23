@@ -1,21 +1,21 @@
 package web_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/restapi"
 	"github.com/go-openapi/loads"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestServeSwagger(t *testing.T) {
 	t.Parallel()
 
-	url, _, _, _ := start(t)
+	url, _, _, assert := start(t)
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
-	assert.NoError(t, err)
+	assert.Nil(err)
 	basePath := swaggerSpec.BasePath()
 
 	testCases := []struct {
@@ -34,8 +34,10 @@ func TestServeSwagger(t *testing.T) {
 	c := &http.Client{}
 
 	for _, tc := range testCases {
-		resp, err := c.Get("http://" + url + tc.path)
-		assert.Nil(t, err, tc.path)
-		assert.Equal(t, tc.want, resp.StatusCode, tc.path)
+		req, err := http.NewRequestWithContext(context.Background(), "GET", "http://"+url+tc.path, nil)
+		assert.Nil(err)
+		resp, err := c.Do(req)
+		assert.Nil(err, tc.path)
+		assert.Equal(tc.want, resp.StatusCode, tc.path)
 	}
 }

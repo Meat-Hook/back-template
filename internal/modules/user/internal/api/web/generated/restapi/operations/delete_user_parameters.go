@@ -13,7 +13,8 @@ import (
 )
 
 // NewDeleteUserParams creates a new DeleteUserParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewDeleteUserParams() DeleteUserParams {
 
 	return DeleteUserParams{}

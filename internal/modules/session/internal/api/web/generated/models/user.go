@@ -6,9 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // User user
@@ -19,15 +22,15 @@ type User struct {
 	// email
 	// Required: true
 	// Format: email
-	Email Email `json:"email"`
+	Email *Email `json:"email"`
 
 	// id
 	// Required: true
-	ID UserID `json:"id"`
+	ID *UserID `json:"id"`
 
 	// username
 	// Required: true
-	Username Username `json:"username"`
+	Username *Username `json:"username"`
 }
 
 // Validate validates this user
@@ -54,11 +57,21 @@ func (m *User) Validate(formats strfmt.Registry) error {
 
 func (m *User) validateEmail(formats strfmt.Registry) error {
 
-	if err := m.Email.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("email")
-		}
+	if err := validate.Required("email", "body", m.Email); err != nil {
 		return err
+	}
+
+	if err := validate.Required("email", "body", m.Email); err != nil {
+		return err
+	}
+
+	if m.Email != nil {
+		if err := m.Email.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("email")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -66,11 +79,21 @@ func (m *User) validateEmail(formats strfmt.Registry) error {
 
 func (m *User) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
+	}
+
+	if err := validate.Required("id", "body", m.ID); err != nil {
+		return err
+	}
+
+	if m.ID != nil {
+		if err := m.ID.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("id")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -78,11 +101,85 @@ func (m *User) validateID(formats strfmt.Registry) error {
 
 func (m *User) validateUsername(formats strfmt.Registry) error {
 
-	if err := m.Username.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("username")
-		}
+	if err := validate.Required("username", "body", m.Username); err != nil {
 		return err
+	}
+
+	if err := validate.Required("username", "body", m.Username); err != nil {
+		return err
+	}
+
+	if m.Username != nil {
+		if err := m.Username.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("username")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this user based on the context it is used
+func (m *User) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateEmail(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateID(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateUsername(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *User) contextValidateEmail(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Email != nil {
+		if err := m.Email.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("email")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *User) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ID != nil {
+		if err := m.ID.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("id")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *User) contextValidateUsername(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Username != nil {
+		if err := m.Username.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("username")
+			}
+			return err
+		}
 	}
 
 	return nil

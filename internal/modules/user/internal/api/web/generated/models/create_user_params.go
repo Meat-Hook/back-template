@@ -6,9 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CreateUserParams create user params
@@ -19,16 +22,16 @@ type CreateUserParams struct {
 	// email
 	// Required: true
 	// Format: email
-	Email Email `json:"email"`
-
-	// username
-	// Required: true
-	Username Username `json:"username"`
+	Email *Email `json:"email"`
 
 	// password
 	// Required: true
 	// Format: password
-	Password Password `json:"password"`
+	Password *Password `json:"password"`
+
+	// username
+	// Required: true
+	Username *Username `json:"username"`
 }
 
 // Validate validates this create user params
@@ -39,11 +42,11 @@ func (m *CreateUserParams) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateUsername(formats); err != nil {
+	if err := m.validatePassword(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validatePassword(formats); err != nil {
+	if err := m.validateUsername(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -55,23 +58,21 @@ func (m *CreateUserParams) Validate(formats strfmt.Registry) error {
 
 func (m *CreateUserParams) validateEmail(formats strfmt.Registry) error {
 
-	if err := m.Email.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("email")
-		}
+	if err := validate.Required("email", "body", m.Email); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (m *CreateUserParams) validateUsername(formats strfmt.Registry) error {
-
-	if err := m.Username.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("username")
-		}
+	if err := validate.Required("email", "body", m.Email); err != nil {
 		return err
+	}
+
+	if m.Email != nil {
+		if err := m.Email.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("email")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -79,11 +80,107 @@ func (m *CreateUserParams) validateUsername(formats strfmt.Registry) error {
 
 func (m *CreateUserParams) validatePassword(formats strfmt.Registry) error {
 
-	if err := m.Password.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("password")
-		}
+	if err := validate.Required("password", "body", m.Password); err != nil {
 		return err
+	}
+
+	if err := validate.Required("password", "body", m.Password); err != nil {
+		return err
+	}
+
+	if m.Password != nil {
+		if err := m.Password.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("password")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CreateUserParams) validateUsername(formats strfmt.Registry) error {
+
+	if err := validate.Required("username", "body", m.Username); err != nil {
+		return err
+	}
+
+	if err := validate.Required("username", "body", m.Username); err != nil {
+		return err
+	}
+
+	if m.Username != nil {
+		if err := m.Username.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("username")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this create user params based on the context it is used
+func (m *CreateUserParams) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateEmail(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePassword(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateUsername(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CreateUserParams) contextValidateEmail(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Email != nil {
+		if err := m.Email.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("email")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CreateUserParams) contextValidatePassword(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Password != nil {
+		if err := m.Password.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("password")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CreateUserParams) contextValidateUsername(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Username != nil {
+		if err := m.Username.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("username")
+			}
+			return err
+		}
 	}
 
 	return nil

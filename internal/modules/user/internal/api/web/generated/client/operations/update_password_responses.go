@@ -46,7 +46,7 @@ func NewUpdatePasswordNoContent() *UpdatePasswordNoContent {
 	return &UpdatePasswordNoContent{}
 }
 
-/*UpdatePasswordNoContent handles this case with default header values.
+/* UpdatePasswordNoContent describes a response with status code 204, with default header values.
 
 The server successfully processed the request and is not returning any content.
 */
@@ -69,7 +69,7 @@ func NewUpdatePasswordDefault(code int) *UpdatePasswordDefault {
 	}
 }
 
-/*UpdatePasswordDefault handles this case with default header values.
+/* UpdatePasswordDefault describes a response with status code -1, with default header values.
 
 Generic error response.
 */
@@ -87,7 +87,6 @@ func (o *UpdatePasswordDefault) Code() int {
 func (o *UpdatePasswordDefault) Error() string {
 	return fmt.Sprintf("[PATCH /user/password][%d] updatePassword default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *UpdatePasswordDefault) GetPayload() *models.Error {
 	return o.Payload
 }

@@ -9,19 +9,9 @@ import (
 
 // Errors.
 var (
-	ErrUnknownToken              = errors.New("unknown token")
-	ErrEmailExist                = errors.New("email exist")
-	ErrUsernameExist             = errors.New("username exist")
-	ErrNotFound                  = errors.New("not found")
-	ErrNotDifferent              = errors.New("the values must be different")
-	ErrNotValidPassword          = errors.New("not valid password")
-	ErrInvalidToken              = errors.New("not valid auth")
-	ErrExpiredToken              = errors.New("auth is expired")
-	ErrUsernameNeedDifferentiate = errors.New("username need to differentiate")
-	ErrEmailNeedDifferentiate    = errors.New("email need to differentiate")
-	ErrNotUnknownKindTask        = errors.New("unknown task kind")
-	ErrCodeExpired               = errors.New("code is expired")
-	ErrNotValidCode              = errors.New("code not equal")
+	ErrNotFound         = errors.New("not found")
+	ErrNotValidPassword = errors.New("not valid password")
+	ErrInvalidToken     = errors.New("not valid auth")
 )
 
 type (

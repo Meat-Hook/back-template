@@ -17,80 +17,95 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewGetUsersParams creates a new GetUsersParams object
-// with the default values initialized.
+// NewGetUsersParams creates a new GetUsersParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetUsersParams() *GetUsersParams {
-	var (
-		limitDefault  = int32(100)
-		offsetDefault = int32(0)
-	)
 	return &GetUsersParams{
-		Limit:  limitDefault,
-		Offset: &offsetDefault,
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetUsersParamsWithTimeout creates a new GetUsersParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetUsersParamsWithTimeout(timeout time.Duration) *GetUsersParams {
-	var (
-		limitDefault  = int32(100)
-		offsetDefault = int32(0)
-	)
 	return &GetUsersParams{
-		Limit:  limitDefault,
-		Offset: &offsetDefault,
-
 		timeout: timeout,
 	}
 }
 
 // NewGetUsersParamsWithContext creates a new GetUsersParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetUsersParamsWithContext(ctx context.Context) *GetUsersParams {
-	var (
-		limitDefault  = int32(100)
-		offsetDefault = int32(0)
-	)
 	return &GetUsersParams{
-		Limit:  limitDefault,
-		Offset: &offsetDefault,
-
 		Context: ctx,
 	}
 }
 
 // NewGetUsersParamsWithHTTPClient creates a new GetUsersParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetUsersParamsWithHTTPClient(client *http.Client) *GetUsersParams {
-	var (
-		limitDefault  = int32(100)
-		offsetDefault = int32(0)
-	)
 	return &GetUsersParams{
-		Limit:      limitDefault,
-		Offset:     &offsetDefault,
 		HTTPClient: client,
 	}
 }
 
-/*GetUsersParams contains all the parameters to send to the API endpoint
-for the get users operation typically these are written to a http.Request
+/* GetUsersParams contains all the parameters to send to the API endpoint
+   for the get users operation.
+
+   Typically these are written to a http.Request.
 */
 type GetUsersParams struct {
 
-	/*Limit*/
+	// Limit.
+	//
+	// Format: int32
+	// Default: 100
 	Limit int32
-	/*Offset*/
+
+	// Offset.
+	//
+	// Format: int32
 	Offset *int32
-	/*Username*/
+
+	// Username.
 	Username string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get users params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetUsersParams) WithDefaults() *GetUsersParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get users params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetUsersParams) SetDefaults() {
+	var (
+		limitDefault = int32(100)
+
+		offsetDefault = int32(0)
+	)
+
+	val := GetUsersParams{
+		Limit:  limitDefault,
+		Offset: &offsetDefault,
+	}
+
+	val.timeout = o.timeout
+	val.Context = o.Context
+	val.HTTPClient = o.HTTPClient
+	*o = val
 }
 
 // WithTimeout adds the timeout to the get users params
@@ -171,6 +186,7 @@ func (o *GetUsersParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 	qrLimit := o.Limit
 	qLimit := swag.FormatInt32(qrLimit)
 	if qLimit != "" {
+
 		if err := r.SetQueryParam("limit", qLimit); err != nil {
 			return err
 		}
@@ -180,22 +196,24 @@ func (o *GetUsersParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 
 		// query param offset
 		var qrOffset int32
+
 		if o.Offset != nil {
 			qrOffset = *o.Offset
 		}
 		qOffset := swag.FormatInt32(qrOffset)
 		if qOffset != "" {
+
 			if err := r.SetQueryParam("offset", qOffset); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	// query param username
 	qrUsername := o.Username
 	qUsername := qrUsername
 	if qUsername != "" {
+
 		if err := r.SetQueryParam("username", qUsername); err != nil {
 			return err
 		}

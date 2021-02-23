@@ -32,61 +32,61 @@ import (
 )
 
 var (
-	logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	logger = zerolog.New(os.Stdout).Level(zerolog.InfoLevel).With().Caller().Timestamp().Logger()
 
-	DBName = &cli.StringFlag{
+	dbName = &cli.StringFlag{
 		Name:     "db-name",
 		Aliases:  []string{"n"},
 		Usage:    "database name",
 		EnvVars:  []string{"DB_NAME"},
 		Required: true,
 	}
-	DBUser = &cli.StringFlag{
+	dbUser = &cli.StringFlag{
 		Name:     "db-user",
 		Aliases:  []string{"u"},
 		Usage:    "database user",
 		EnvVars:  []string{"DB_USER"},
 		Required: true,
 	}
-	DBPass = &cli.StringFlag{
+	dbPass = &cli.StringFlag{
 		Name:     "db-pass",
 		Aliases:  []string{"p"},
 		Usage:    "database password",
 		EnvVars:  []string{"DB_PASS"},
 		Required: true,
 	}
-	DBHost = &cli.StringFlag{
+	dbHost = &cli.StringFlag{
 		Name:     "db-host",
 		Aliases:  []string{"H"},
 		Usage:    "database host",
 		EnvVars:  []string{"DB_HOST"},
 		Required: true,
 	}
-	DBPort = &cli.IntFlag{
+	dbPort = &cli.IntFlag{
 		Name:     "db-port",
 		Aliases:  []string{"P"},
 		Usage:    "database port",
 		EnvVars:  []string{"DB_PORT"},
 		Required: true,
 	}
-	Nats = &cli.StringFlag{
+	natsAddr = &cli.StringFlag{
 		Name:     "nats",
 		Usage:    "nats server address",
 		EnvVars:  []string{"NATS"},
 		Required: true,
 	}
-	SessionSrv = &cli.StringFlag{
+	sessionSrv = &cli.StringFlag{
 		Name:     "session-srv",
 		Usage:    "session server address",
 		EnvVars:  []string{"SESSION_SRV"},
 		Required: true,
 	}
-	Host = &cli.StringFlag{
+	host = &cli.StringFlag{
 		Name:    "hostname",
 		Usage:   "service hostname",
 		EnvVars: []string{"HOSTNAME"},
 	}
-	GRPCPort = &cli.IntFlag{
+	grpcPort = &cli.IntFlag{
 		Name:       "grpc-port",
 		Usage:      "grpc service port",
 		EnvVars:    []string{"GRPC_PORT"},
@@ -94,7 +94,7 @@ var (
 		Required:   true,
 		HasBeenSet: true,
 	}
-	HTTPPort = &cli.IntFlag{
+	httpPort = &cli.IntFlag{
 		Name:       "http-port",
 		Usage:      "http service port",
 		EnvVars:    []string{"HTTP_PORT"},
@@ -102,7 +102,7 @@ var (
 		Required:   true,
 		HasBeenSet: true,
 	}
-	MetricPort = &cli.IntFlag{
+	metricPort = &cli.IntFlag{
 		Name:       "metric-port",
 		Usage:      "metric service port",
 		EnvVars:    []string{"METRIC_PORT"},
@@ -110,7 +110,7 @@ var (
 		Required:   true,
 		HasBeenSet: true,
 	}
-	Migrate = &cli.BoolFlag{
+	migrate = &cli.BoolFlag{
 		Name:       "migrate",
 		Usage:      "start automatic migrate to database",
 		EnvVars:    []string{"MIGRATE"},
@@ -118,7 +118,7 @@ var (
 		Required:   true,
 		HasBeenSet: true,
 	}
-	MigrateDir = &cli.StringFlag{
+	migrateDir = &cli.StringFlag{
 		Name:       "migrate-dir",
 		Usage:      "path to database migration",
 		EnvVars:    []string{"MIGRATE_DIR"},
@@ -166,9 +166,9 @@ func main() {
 		Description: "Microservice for working with user info.",
 		Commands:    []*cli.Command{version},
 		Flags: []cli.Flag{
-			DBName, DBPass, DBUser, DBPort, DBHost, Nats,
-			SessionSrv, Host, GRPCPort, HTTPPort, MetricPort,
-			Migrate, MigrateDir,
+			dbName, dbPass, dbUser, dbPort, dbHost, natsAddr,
+			sessionSrv, host, grpcPort, httpPort, metricPort,
+			migrate, migrateDir,
 		},
 		Version:              doc.Spec().Info.Version,
 		EnableBashCompletion: true,
@@ -197,40 +197,40 @@ const (
 )
 
 func start(c *cli.Context) error {
-	host, err := os.Hostname()
+	appHost, err := os.Hostname()
 	if err != nil {
 		return fmt.Errorf("os hostname: %w", err)
 	}
 
-	if val := c.String(Host.Name); val != "" {
-		host = val
+	if val := c.String(host.Name); val != "" {
+		appHost = val
 	}
 
 	// init database connection
 	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
-	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable", c.String(DBHost.Name), c.Int(DBPort.Name), c.String(DBUser.Name),
-		c.String(DBPass.Name), c.String(DBName.Name)))
+	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("appHost=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable", c.String(dbHost.Name), c.Int(dbPort.Name), c.String(dbUser.Name),
+		c.String(dbPass.Name), c.String(dbName.Name)))
 	if err != nil {
 		return fmt.Errorf("DB connect: %w", err)
 	}
 	defer log.WarnIfFail(logger, db.Close)
 
-	if c.Bool(Migrate.Name) {
-		err := migrater.Auto(c.Context, db.DB, c.String(MigrateDir.Name), logger)
+	if c.Bool(migrate.Name) {
+		err := migrater.Auto(c.Context, db.DB, c.String(migrateDir.Name), logger)
 		if err != nil {
 			return fmt.Errorf("start auto migration: %w", err)
 		}
 	}
 
-	natsConn, err := nats.Connect(c.String(Nats.Name))
+	natsConn, err := nats.Connect(c.String(natsAddr.Name))
 	if err != nil {
 		return fmt.Errorf("nats connect: %w", err)
 	}
 	defer log.WarnIfFail(logger, natsConn.Drain)
 	defer natsConn.Close()
 
-	grpcConn, err := librpc.Client(c.Context, c.String(SessionSrv.Name))
+	grpcConn, err := librpc.Client(c.Context, c.String(sessionSrv.Name))
 	if err != nil {
 		return fmt.Errorf("build lib rpc: %w", err)
 	}
@@ -245,8 +245,8 @@ func start(c *cli.Context) error {
 	apiMetric := metrics.HTTP(name, restapi.FlatSwaggerJSON)
 	internalAPI := rpc.New(module, librpc.Server(logger))
 	externalAPI, err := web.New(module, logger, &apiMetric, web.Config{
-		Host: host,
-		Port: c.Int(HTTPPort.Name),
+		Host: appHost,
+		Port: c.Int(httpPort.Name),
 	})
 	if err != nil {
 		return fmt.Errorf("build external api: %w", err)
@@ -254,9 +254,9 @@ func start(c *cli.Context) error {
 
 	return runner.Start(
 		c.Context,
-		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, host, c.Int(GRPCPort.Name)),
-		runner.HTTP(logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, host, c.Int(HTTPPort.Name)),
-		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), host, c.Int(MetricPort.Name)),
+		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
+		runner.HTTP(logger.With().Str(log.Name, "HTTP").Logger(), externalAPI, appHost, c.Int(httpPort.Name)),
+		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), appHost, c.Int(metricPort.Name)),
 	)
 }
 

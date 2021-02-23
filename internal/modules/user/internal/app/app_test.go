@@ -37,7 +37,7 @@ func TestModule_VerificationEmail(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			err := module.VerificationEmail(ctx, tc.email)
-			assert.Equal(tc.want, err)
+			assert.ErrorIs(err, tc.want)
 		})
 	}
 }
@@ -70,7 +70,7 @@ func TestModule_VerificationUsername(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			err := module.VerificationUsername(ctx, tc.username)
-			assert.Equal(tc.want, err)
+			assert.ErrorIs(err, tc.want)
 		})
 	}
 }
@@ -132,7 +132,7 @@ func TestModule_CreateUser(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			res, err := module.CreateUser(ctx, tc.email, tc.username, tc.password)
 			assert.Equal(tc.want, res)
-			assert.Equal(tc.wantErr, err)
+			assert.ErrorIs(err, tc.wantErr)
 		})
 	}
 }
@@ -165,8 +165,8 @@ func TestModule_UserByID(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			res, err := module.UserByID(ctx, app.Session{}, tc.userID)
-			assert.Equal(tc.wantErr, err)
 			assert.Equal(tc.want, res)
+			assert.ErrorIs(err, tc.wantErr)
 		})
 	}
 }
@@ -194,7 +194,7 @@ func TestModule_DeleteUser(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			err := module.DeleteUser(ctx, *tc.session)
-			assert.Equal(tc.want, err)
+			assert.ErrorIs(err, tc.want)
 		})
 	}
 }
@@ -244,7 +244,7 @@ func TestModule_UpdateUsername(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			err := module.UpdateUsername(ctx, *tc.session, tc.username)
-			assert.Equal(tc.want, err)
+			assert.ErrorIs(err, tc.want)
 		})
 	}
 }
@@ -309,7 +309,7 @@ func TestModule_UpdatePassword(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			err := module.UpdatePassword(ctx, *tc.session, tc.oldPass, tc.newPass)
-			assert.Equal(tc.want, err)
+			assert.ErrorIs(err, tc.want)
 		})
 	}
 }
@@ -348,7 +348,7 @@ func TestModule_ListUserByUsername(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			res, total, err := module.ListUserByUsername(ctx, app.Session{}, tc.username, p)
-			assert.Equal(tc.wantErr, err)
+			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
 			assert.Equal(tc.wantTotal, total)
 		})
@@ -381,7 +381,7 @@ func TestModule_Auth(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			res, err := module.Auth(ctx, tc.token)
-			assert.Equal(tc.wantErr, err)
+			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
 		})
 	}
@@ -426,7 +426,7 @@ func TestModule_Access(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			res, err := module.Access(ctx, tc.email, tc.pass)
-			assert.Equal(tc.wantErr, err)
+			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
 		})
 	}

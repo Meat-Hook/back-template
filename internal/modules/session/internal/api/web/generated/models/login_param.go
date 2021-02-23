@@ -6,9 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // LoginParam login param
@@ -19,12 +22,12 @@ type LoginParam struct {
 	// email
 	// Required: true
 	// Format: email
-	Email Email `json:"email"`
+	Email *Email `json:"email"`
 
 	// password
 	// Required: true
 	// Format: password
-	Password Password `json:"password"`
+	Password *Password `json:"password"`
 }
 
 // Validate validates this login param
@@ -47,11 +50,21 @@ func (m *LoginParam) Validate(formats strfmt.Registry) error {
 
 func (m *LoginParam) validateEmail(formats strfmt.Registry) error {
 
-	if err := m.Email.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("email")
-		}
+	if err := validate.Required("email", "body", m.Email); err != nil {
 		return err
+	}
+
+	if err := validate.Required("email", "body", m.Email); err != nil {
+		return err
+	}
+
+	if m.Email != nil {
+		if err := m.Email.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("email")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -59,11 +72,67 @@ func (m *LoginParam) validateEmail(formats strfmt.Registry) error {
 
 func (m *LoginParam) validatePassword(formats strfmt.Registry) error {
 
-	if err := m.Password.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("password")
-		}
+	if err := validate.Required("password", "body", m.Password); err != nil {
 		return err
+	}
+
+	if err := validate.Required("password", "body", m.Password); err != nil {
+		return err
+	}
+
+	if m.Password != nil {
+		if err := m.Password.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("password")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this login param based on the context it is used
+func (m *LoginParam) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateEmail(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePassword(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *LoginParam) contextValidateEmail(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Email != nil {
+		if err := m.Email.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("email")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *LoginParam) contextValidatePassword(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Password != nil {
+		if err := m.Password.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("password")
+			}
+			return err
+		}
 	}
 
 	return nil

@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
@@ -20,11 +22,11 @@ type Email strfmt.Email
 func (m Email) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := validate.MinLength("", "body", string(m), 1); err != nil {
+	if err := validate.MinLength("", "body", strfmt.Email(m).String(), 1); err != nil {
 		return err
 	}
 
-	if err := validate.MaxLength("", "body", string(m), 255); err != nil {
+	if err := validate.MaxLength("", "body", strfmt.Email(m).String(), 255); err != nil {
 		return err
 	}
 
@@ -35,5 +37,10 @@ func (m Email) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// ContextValidate validates this email based on context it is used
+func (m Email) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

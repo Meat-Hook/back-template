@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Default service user HTTP client.
+// Default user service HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -27,14 +27,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http"}
 
-// NewHTTPClient creates a new service user HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *ServiceUser {
+// NewHTTPClient creates a new user service HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *UserService {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new service user HTTP client,
+// NewHTTPClientWithConfig creates a new user service HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *ServiceUser {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *UserService {
 	// ensure nullable parameters have default
 	if cfg == nil {
 		cfg = DefaultTransportConfig()
@@ -45,14 +45,14 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Ser
 	return New(transport, formats)
 }
 
-// New creates a new service user client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *ServiceUser {
+// New creates a new user service client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *UserService {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
 	}
 
-	cli := new(ServiceUser)
+	cli := new(UserService)
 	cli.Transport = transport
 	cli.Operations = operations.New(transport, formats)
 	return cli
@@ -97,15 +97,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// ServiceUser is a client for service user
-type ServiceUser struct {
+// UserService is a client for user service
+type UserService struct {
 	Operations operations.ClientService
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *ServiceUser) SetTransport(transport runtime.ClientTransport) {
+func (c *UserService) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Operations.SetTransport(transport)
 }

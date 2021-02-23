@@ -5,10 +5,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -38,6 +40,10 @@ var (
 // Access get user info by his email and pass.
 // Needed for user auth.
 func (c *Client) Access(ctx context.Context, email, pass string) (*User, error) {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.MD{
+		log.ReqID: []string{log.ReqIDFromCtx(ctx)},
+	})
+
 	res, err := c.conn.Access(ctx, &pb.RequestAccess{
 		Email:    email,
 		Password: pass,

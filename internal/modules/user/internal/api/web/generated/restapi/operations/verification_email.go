@@ -6,12 +6,14 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/web/generated/models"
 )
@@ -34,7 +36,7 @@ func NewVerificationEmail(ctx *middleware.Context, handler VerificationEmailHand
 	return &VerificationEmail{Context: ctx, Handler: handler}
 }
 
-/*VerificationEmail swagger:route POST /email/verification verificationEmail
+/* VerificationEmail swagger:route POST /email/verification verificationEmail
 
 VerificationEmail verification email API
 
@@ -50,14 +52,12 @@ func (o *VerificationEmail) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewVerificationEmailParams()
-
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -70,7 +70,7 @@ type VerificationEmailBody struct {
 	// email
 	// Required: true
 	// Format: email
-	Email models.Email `json:"email"`
+	Email *models.Email `json:"email"`
 }
 
 // Validate validates this verification email body
@@ -89,11 +89,49 @@ func (o *VerificationEmailBody) Validate(formats strfmt.Registry) error {
 
 func (o *VerificationEmailBody) validateEmail(formats strfmt.Registry) error {
 
-	if err := o.Email.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("args" + "." + "email")
-		}
+	if err := validate.Required("args"+"."+"email", "body", o.Email); err != nil {
 		return err
+	}
+
+	if err := validate.Required("args"+"."+"email", "body", o.Email); err != nil {
+		return err
+	}
+
+	if o.Email != nil {
+		if err := o.Email.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "email")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this verification email body based on the context it is used
+func (o *VerificationEmailBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateEmail(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *VerificationEmailBody) contextValidateEmail(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Email != nil {
+		if err := o.Email.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("args" + "." + "email")
+			}
+			return err
+		}
 	}
 
 	return nil

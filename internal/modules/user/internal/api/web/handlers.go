@@ -13,7 +13,7 @@ import (
 func (svc *service) verificationEmail(params operations.VerificationEmailParams) operations.VerificationEmailResponder {
 	ctx, log := fromRequest(params.HTTPRequest, nil)
 
-	err := svc.app.VerificationEmail(ctx, string(params.Args.Email))
+	err := svc.app.VerificationEmail(ctx, string(*params.Args.Email))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -29,7 +29,7 @@ func (svc *service) verificationEmail(params operations.VerificationEmailParams)
 func (svc *service) verificationUsername(params operations.VerificationUsernameParams) operations.VerificationUsernameResponder {
 	ctx, log := fromRequest(params.HTTPRequest, nil)
 
-	err := svc.app.VerificationUsername(ctx, string(params.Args.Username))
+	err := svc.app.VerificationUsername(ctx, string(*params.Args.Username))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -47,9 +47,9 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 
 	id, err := svc.app.CreateUser(
 		ctx,
-		string(params.Args.Email),
-		string(params.Args.Username),
-		string(params.Args.Password),
+		string(*params.Args.Email),
+		string(*params.Args.Username),
+		string(*params.Args.Password),
 	)
 	defer logs(log, err)
 	switch {
@@ -103,7 +103,7 @@ func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.
 func (svc *service) updatePassword(params operations.UpdatePasswordParams, session *app.Session) operations.UpdatePasswordResponder {
 	ctx, log := fromRequest(params.HTTPRequest, session)
 
-	err := svc.app.UpdatePassword(ctx, *session, string(params.Args.Old), string(params.Args.New))
+	err := svc.app.UpdatePassword(ctx, *session, string(*params.Args.Old), string(*params.Args.New))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -120,7 +120,7 @@ func (svc *service) updatePassword(params operations.UpdatePasswordParams, sessi
 func (svc *service) updateUsername(params operations.UpdateUsernameParams, session *app.Session) operations.UpdateUsernameResponder {
 	ctx, log := fromRequest(params.HTTPRequest, session)
 
-	err := svc.app.UpdateUsername(ctx, *session, string(params.Args.Username))
+	err := svc.app.UpdateUsername(ctx, *session, string(*params.Args.Username))
 	defer logs(log, err)
 	switch {
 	case err == nil:
