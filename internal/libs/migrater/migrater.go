@@ -1,3 +1,4 @@
+// Package migrater contains migrate module.
 package migrater
 
 import (

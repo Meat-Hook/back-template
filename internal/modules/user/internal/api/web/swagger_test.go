@@ -1,6 +1,7 @@
 package web_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -33,7 +34,9 @@ func TestServeSwagger(t *testing.T) {
 	c := &http.Client{}
 
 	for _, tc := range testCases {
-		resp, err := c.Get("http://" + url + tc.path)
+		req, err := http.NewRequestWithContext(context.Background(), "GET", "http://"+url+tc.path, nil)
+		assert.Nil(err)
+		resp, err := c.Do(req)
 		assert.Nil(err, tc.path)
 		assert.Equal(tc.want, resp.StatusCode, tc.path)
 	}

@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -9,10 +10,10 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/session/client"
 	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/rpc/pb"
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -31,7 +32,7 @@ func (p protoMatcher) Matches(x interface{}) bool {
 
 // String for implements gomock.Matcher.
 func (p protoMatcher) String() string {
-	return p.value.String()
+	return fmt.Sprintf("%v", p.value)
 }
 
 type reqIDMatcher struct {

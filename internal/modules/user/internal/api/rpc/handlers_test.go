@@ -9,9 +9,9 @@ import (
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 var (

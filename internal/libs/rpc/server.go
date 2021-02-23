@@ -1,4 +1,4 @@
-// Package rpc
+// Package rpc contains rpc helpers.
 package rpc
 
 import (

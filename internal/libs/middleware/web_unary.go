@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Recovery must be first middleware in http server.
 // go-swagger responders panic on error while writing response to client,
 // this shouldn't result in crash - unlike a real, reasonable panic.
 //

@@ -28,6 +28,8 @@ run:
   skip-dirs:
     #- old
     - "^api/(.*/)?(client|model|restapi)$"
+    - "generated/"
+    - "metrics"
 
   # default is true. Enables skipping of directories:
   #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
@@ -42,6 +44,7 @@ run:
   skip-files:
     - "\\.[\\w-]+\\.go$"
     - "/migrations/(.*/)?[0-9]{5}_"
+    - "main.go"
 
   # by default isn't set. If set we pass it to "go list -mod={option}". From "go help modules":
   # If invoked with -mod=readonly, the go command is disallowed from the implicit
@@ -260,14 +263,7 @@ linters-settings:
   golint:
   # minimal confidence for issues, default is 0.8
   # min-confidence: 0.8
-  gomnd:
-    settings:
-      mnd:
-        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
-        checks: argument,case,condition,operation,return,assign
-        # ignored-numbers: 1000
-        # ignored-files: magic_.*.go
-        # ignored-functions: math.*
+
   gomodguard:
     allowed:
       modules:                                                        # List of allowed modules
@@ -280,7 +276,7 @@ linters-settings:
       #     recommendations:                                        # Recommended modules that should be used instead (Optional)
       #       - golang.org/x/mod
       #     reason: "`mod` is the official go.mod parser library."  # Reason why the recommended module should be used (Optional)
-      versions:                                                       # List of blocked module version constraints
+      versions: # List of blocked module version constraints
         - github.com/cenkalti/backoff:
             version: "< 4.0.0"
         # - github.com/mitchellh/go-homedir:                          # Blocked module with version constraint
@@ -364,7 +360,7 @@ linters-settings:
     # Disable to ensure that nolint directives don't have a leading space. Default is true.
     allow-leading-space: false
     # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
+    allow-no-explanation: [ ]
     # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
     require-explanation: true
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
@@ -477,10 +473,12 @@ linters:
     - maligned # premature optimization
     - nlreturn
     - paralleltest # questionable
+    - gomnd
     - tparallel # questionable
     - prealloc
     - wrapcheck # enable after implementing https://github.com/tomarrell/wrapcheck/issues/1
     - wsl # questionable
+    - exhaustive
   #disable-all: false
   #presets:
   #   - bugs
@@ -642,7 +640,6 @@ issues:
         - goheader
         - goimports
         - golint
-        - gomnd
         - gomodguard
         - goprintffuncname
         - gosec
