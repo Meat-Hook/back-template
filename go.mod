@@ -1,9 +1,9 @@
 module github.com/Meat-Hook/back-template
 
-go 1.15
+go 1.16
 
 require (
-	github.com/Meat-Hook/migrate v0.7.5
+	github.com/Meat-Hook/migrate v0.8.2
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/go-openapi/errors v0.20.0
 	github.com/go-openapi/loads v0.20.2
@@ -32,7 +32,6 @@ require (
 	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.20.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
-	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83

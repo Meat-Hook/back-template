@@ -3,17 +3,16 @@ package repo_test
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/migrate/core"
-	"github.com/Meat-Hook/migrate/fs"
-	"github.com/Meat-Hook/migrate/migrater"
+	"github.com/Meat-Hook/back-template/internal/libs/migrater"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
 
@@ -60,13 +59,11 @@ func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
 		r.Nil(err)
 	})
 
-	migrate := core.New(fs.New(), migrater.New(db.DB, logrus.New()))
-
 	var cancel func()
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
 
-	err = migrate.Migrate(ctx, migrateDir, core.Config{Cmd: core.Up})
+	err = migrater.Auto(ctx, db.DB, migrateDir, zerolog.New(os.Stderr))
 	r.Nil(err)
 
 	return db, r
