@@ -14,14 +14,14 @@ import (
 )
 
 // Auto start automate migration to database.
-func Auto(ctx context.Context, logger zerolog.Logger, db *sql.DB, dir string, fs fs.FS) error {
+func Auto(ctx context.Context, logger zerolog.Logger, db *sql.DB, dir string, migrates fs.FS) error {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
 	}
 
 	m := migrate.New(logger, filesystem.New(), repo.New(tx))
-	err = m.Migrate(ctx, dir, migrate.Config{Cmd: migrate.Up}, migrate.WithCustomFS(fs))
+	err = m.Migrate(ctx, dir, migrate.Config{Cmd: migrate.Up}, migrate.WithCustomFS(migrates))
 	if err != nil {
 		return fmt.Errorf("migrate: %w, rollback: %s", err, tx.Rollback())
 	}
