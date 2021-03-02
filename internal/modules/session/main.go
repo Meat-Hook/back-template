@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"os"
 	"os/signal"
@@ -29,6 +30,9 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
+
+//go:embed internal/repo/migrate/*
+var migrates embed.FS
 
 var (
 	logger = zerolog.New(os.Stdout).Level(zerolog.InfoLevel).With().Caller().Timestamp().Logger()
@@ -216,7 +220,7 @@ func start(c *cli.Context) error {
 	defer log.WarnIfFail(logger, db.Close)
 
 	if c.Bool(migrate.Name) {
-		err := migrater.Auto(c.Context, db.DB, c.String(migrateDir.Name), logger)
+		err := migrater.Auto(c.Context, logger, db.DB, c.String(migrateDir.Name), migrates)
 		if err != nil {
 			return fmt.Errorf("start auto migration: %w", err)
 		}

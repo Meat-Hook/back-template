@@ -3,7 +3,7 @@ module github.com/Meat-Hook/back-template
 go 1.16
 
 require (
-	github.com/Meat-Hook/migrate v0.8.2
+	github.com/Meat-Hook/migrate v0.8.3
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/go-openapi/errors v0.20.0
 	github.com/go-openapi/loads v0.20.2
@@ -27,8 +27,6 @@ require (
 	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/ory/dockertest/v3 v3.6.2
 	github.com/prometheus/client_golang v1.9.0
-	github.com/prometheus/common v0.17.0 // indirect
-	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.20.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
