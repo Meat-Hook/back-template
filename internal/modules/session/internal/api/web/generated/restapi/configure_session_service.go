@@ -6,10 +6,11 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/web/generated/restapi/operations"
-	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+
+	"github.com/Meat-Hook/back-template/internal/modules/session/internal/api/web/generated/restapi/operations"
+	"github.com/Meat-Hook/back-template/internal/modules/session/internal/app"
 )
 
 //go:generate swagger generate server --target ../../generated --name SessionService --spec ../../../../../swagger.yml --principal github.com/Meat-Hook/back-template/internal/modules/session/internal/app.Session --exclude-main --strict-responders

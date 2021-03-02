@@ -6,10 +6,9 @@ package web_test
 
 import (
 	context "context"
-	reflect "reflect"
-
 	app "github.com/Meat-Hook/back-template/internal/modules/user/internal/app"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // Mockapplication is a mock of application interface
