@@ -3,6 +3,6 @@
 module=$1
 name=$2
 
-path="./internal/modules/$module/internal/repo/migrate"
+path="./internal/modules/$module/migrate/"
 
 migrate create --dir $path --name $name

@@ -2,7 +2,6 @@ package repo_test
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"os"
 	"testing"
@@ -18,12 +17,9 @@ import (
 )
 
 const (
-	migrateDir = `migrate`
+	migrateDir = `../../migrate`
 	timeout    = time.Second * 5
 )
-
-//go:embed migrate/*
-var migrates embed.FS
 
 var ctx context.Context
 
@@ -36,7 +32,7 @@ func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
 
 	opt := &dockertest.RunOptions{
 		Repository: "cockroachdb/cockroach",
-		Tag:        "v20.1.7",
+		Tag:        "v20.2.0",
 		Cmd:        []string{"start-single-node", "--insecure"},
 	}
 
@@ -67,7 +63,7 @@ func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
 
-	err = migrater.Auto(ctx, zerolog.New(os.Stderr), db.DB, migrateDir, migrates)
+	err = migrater.Auto(ctx, zerolog.New(os.Stderr), db.DB, migrateDir)
 	r.Nil(err)
 
 	return db, r

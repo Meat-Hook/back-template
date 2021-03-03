@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"os"
 	"os/signal"
@@ -30,9 +29,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
-
-//go:embed internal/repo/migrate/*
-var migrates embed.FS
 
 var (
 	logger = zerolog.New(os.Stdout).Level(zerolog.InfoLevel).With().Caller().Timestamp().Logger()
@@ -211,7 +207,7 @@ func start(c *cli.Context) error {
 
 	// init database connection
 	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
-	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("appHost=%s port=%d user=%s "+
+	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable", c.String(dbHost.Name), c.Int(dbPort.Name), c.String(dbUser.Name),
 		c.String(dbPass.Name), c.String(dbName.Name)))
 	if err != nil {
@@ -220,7 +216,7 @@ func start(c *cli.Context) error {
 	defer log.WarnIfFail(logger, db.Close)
 
 	if c.Bool(migrate.Name) {
-		err := migrater.Auto(c.Context, logger, db.DB, c.String(migrateDir.Name), migrates)
+		err := migrater.Auto(c.Context, logger, db.DB, c.String(migrateDir.Name))
 		if err != nil {
 			return fmt.Errorf("start auto migration: %w", err)
 		}

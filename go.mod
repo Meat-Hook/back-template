@@ -3,7 +3,7 @@ module github.com/Meat-Hook/back-template
 go 1.16
 
 require (
-	github.com/Meat-Hook/migrate v0.8.3
+	github.com/Meat-Hook/migrate v0.9.1
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/go-openapi/errors v0.20.0
 	github.com/go-openapi/loads v0.20.2
