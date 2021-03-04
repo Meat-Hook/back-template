@@ -243,6 +243,7 @@ func start(c *cli.Context) error {
 		return fmt.Errorf("build external api: %w", err)
 	}
 
+
 	return runner.Start(
 		c.Context,
 		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
