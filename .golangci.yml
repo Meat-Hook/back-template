@@ -13,7 +13,7 @@ run:
   #issues-exit-code: 1
 
   # include test files or not, default is true
-  #tests: true
+  tests: false
 
   # list of build tags, all linters use it. Default is empty list.
   build-tags:
@@ -42,8 +42,6 @@ run:
   # "/" will be replaced by current OS file path separator to properly work
   # on Windows.
   skip-files:
-    - "\\.[\\w-]+\\.go$"
-    - "/migrations/(.*/)?[0-9]{5}_"
     - "main.go"
 
   # by default isn't set. If set we pass it to "go list -mod={option}". From "go help modules":
@@ -300,8 +298,8 @@ linters-settings:
     #enable:
     #   - atomicalign
     enable-all: true
-    #disable:
-    #   - shadow
+    disable:
+       - fieldalignment
     #disable-all: false
   depguard:
     list-type: blacklist
@@ -646,7 +644,6 @@ issues:
         - gosimple
         - govet
         - ineffassign
-        - interfacer
         - lll
         - maligned
         - misspell
