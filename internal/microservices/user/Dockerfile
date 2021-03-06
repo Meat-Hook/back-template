@@ -1,7 +1,24 @@
-FROM alpine
+FROM golang:1.16-alpine AS builder
 
-COPY ./bin/ /
+RUN apk update && apk add git && apk add ca-certificates
 
-COPY ./migrate/ /migrate/
+WORKDIR /build
 
-CMD /user
+COPY . .
+
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=amd64
+
+RUN go build ./internal/microservices/user
+
+FROM scratch
+
+WORKDIR /bin
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /build/user user
+COPY ./internal/microservices/session/migrate migrate/
+
+CMD ./user

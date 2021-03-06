@@ -16,8 +16,8 @@ services:
 
   user-service:
     build:
-      context: internal/microservices/user
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: internal/microservices/user/Dockerfile
     image: user-service
     container_name: user-service
     restart: always
@@ -57,8 +57,8 @@ services:
 
   session-service:
     build:
-      context: internal/microservices/session
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: internal/microservices/session/Dockerfile
     image: session-service
     container_name: session-service
     restart: always
