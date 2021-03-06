@@ -16,7 +16,7 @@ services:
 
   user-service:
     build:
-      context: ./internal/modules/user
+      context: internal/microservices/user
       dockerfile: Dockerfile
     image: user-service
     container_name: user-service
@@ -57,7 +57,7 @@ services:
 
   session-service:
     build:
-      context: ./internal/modules/session
+      context: internal/microservices/session
       dockerfile: Dockerfile
     image: session-service
     container_name: session-service

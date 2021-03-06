@@ -3,12 +3,12 @@ name: CI_SESSION
 on:
   push:
     paths:
-      - 'internal/modules/session/*'
+      - 'internal/microservices/session/*'
     branches:
       - main
   pull_request:
     paths:
-      - 'internal/modules/session/*'
+      - 'internal/microservices/session/*'
     branches:
       - main
 
@@ -35,4 +35,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Start test.
-        run: go test -race ./internal/modules/session/...
+        run: go test -race ./internal/microservices/session/...

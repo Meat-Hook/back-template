@@ -1,8 +1,8 @@
 #!/bin/bash
 
-module=$1
+microservice=$1
 name=$2
 
-path="./internal/modules/$module/migrate/"
+path="./internal/microservices/$microservice/migrate/"
 
 migrate create --dir $path --name $name
