@@ -20,7 +20,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.38
+          version: v1.38.0
 
   test:
     runs-on: self-hosted
