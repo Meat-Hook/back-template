@@ -16,6 +16,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/swag"
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ var (
 	errAny = errors.New("any error")
 
 	user = app.User{
-		ID:    1,
+		ID:    uuid.Must(uuid.NewV4()),
 		Email: "email",
 		Name:  "username",
 	}

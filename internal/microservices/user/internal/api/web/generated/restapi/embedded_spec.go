@@ -70,8 +70,8 @@ func init() {
         "operationId": "getUser",
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
+            "format": "uuid",
             "name": "id",
             "in": "query"
           }
@@ -353,8 +353,8 @@ func init() {
       }
     },
     "UserID": {
-      "type": "integer",
-      "format": "int64"
+      "type": "string",
+      "format": "uuid"
     },
     "Username": {
       "type": "string",
@@ -443,8 +443,8 @@ func init() {
         "operationId": "getUser",
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
+            "format": "uuid",
             "name": "id",
             "in": "query"
           }
@@ -748,8 +748,8 @@ func init() {
       }
     },
     "UserID": {
-      "type": "integer",
-      "format": "int64"
+      "type": "string",
+      "format": "uuid"
     },
     "Username": {
       "type": "string",

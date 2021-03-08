@@ -7,6 +7,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/repo"
+	"github.com/gofrs/uuid"
 )
 
 func TestRepo_Smoke(t *testing.T) {
@@ -18,13 +19,14 @@ func TestRepo_Smoke(t *testing.T) {
 	r := repo.New(db, &m)
 
 	user := app.User{
-		ID:        0,
+		ID:        uuid.Nil,
 		Email:     "email@gmail.com",
 		Name:      "username",
 		PassHash:  []byte("pass"),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+	user2 := user
 
 	id, err := r.Save(ctx, user)
 	assert.Nil(err)
@@ -34,6 +36,14 @@ func TestRepo_Smoke(t *testing.T) {
 	user.Name = "new_username"
 	err = r.Update(ctx, user)
 	assert.Nil(err)
+
+	_, err = r.Save(ctx, user2)
+	assert.ErrorIs(err, app.ErrEmailExist)
+
+	user2.Email = "free@gmail.com"
+	user2.Name = user.Name
+	_, err = r.Save(ctx, user2)
+	assert.ErrorIs(err, app.ErrUsernameExist)
 
 	res, err := r.ByID(ctx, user.ID)
 	assert.Nil(err)

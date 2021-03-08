@@ -8,6 +8,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,13 +18,13 @@ import (
 var (
 	errAny = errors.New("any err")
 	user   = app.User{
-		ID:    1,
+		ID:    uuid.Must(uuid.NewV4()),
 		Email: "username",
 		Name:  "email@email.com",
 	}
 
 	rpcUser = pb.UserInfo{
-		Id:    int64(user.ID),
+		Id:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,
 	}
@@ -48,11 +49,11 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 		appErr  error
 		wantErr error
 	}{
-		"success":   {&user, &rpcUser, nil, nil},
-		"not_found": {nil, nil, app.ErrNotFound, errNotFound},
-		"deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
-		"canceled":  {nil, nil, context.Canceled, errCanceled},
-		"internal":  {nil, nil, errAny, errInternal},
+		"success":       {&user, &rpcUser, nil, nil},
+		"err_not_found": {nil, nil, app.ErrNotFound, errNotFound},
+		"err_deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
+		"err_canceled":  {nil, nil, context.Canceled, errCanceled},
+		"err_any":       {nil, nil, errAny, errInternal},
 	}
 
 	for name, tc := range testCases {

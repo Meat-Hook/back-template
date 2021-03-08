@@ -36,7 +36,7 @@ func (a *Auth) Token(subject app.Subject) (*app.Token, error) {
 
 	value, err := paseto.Encrypt(a.key, t, "")
 	if err != nil {
-		return nil, fmt.Errorf("encrypt access token: %w", err)
+		return nil, fmt.Errorf("paseto encrypt: %w", err)
 	}
 
 	res := &app.Token{

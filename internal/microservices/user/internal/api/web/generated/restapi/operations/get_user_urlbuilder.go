@@ -10,12 +10,12 @@ import (
 	"net/url"
 	golangswaggerpaths "path"
 
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/strfmt"
 )
 
 // GetUserURL generates an URL for the get user operation
 type GetUserURL struct {
-	ID *int64
+	ID *strfmt.UUID
 
 	_basePath string
 	// avoid unkeyed usage
@@ -53,7 +53,7 @@ func (o *GetUserURL) Build() (*url.URL, error) {
 
 	var idQ string
 	if o.ID != nil {
-		idQ = swag.FormatInt64(*o.ID)
+		idQ = o.ID.String()
 	}
 	if idQ != "" {
 		qs.Set("id", idQ)

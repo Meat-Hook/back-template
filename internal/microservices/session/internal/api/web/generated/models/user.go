@@ -26,6 +26,7 @@ type User struct {
 
 	// id
 	// Required: true
+	// Format: uuid
 	ID *UserID `json:"id"`
 
 	// username

@@ -23,7 +23,7 @@ func (a *api) Session(ctx context.Context, req *pb.RequestSession) (*pb.SessionI
 func apiSession(session *app.Session) *pb.SessionInfo {
 	return &pb.SessionInfo{
 		ID:     session.ID,
-		UserID: int64(session.UserID),
+		UserID: session.UserID.String(),
 	}
 }
 

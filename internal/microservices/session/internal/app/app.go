@@ -3,8 +3,11 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 // Errors.
@@ -63,7 +66,7 @@ type (
 
 	// User contains user information.
 	User struct {
-		ID    int
+		ID    uuid.UUID
 		Email string
 		Name  string
 	}
@@ -76,11 +79,10 @@ type (
 
 	// Session contains session info for identify a user.
 	Session struct {
-		ID     string
-		Origin Origin
-		Token  Token
-		UserID int
-
+		ID        string
+		Origin    Origin
+		Token     Token
+		UserID    uuid.UUID
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -108,14 +110,14 @@ func New(r Repo, u Users, a Auth, id ID) *Module {
 func (m *Module) Login(ctx context.Context, email, password string, origin Origin) (*User, *Token, error) {
 	user, err := m.user.Access(ctx, email, password)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("user access: %w", err)
 	}
 
 	sessionID := m.id.New()
 
 	token, err := m.auth.Token(Subject{SessionID: sessionID})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("auth token: %w", err)
 	}
 
 	session := Session{
@@ -129,7 +131,7 @@ func (m *Module) Login(ctx context.Context, email, password string, origin Origi
 
 	err = m.session.Save(ctx, session)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("session save: %w", err)
 	}
 
 	return user, token, nil
@@ -144,12 +146,12 @@ func (m *Module) Logout(ctx context.Context, session Session) error {
 func (m *Module) Session(ctx context.Context, token string) (*Session, error) {
 	subject, err := m.auth.Subject(token)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("auth subject: %w", err)
 	}
 
 	session, err := m.session.ByID(ctx, subject.SessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("session by id: %w", err)
 	}
 
 	return session, nil

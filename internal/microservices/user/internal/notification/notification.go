@@ -40,12 +40,12 @@ func (c *Client) Send(_ context.Context, contact string, msg app.Message) error 
 
 	buf, err := json.Marshal(m)
 	if err != nil {
-		return fmt.Errorf("marshal message: %w", err)
+		return fmt.Errorf("json marshal: %w", err)
 	}
 
 	err = c.conn.Publish(subj, buf)
 	if err != nil {
-		return fmt.Errorf("publish message: %w", err)
+		return fmt.Errorf("conn publish: %w", err)
 	}
 
 	return nil

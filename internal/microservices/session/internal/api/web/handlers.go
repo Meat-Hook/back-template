@@ -51,7 +51,7 @@ func (svc *service) logout(params operations.LogoutParams, session *app.Session)
 
 // User conversion app.User => models.User.
 func User(u *app.User) *models.User {
-	id := models.UserID(u.ID)
+	id := models.UserID(u.ID.String())
 	username := models.Username(u.Name)
 	email := models.Email(u.Email)
 

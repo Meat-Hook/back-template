@@ -4,8 +4,11 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 // Errors.
@@ -22,16 +25,16 @@ type (
 	Repo interface {
 		// Save adds to the new user in repository.
 		// Errors: ErrEmailExist, ErrUsernameExist, unknown.
-		Save(context.Context, User) (id int, err error)
+		Save(context.Context, User) (uuid.UUID, error)
 		// Update update user info.
 		// Errors: ErrUsernameExist, ErrEmailExist, unknown.
 		Update(context.Context, User) error
 		// Delete removes user from repository by id.
 		// Errors: unknown.
-		Delete(context.Context, int) error
+		Delete(context.Context, uuid.UUID) error
 		// ByID returning user info by id.
 		// Errors: ErrNotFound, unknown.
-		ByID(context.Context, int) (*User, error)
+		ByID(context.Context, uuid.UUID) (*User, error)
 		// ByEmail returning user info by email.
 		// Errors: ErrNotFound, unknown.
 		ByEmail(context.Context, string) (*User, error)
@@ -84,16 +87,15 @@ type (
 	// Session contains user session information.
 	Session struct {
 		ID     string
-		UserID int
+		UserID uuid.UUID
 	}
 
 	// User contains user information.
 	User struct {
-		ID       int
-		Email    string
-		Name     string
-		PassHash []byte
-
+		ID        uuid.UUID
+		Email     string
+		Name      string
+		PassHash  []byte
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -136,7 +138,7 @@ func (m *Module) VerificationEmail(ctx context.Context, email string) error {
 	case err == nil:
 		return ErrEmailExist
 	default:
-		return err
+		return fmt.Errorf("user by email: %w", err)
 	}
 }
 
@@ -149,15 +151,15 @@ func (m *Module) VerificationUsername(ctx context.Context, username string) erro
 	case err == nil:
 		return ErrUsernameExist
 	default:
-		return err
+		return fmt.Errorf("user by username: %w", err)
 	}
 }
 
 // CreateUser create new user by params.
-func (m *Module) CreateUser(ctx context.Context, email, username, password string) (int, error) {
+func (m *Module) CreateUser(ctx context.Context, email, username, password string) (uuid.UUID, error) {
 	passHash, err := m.hash.Hashing(password)
 	if err != nil {
-		return 0, err
+		return uuid.Nil, fmt.Errorf("hash hashing: %w", err)
 	}
 	email = strings.ToLower(email)
 
@@ -168,7 +170,7 @@ func (m *Module) CreateUser(ctx context.Context, email, username, password strin
 
 	err = m.notification.Send(ctx, email, msg)
 	if err != nil {
-		return 0, err
+		return uuid.Nil, fmt.Errorf("notification send: %w", err)
 	}
 
 	newUser := User{
@@ -179,14 +181,14 @@ func (m *Module) CreateUser(ctx context.Context, email, username, password strin
 
 	userID, err := m.user.Save(ctx, newUser)
 	if err != nil {
-		return 0, err
+		return uuid.Nil, fmt.Errorf("user save: %w", err)
 	}
 
 	return userID, nil
 }
 
 // UserByID get user by id.
-func (m *Module) UserByID(ctx context.Context, _ Session, userID int) (*User, error) {
+func (m *Module) UserByID(ctx context.Context, _ Session, userID uuid.UUID) (*User, error) {
 	return m.user.ByID(ctx, userID)
 }
 
@@ -199,7 +201,7 @@ func (m *Module) DeleteUser(ctx context.Context, session Session) error {
 func (m *Module) UpdateUsername(ctx context.Context, session Session, username string) error {
 	user, err := m.user.ByID(ctx, session.UserID)
 	if err != nil {
-		return err
+		return fmt.Errorf("user by id: %w", err)
 	}
 
 	if user.Name == username {
@@ -214,7 +216,7 @@ func (m *Module) UpdateUsername(ctx context.Context, session Session, username s
 func (m *Module) UpdatePassword(ctx context.Context, session Session, oldPass, newPass string) error {
 	user, err := m.user.ByID(ctx, session.UserID)
 	if err != nil {
-		return err
+		return fmt.Errorf("user by id: %w", err)
 	}
 
 	if !m.hash.Compare(user.PassHash, []byte(oldPass)) {
@@ -227,7 +229,7 @@ func (m *Module) UpdatePassword(ctx context.Context, session Session, oldPass, n
 
 	passHash, err := m.hash.Hashing(newPass)
 	if err != nil {
-		return err
+		return fmt.Errorf("hash hashing: %w", err)
 	}
 	user.PassHash = passHash
 
@@ -249,7 +251,7 @@ func (m *Module) Access(ctx context.Context, email, password string) (*User, err
 	email = strings.ToLower(email)
 	user, err := m.user.ByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("user by email: %w", err)
 	}
 
 	if !m.hash.Compare(user.PassHash, []byte(password)) {

@@ -9,6 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/client"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/api/rpc/pb"
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -63,7 +64,7 @@ func TestClient_Access(t *testing.T) {
 
 	var (
 		user = &client.User{
-			ID:    1,
+			ID:    uuid.Must(uuid.NewV4()),
 			Email: "email@mail.com",
 			Name:  "username",
 		}
@@ -84,7 +85,7 @@ func TestClient_Access(t *testing.T) {
 		Email:    user.Email,
 		Password: pass,
 	}}).Return(&pb.UserInfo{
-		Id:    int64(user.ID),
+		Id:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,
 	}, nil)

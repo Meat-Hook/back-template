@@ -7,7 +7,9 @@ import (
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/api/web/generated/client/operations"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 )
 
@@ -19,9 +21,9 @@ func TestService_VerificationEmail(t *testing.T) {
 		appErr error
 		want   *models.Error
 	}{
-		"success":   {"notExist@mail.com", nil, nil},
-		"exist":     {"email@mail.com", app.ErrEmailExist, APIError(app.ErrEmailExist.Error())},
-		"any_error": {"email@mail.com", errAny, APIError("Internal Server Error")},
+		"success":         {"notExist@mail.com", nil, nil},
+		"err_email_exist": {"email@mail.com", app.ErrEmailExist, APIError(app.ErrEmailExist.Error())},
+		"err_any":         {"email@mail.com", errAny, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -50,9 +52,9 @@ func TestService_VerificationUsername(t *testing.T) {
 		appErr   error
 		want     *models.Error
 	}{
-		"success":   {"freeUsername", nil, nil},
-		"exist":     {"existUsername", app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
-		"any_error": {"existUsername", errAny, APIError("Internal Server Error")},
+		"success":            {"freeUsername", nil, nil},
+		"err_username_exist": {"existUsername", app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
+		"err_any":            {"existUsername", errAny, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -82,16 +84,18 @@ func TestService_CreateUser(t *testing.T) {
 		pass     = `password`
 	)
 
+	uid := uuid.Must(uuid.NewV4())
+
 	testCases := map[string]struct {
-		id      int
+		id      uuid.UUID
 		appErr  error
 		want    *operations.CreateUserOK
 		wantErr *models.Error
 	}{
-		"success":        {1, nil, &operations.CreateUserOK{Payload: &operations.CreateUserOKBody{ID: 1}}, nil},
-		"email_exist":    {0, app.ErrEmailExist, nil, APIError(app.ErrEmailExist.Error())},
-		"username_exist": {0, app.ErrUsernameExist, nil, APIError(app.ErrUsernameExist.Error())},
-		"internal_error": {0, errAny, nil, APIError("Internal Server Error")},
+		"success":            {uid, nil, &operations.CreateUserOK{Payload: &operations.CreateUserOKBody{ID: models.UserID(uid.String())}}, nil},
+		"err_email_exist":    {uuid.Nil, app.ErrEmailExist, nil, APIError(app.ErrEmailExist.Error())},
+		"err_username_exist": {uuid.Nil, app.ErrUsernameExist, nil, APIError(app.ErrUsernameExist.Error())},
+		"err_any":            {uuid.Nil, errAny, nil, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -126,15 +130,15 @@ func TestService_GetUser(t *testing.T) {
 
 	restUser := web.User(&user)
 	testCases := map[string]struct {
-		arg     int
+		arg     uuid.UUID
 		user    *app.User
 		appErr  error
 		want    *operations.GetUserOK
 		wantErr *models.Error
 	}{
-		"success":   {user.ID, &user, nil, &operations.GetUserOK{Payload: restUser}, nil},
-		"not_found": {2, nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error())},
-		"any_error": {3, nil, errAny, nil, APIError("Internal Server Error")},
+		"success":       {user.ID, &user, nil, &operations.GetUserOK{Payload: restUser}, nil},
+		"err_not_found": {uuid.Must(uuid.NewV4()), nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error())},
+		"err_any":       {uuid.Must(uuid.NewV4()), nil, errAny, nil, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -147,7 +151,9 @@ func TestService_GetUser(t *testing.T) {
 			mockApp.EXPECT().UserByID(gomock.Any(), session, tc.arg).Return(tc.user, tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
-			params := operations.NewGetUserParams().WithID(swag.Int64(int64(tc.arg)))
+			uid := strfmt.UUID(tc.arg.String())
+
+			params := operations.NewGetUserParams().WithID(&uid)
 			res, err := client.Operations.GetUser(params, apiKeyAuth)
 			assert.Equal(tc.wantErr, errPayload(err))
 			assert.Equal(tc.want, res)
@@ -162,8 +168,8 @@ func TestService_DeleteUser(t *testing.T) {
 		appErr error
 		want   *models.Error
 	}{
-		"success":   {nil, nil},
-		"any_error": {errAny, APIError("Internal Server Error")},
+		"success": {nil, nil},
+		"err_any": {errAny, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -191,9 +197,9 @@ func TestServiceUpdatePassword(t *testing.T) {
 		appErr           error
 		want             *models.Error
 	}{
-		"success":            {"old_pass", "NewPassword", nil, nil},
-		"not_valid_password": {"notCorrectPass", "NewPassword", app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
-		"any_error":          {"notCorrectPass2", "NewPassword", errAny, APIError("Internal Server Error")},
+		"success":                {"old_pass", "NewPassword", nil, nil},
+		"err_not_valid_password": {"notCorrectPass", "NewPassword", app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
+		"err_any":                {"notCorrectPass2", "NewPassword", errAny, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -227,10 +233,10 @@ func TestServiceUpdateUsername(t *testing.T) {
 		appErr error
 		want   *models.Error
 	}{
-		"success":                {nil, nil},
-		"username_exist":         {app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
-		"username_not_different": {app.ErrNotDifferent, APIError(app.ErrNotDifferent.Error())},
-		"any_error":              {errAny, APIError("Internal Server Error")},
+		"success":                    {nil, nil},
+		"err_username_exist":         {app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
+		"err_username_not_different": {app.ErrNotDifferent, APIError(app.ErrNotDifferent.Error())},
+		"err_any":                    {errAny, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -265,8 +271,8 @@ func TestServiceGetUsers(t *testing.T) {
 		wantTotal int32
 		wantErr   *models.Error
 	}{
-		"success":   {[]app.User{user}, nil, &operations.GetUsersOK{Payload: &operations.GetUsersOKBody{Total: swag.Int32(1), Users: web.Users([]app.User{user})}}, 1, nil},
-		"any_error": {nil, errAny, nil, 0, APIError("Internal Server Error")},
+		"success": {[]app.User{user}, nil, &operations.GetUsersOK{Payload: &operations.GetUsersOKBody{Total: swag.Int32(1), Users: web.Users([]app.User{user})}}, 1, nil},
+		"err_any": {nil, errAny, nil, 0, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {

@@ -4,14 +4,13 @@ package repo
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"net"
 	"time"
 
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
+	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"
 )
@@ -30,7 +29,7 @@ type (
 		Token     string      `db:"token"`
 		IP        pgtype.Inet `db:"ip"`
 		UserAgent string      `db:"user_agent"`
-		UserID    int         `db:"user_id"`
+		UserID    uuid.UUID   `db:"user_id"`
 		CreatedAt time.Time   `db:"created_at"`
 		UpdatedAt time.Time   `db:"updated_at"`
 	}
@@ -156,13 +155,4 @@ func (r *Repo) Delete(ctx context.Context, sessionID string) error {
 
 		return nil
 	})
-}
-
-func convertErr(err error) error {
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return app.ErrNotFound
-	default:
-		return err
-	}
 }

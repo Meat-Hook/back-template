@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	"github.com/gofrs/uuid"
 )
 
 func TestModule_VerificationEmail(t *testing.T) {
@@ -28,9 +29,9 @@ func TestModule_VerificationEmail(t *testing.T) {
 		email string
 		want  error
 	}{
-		"success":   {free, nil},
-		"exist":     {exist, app.ErrEmailExist},
-		"any_error": {any, errAny},
+		"success":         {free, nil},
+		"err_email_exist": {exist, app.ErrEmailExist},
+		"err_any":         {any, errAny},
 	}
 
 	for name, tc := range testCases {
@@ -61,9 +62,9 @@ func TestModule_VerificationUsername(t *testing.T) {
 		username string
 		want     error
 	}{
-		"success":   {free, nil},
-		"exist":     {exist, app.ErrUsernameExist},
-		"any_error": {any, errAny},
+		"success":            {free, nil},
+		"err_username_exist": {exist, app.ErrUsernameExist},
+		"err_any":            {any, errAny},
 	}
 
 	for name, tc := range testCases {
@@ -80,14 +81,14 @@ func TestModule_CreateUser(t *testing.T) {
 
 	module, mocks, assert := start(t)
 
-	const (
+	var (
 		pass          = `pass`
 		unknownPass   = `unknownPass`
 		email         = `email`
 		notValidEmail = `emailNotValid`
 		username      = `username`
 		existUserName = `existUsername`
-		wantID        = 1
+		wantID        = uuid.Must(uuid.NewV4())
 	)
 
 	mocks.hasher.EXPECT().Hashing(pass).Return([]byte(pass), nil).Times(3)
@@ -105,7 +106,7 @@ func TestModule_CreateUser(t *testing.T) {
 		Email:    email,
 		Name:     existUserName,
 		PassHash: []byte(pass),
-	}).Return(0, app.ErrUsernameExist)
+	}).Return(uuid.Nil, app.ErrUsernameExist)
 
 	mocks.notification.EXPECT().Send(ctx, strings.ToLower(notValidEmail), app.Message{
 		Kind:    app.Welcome,
@@ -118,13 +119,13 @@ func TestModule_CreateUser(t *testing.T) {
 		email    string
 		username string
 		password string
-		want     int
+		want     uuid.UUID
 		wantErr  error
 	}{
 		"success":          {email, username, pass, wantID, nil},
-		"err_save_user":    {email, existUserName, pass, 0, app.ErrUsernameExist},
-		"err_notification": {notValidEmail, username, pass, 0, errAny},
-		"err_hashing":      {notValidEmail, username, unknownPass, 0, errAny},
+		"err_save_user":    {email, existUserName, pass, uuid.Nil, app.ErrUsernameExist},
+		"err_notification": {notValidEmail, username, pass, uuid.Nil, errAny},
+		"err_hashing":      {notValidEmail, username, unknownPass, uuid.Nil, errAny},
 	}
 
 	for name, tc := range testCases {
@@ -143,7 +144,7 @@ func TestModule_UserByID(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	user := &app.User{
-		ID:        1,
+		ID:        uuid.Must(uuid.NewV4()),
 		Email:     "email@mail.com",
 		Name:      "username",
 		PassHash:  []byte{12, 12, 34, 124, 19},
@@ -154,7 +155,7 @@ func TestModule_UserByID(t *testing.T) {
 	mocks.repo.EXPECT().ByID(ctx, user.ID).Return(user, nil)
 
 	testCases := map[string]struct {
-		userID  int
+		userID  uuid.UUID
 		want    *app.User
 		wantErr error
 	}{
@@ -178,7 +179,7 @@ func TestModule_DeleteUser(t *testing.T) {
 
 	session := &app.Session{
 		ID:     "id",
-		UserID: 1,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 
 	mocks.repo.EXPECT().Delete(ctx, session.UserID).Return(nil)
@@ -206,14 +207,14 @@ func TestModule_UpdateUsername(t *testing.T) {
 
 	session := &app.Session{
 		ID:     "id",
-		UserID: 1,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 	notValidSession := &app.Session{
 		ID:     "id2",
-		UserID: 2,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 	user := &app.User{
-		ID:        1,
+		ID:        uuid.Must(uuid.NewV4()),
 		Email:     "email@mail.com",
 		Name:      "username",
 		PassHash:  []byte{1, 2, 3, 34, 5, 6, 7},
@@ -235,9 +236,9 @@ func TestModule_UpdateUsername(t *testing.T) {
 		username string
 		want     error
 	}{
-		"success":         {session, newUsername, nil},
-		"usernames_equal": {session, user.Name, app.ErrNotDifferent},
-		"user_not_found":  {notValidSession, newUsername, app.ErrNotFound},
+		"success":                {session, newUsername, nil},
+		"err_different_username": {session, user.Name, app.ErrNotDifferent},
+		"err__not_found":         {notValidSession, newUsername, app.ErrNotFound},
 	}
 
 	for name, tc := range testCases {
@@ -256,14 +257,14 @@ func TestModule_UpdatePassword(t *testing.T) {
 
 	session := &app.Session{
 		ID:     "id",
-		UserID: 1,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 	notValidSession := &app.Session{
 		ID:     "id2",
-		UserID: 2,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 	user := &app.User{
-		ID:        1,
+		ID:        uuid.Must(uuid.NewV4()),
 		Email:     "email@mail.com",
 		Name:      "username",
 		PassHash:  []byte("pass"),
@@ -320,7 +321,7 @@ func TestModule_ListUserByUsername(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	user := app.User{
-		ID:        1,
+		ID:        uuid.Must(uuid.NewV4()),
 		Email:     "email@mail.com",
 		Name:      "username",
 		PassHash:  []byte{12, 12, 34, 124, 19},
@@ -362,7 +363,7 @@ func TestModule_Auth(t *testing.T) {
 
 	session := &app.Session{
 		ID:     "id",
-		UserID: 1,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 
 	const token = "token"
@@ -393,7 +394,7 @@ func TestModule_Access(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	user := &app.User{
-		ID:        1,
+		ID:        uuid.Must(uuid.NewV4()),
 		Email:     "email@mail.com",
 		Name:      "username",
 		PassHash:  []byte("pass"),
@@ -417,9 +418,9 @@ func TestModule_Access(t *testing.T) {
 		want    *app.User
 		wantErr error
 	}{
-		"success":            {user.Email, string(user.PassHash), user, nil},
-		"err_pass_not_valid": {user.Email, notValidPass, nil, app.ErrNotValidPassword},
-		"err_user_not_found": {unknownEmail, "", nil, app.ErrNotFound},
+		"success":       {user.Email, string(user.PassHash), user, nil},
+		"err_not_valid": {user.Email, notValidPass, nil, app.ErrNotValidPassword},
+		"err_not_found": {unknownEmail, "", nil, app.ErrNotFound},
 	}
 
 	for name, tc := range testCases {

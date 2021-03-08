@@ -123,6 +123,7 @@ swagger:model CreateUserOKBody
 type CreateUserOKBody struct {
 
 	// id
+	// Format: uuid
 	ID models.UserID `json:"id,omitempty"`
 }
 
@@ -130,9 +131,28 @@ type CreateUserOKBody struct {
 func (o *CreateUserOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *CreateUserOKBody) validateID(formats strfmt.Registry) error {
+	if swag.IsZero(o.ID) { // not required
+		return nil
+	}
+
+	if err := o.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("createUserOK" + "." + "id")
+		}
+		return err
+	}
+
 	return nil
 }
 

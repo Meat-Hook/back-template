@@ -46,8 +46,8 @@ definitions:
     maxLength: 100
 
   UserID:
-    type: integer
-    format: int64
+    type: string
+    format: uuid
 
   Username:
     type: string
@@ -171,8 +171,8 @@ paths:
         - name: id
           in: query
           required: false
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         200:
           description: OK

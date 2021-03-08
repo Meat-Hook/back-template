@@ -8,16 +8,27 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/validate"
 )
 
 // UserID user ID
 //
 // swagger:model UserID
-type UserID int64
+type UserID strfmt.UUID
 
 // Validate validates this user ID
 func (m UserID) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := validate.FormatOf("", "body", "uuid", strfmt.UUID(m).String(), formats); err != nil {
+		return err
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
