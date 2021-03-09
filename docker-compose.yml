@@ -21,7 +21,6 @@ services:
       - "MIGRATE=true"
     ports:
       - "8080:8080"
-      - "8100:8100"
 
   user-db:
     container_name: user-db
@@ -62,7 +61,6 @@ services:
       - "MIGRATE=true"
     ports:
       - "8081:8080"
-      - "8101:8100"
 
   session-db:
     container_name: session-db

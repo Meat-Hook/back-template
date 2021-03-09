@@ -216,7 +216,7 @@ func start(c *cli.Context) error {
 	defer log.WarnIfFail(logger, db.Close)
 
 	if c.Bool(migrate.Name) {
-		err := migrater.Auto(c.Context, logger, db.DB, c.String(migrateDir.Name))
+		err := migrater.Auto(c.Context, logger.With().Str(log.Name, "migrate").Logger(), db.DB, c.String(migrateDir.Name))
 		if err != nil {
 			return fmt.Errorf("start auto migration: %w", err)
 		}

@@ -19,6 +19,6 @@ WORKDIR /bin
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /build/user user
-COPY ./internal/microservices/session/migrate migrate/
+COPY ./internal/microservices/user/migrate/ migrate/
 
 CMD ./user
