@@ -8,6 +8,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/api/web/generated/restapi/operations"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
 	"github.com/go-openapi/swag"
+	"github.com/gofrs/uuid"
 )
 
 func (svc *service) verificationEmail(params operations.VerificationEmailParams) operations.VerificationEmailResponder {
@@ -54,7 +55,7 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 	defer logs(log, err)
 	switch {
 	case err == nil:
-		return operations.NewCreateUserOK().WithPayload(&operations.CreateUserOKBody{ID: models.UserID(id)})
+		return operations.NewCreateUserOK().WithPayload(&operations.CreateUserOKBody{ID: models.UserID(id.String())})
 	case errors.Is(err, app.ErrEmailExist):
 		return operations.NewCreateUserDefault(http.StatusConflict).WithPayload(apiError(err.Error()))
 	case errors.Is(err, app.ErrUsernameExist):
@@ -70,7 +71,7 @@ func (svc *service) getUser(params operations.GetUserParams, session *app.Sessio
 
 	getUserID := session.UserID
 	if params.ID != nil {
-		getUserID = int(*params.ID)
+		getUserID = uuid.FromStringOrNil(params.ID.String())
 	}
 
 	u, err := svc.app.UserByID(ctx, *session, getUserID)

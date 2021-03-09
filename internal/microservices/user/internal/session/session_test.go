@@ -7,6 +7,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/microservices/session/client"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	"github.com/gofrs/uuid"
 )
 
 var (
@@ -19,7 +20,7 @@ func TestClient_Session(t *testing.T) {
 
 	sessionInfo := &app.Session{
 		ID:     "id",
-		UserID: 1,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 
 	testCases := map[string]struct {

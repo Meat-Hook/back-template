@@ -8,6 +8,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -26,7 +27,7 @@ func New(conn grpc.ClientConnInterface) *Client {
 
 // User contains main user info.
 type User struct {
-	ID    int
+	ID    uuid.UUID
 	Email string
 	Name  string
 }
@@ -57,8 +58,13 @@ func (c *Client) Access(ctx context.Context, email, pass string) (*User, error) 
 		return nil, fmt.Errorf("access: %w", err)
 	}
 
+	uid, err := uuid.FromString(res.Id)
+	if err != nil {
+		return nil, fmt.Errorf("parse uuid: %w", err)
+	}
+
 	return &User{
-		ID:    int(res.Id),
+		ID:    uid,
 		Email: res.Email,
 		Name:  res.Name,
 	}, nil

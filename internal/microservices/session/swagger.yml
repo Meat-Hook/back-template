@@ -57,8 +57,8 @@ definitions:
     maxLength: 100
 
   UserID:
-    type: integer
-    format: int64
+    type: string
+    format: uuid
 
   Username:
     type: string

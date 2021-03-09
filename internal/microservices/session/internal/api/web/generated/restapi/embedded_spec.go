@@ -140,8 +140,8 @@ func init() {
       }
     },
     "UserID": {
-      "type": "integer",
-      "format": "int64"
+      "type": "string",
+      "format": "uuid"
     },
     "Username": {
       "type": "string",
@@ -303,8 +303,8 @@ func init() {
       }
     },
     "UserID": {
-      "type": "integer",
-      "format": "int64"
+      "type": "string",
+      "format": "uuid"
     },
     "Username": {
       "type": "string",

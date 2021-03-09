@@ -7,6 +7,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/client"
+	"github.com/gofrs/uuid"
 )
 
 var (
@@ -18,7 +19,7 @@ func TestClient_Access(t *testing.T) {
 	t.Parallel()
 
 	userInfo := &app.User{
-		ID:    1,
+		ID:    uuid.Must(uuid.NewV4()),
 		Email: "email@mail.com",
 		Name:  "username",
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/repo"
+	"github.com/gofrs/uuid"
 	"github.com/rs/xid"
 )
 
@@ -28,7 +29,7 @@ func TestRepo_Smoke(t *testing.T) {
 		Token: app.Token{
 			Value: "token",
 		},
-		UserID:    1,
+		UserID:    uuid.Must(uuid.NewV4()),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

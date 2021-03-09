@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
+	"github.com/gofrs/uuid"
 )
 
 func TestModule_Login(t *testing.T) {
@@ -29,12 +30,12 @@ func TestModule_Login(t *testing.T) {
 			UserAgent: "UserAgent",
 		}
 		user = app.User{
-			ID:    1,
+			ID:    uuid.Must(uuid.NewV4()),
 			Email: email,
 			Name:  "username",
 		}
 		user2 = app.User{
-			ID:    2,
+			ID:    uuid.Must(uuid.NewV4()),
 			Email: errSaveSessionEmail,
 			Name:  "username",
 		}
@@ -74,9 +75,9 @@ func TestModule_Login(t *testing.T) {
 		wantToken       *app.Token
 		wantErr         error
 	}{
-		"success":          {email, pass, &user, &token, nil},
-		"err_save_session": {errSaveSessionEmail, pass, nil, nil, errAny},
-		"err_user_access":  {notValidEmail, pass, nil, nil, app.ErrNotFound},
+		"success":       {email, pass, &user, &token, nil},
+		"err_any":       {errSaveSessionEmail, pass, nil, nil, errAny},
+		"err_not_found": {notValidEmail, pass, nil, nil, app.ErrNotFound},
 	}
 
 	for name, tc := range testCases {
@@ -104,7 +105,7 @@ func TestModule_Logout(t *testing.T) {
 		Token: app.Token{
 			Value: "token",
 		},
-		UserID: 1,
+		UserID: uuid.Must(uuid.NewV4()),
 	}
 
 	mocks.repo.EXPECT().Delete(ctx, session.ID).Return(nil)
@@ -142,7 +143,7 @@ func TestModule_Session(t *testing.T) {
 			Token: app.Token{
 				Value: token,
 			},
-			UserID: 1,
+			UserID: uuid.Must(uuid.NewV4()),
 		}
 
 		tokenNotFound           = "tokenNotFound"
@@ -162,9 +163,9 @@ func TestModule_Session(t *testing.T) {
 		want    *app.Session
 		wantErr error
 	}{
-		"success":             {token, &session, nil},
-		"err_session_by_id":   {tokenNotFound, nil, app.ErrNotFound},
-		"err_not_valid_token": {notValidToken, nil, app.ErrInvalidToken},
+		"success":           {token, &session, nil},
+		"err_not_found":     {tokenNotFound, nil, app.ErrNotFound},
+		"err_invalid_token": {notValidToken, nil, app.ErrInvalidToken},
 	}
 
 	for name, tc := range testCases {

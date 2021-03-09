@@ -9,6 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/client"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/api/rpc/pb"
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -69,7 +70,7 @@ func TestClient_Access(t *testing.T) {
 	var (
 		session = &client.Session{
 			ID:     "sessionID",
-			UserID: 1,
+			UserID: uuid.Must(uuid.NewV4()),
 		}
 		token         = `token`
 		notValidToken = `notValidToken`
@@ -89,7 +90,7 @@ func TestClient_Access(t *testing.T) {
 		Token: token,
 	}}).Return(&pb.SessionInfo{
 		ID:     session.ID,
-		UserID: int64(session.UserID),
+		UserID: session.UserID.String(),
 	}, nil)
 
 	// err any

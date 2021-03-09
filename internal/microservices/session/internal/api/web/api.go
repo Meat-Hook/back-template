@@ -16,6 +16,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
 	"github.com/go-openapi/loads"
 	swag_middleware "github.com/go-openapi/runtime/middleware"
+	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog"
 	"github.com/sebest/xff"
 )
@@ -89,12 +90,12 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 
 func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger, net.IP) {
 	ctx := r.Context()
-	userID := 0
+	userID := uuid.Nil
 	if session != nil {
 		userID = session.UserID
 	}
 
-	logger := zerolog.Ctx(r.Context()).With().Int(log.User, userID).Logger()
+	logger := zerolog.Ctx(r.Context()).With().Stringer(log.User, userID).Logger()
 	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
 
 	return ctx, logger, net.ParseIP(remoteIP)

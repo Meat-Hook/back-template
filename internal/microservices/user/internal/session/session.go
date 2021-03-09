@@ -34,7 +34,7 @@ func (c *Client) Session(ctx context.Context, token string) (*app.Session, error
 	res, err := c.session.Session(ctx, token)
 	switch {
 	case errors.Is(err, session.ErrNotFound):
-		return nil, fmt.Errorf("%w: %s", app.ErrNotFound, err)
+		return nil, app.ErrNotFound
 	case err != nil:
 		return nil, fmt.Errorf("session: %w", err)
 	}

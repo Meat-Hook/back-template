@@ -7,6 +7,7 @@ package app_test
 import (
 	context "context"
 	app "github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -35,10 +36,10 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 }
 
 // Save mocks base method
-func (m *MockRepo) Save(arg0 context.Context, arg1 app.User) (int, error) {
+func (m *MockRepo) Save(arg0 context.Context, arg1 app.User) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Save", arg0, arg1)
-	ret0, _ := ret[0].(int)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -64,7 +65,7 @@ func (mr *MockRepoMockRecorder) Update(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Delete mocks base method
-func (m *MockRepo) Delete(arg0 context.Context, arg1 int) error {
+func (m *MockRepo) Delete(arg0 context.Context, arg1 uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -78,7 +79,7 @@ func (mr *MockRepoMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // ByID mocks base method
-func (m *MockRepo) ByID(arg0 context.Context, arg1 int) (*app.User, error) {
+func (m *MockRepo) ByID(arg0 context.Context, arg1 uuid.UUID) (*app.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByID", arg0, arg1)
 	ret0, _ := ret[0].(*app.User)

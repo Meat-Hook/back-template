@@ -22,7 +22,7 @@ func (a *api) Access(ctx context.Context, req *pb.RequestAccess) (*pb.UserInfo, 
 
 func apiUser(user *app.User) *pb.UserInfo {
 	return &pb.UserInfo{
-		Id:    int64(user.ID),
+		Id:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,
 	}

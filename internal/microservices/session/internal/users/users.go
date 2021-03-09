@@ -34,11 +34,11 @@ func (c *Client) Access(ctx context.Context, email, password string) (*app.User,
 	res, err := c.users.Access(ctx, email, password)
 	switch {
 	case errors.Is(err, user.ErrNotFound):
-		return nil, fmt.Errorf("%w: %s", app.ErrNotFound, err)
+		return nil, app.ErrNotFound
 	case errors.Is(err, user.ErrNotValidPass):
-		return nil, fmt.Errorf("%w: %s", app.ErrNotValidPassword, err)
+		return nil, app.ErrNotValidPassword
 	case err != nil:
-		return nil, fmt.Errorf("session: %w", err)
+		return nil, fmt.Errorf("user access: %w", err)
 	}
 
 	return &app.User{

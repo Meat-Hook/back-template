@@ -7,6 +7,7 @@ package web_test
 import (
 	context "context"
 	app "github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -63,10 +64,10 @@ func (mr *MockapplicationMockRecorder) VerificationUsername(ctx, username interf
 }
 
 // CreateUser mocks base method
-func (m *Mockapplication) CreateUser(ctx context.Context, email, username, pass string) (int, error) {
+func (m *Mockapplication) CreateUser(ctx context.Context, email, username, pass string) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, email, username, pass)
-	ret0, _ := ret[0].(int)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,7 +79,7 @@ func (mr *MockapplicationMockRecorder) CreateUser(ctx, email, username, pass int
 }
 
 // UserByID mocks base method
-func (m *Mockapplication) UserByID(ctx context.Context, session app.Session, id int) (*app.User, error) {
+func (m *Mockapplication) UserByID(ctx context.Context, session app.Session, id uuid.UUID) (*app.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserByID", ctx, session, id)
 	ret0, _ := ret[0].(*app.User)

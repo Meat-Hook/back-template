@@ -8,6 +8,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
+	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -27,7 +28,7 @@ func New(conn grpc.ClientConnInterface) *Client {
 // Session contains main session info.
 type Session struct {
 	ID     string
-	UserID int
+	UserID uuid.UUID
 }
 
 // Errors.
@@ -51,8 +52,13 @@ func (c *Client) Session(ctx context.Context, token string) (*Session, error) {
 		return nil, fmt.Errorf("session: %w", err)
 	}
 
+	uid, err := uuid.FromString(res.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("parse uuid: %w", err)
+	}
+
 	return &Session{
 		ID:     res.ID,
-		UserID: int(res.UserID),
+		UserID: uid,
 	}, nil
 }

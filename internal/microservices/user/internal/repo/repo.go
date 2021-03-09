@@ -8,6 +8,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
+	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"
 )
@@ -22,7 +23,7 @@ type (
 	}
 
 	user struct {
-		ID        int       `db:"id"`
+		ID        uuid.UUID `db:"id"`
 		Email     string    `db:"email"`
 		Name      string    `db:"name"`
 		PassHash  []byte    `db:"pass_hash"`
@@ -62,7 +63,7 @@ func New(db *sqlx.DB, m *metrics.Database) *Repo {
 }
 
 // Save for implements app.Repo.
-func (r *Repo) Save(ctx context.Context, u app.User) (id int, err error) {
+func (r *Repo) Save(ctx context.Context, u app.User) (id uuid.UUID, err error) {
 	err = r.metric.Collect(func() error {
 		newUser := convert(u)
 		const query = `
@@ -81,13 +82,13 @@ func (r *Repo) Save(ctx context.Context, u app.User) (id int, err error) {
 
 		err := r.db.GetContext(ctx, &id, query, newUser.Email, newUser.Name, passHash)
 		if err != nil {
-			return fmt.Errorf("save user: %w", err)
+			return fmt.Errorf("get context: %w", convertErr(err))
 		}
 
 		return nil
 	})
 	if err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
 
 	return id, nil
@@ -113,7 +114,7 @@ func (r *Repo) Update(ctx context.Context, u app.User) error {
 
 		_, err := r.db.ExecContext(ctx, query, updateUser.Email, updateUser.Name, passHash, updateUser.ID)
 		if err != nil {
-			return fmt.Errorf("update user: %w", err)
+			return fmt.Errorf("exec context: %w", convertErr(err))
 		}
 
 		return nil
@@ -121,7 +122,7 @@ func (r *Repo) Update(ctx context.Context, u app.User) error {
 }
 
 // Delete for implements app.Repo.
-func (r *Repo) Delete(ctx context.Context, id int) error {
+func (r *Repo) Delete(ctx context.Context, id uuid.UUID) error {
 	return r.metric.Collect(func() error {
 		const query = `
 		delete
@@ -130,7 +131,7 @@ func (r *Repo) Delete(ctx context.Context, id int) error {
 
 		_, err := r.db.ExecContext(ctx, query, id)
 		if err != nil {
-			return fmt.Errorf("delete user: %w", err)
+			return fmt.Errorf("exec context: %w", convertErr(err))
 		}
 
 		return nil
@@ -138,14 +139,14 @@ func (r *Repo) Delete(ctx context.Context, id int) error {
 }
 
 // ByID for implements app.Repo.
-func (r *Repo) ByID(ctx context.Context, id int) (u *app.User, err error) {
+func (r *Repo) ByID(ctx context.Context, id uuid.UUID) (u *app.User, err error) {
 	err = r.metric.Collect(func() error {
 		const query = `select * from users where id = $1`
 
 		res := user{}
 		err = r.db.GetContext(ctx, &res, query, id)
 		if err != nil {
-			return fmt.Errorf("get user by id: %w", convertErr(err))
+			return fmt.Errorf("get context: %w", convertErr(err))
 		}
 
 		u = res.convert()
@@ -167,7 +168,7 @@ func (r *Repo) ByEmail(ctx context.Context, email string) (u *app.User, err erro
 		res := user{}
 		err = r.db.GetContext(ctx, &res, query, email)
 		if err != nil {
-			return fmt.Errorf("get user by id: %w", convertErr(err))
+			return fmt.Errorf("get context: %w", convertErr(err))
 		}
 
 		u = res.convert()
@@ -189,7 +190,7 @@ func (r *Repo) ByUsername(ctx context.Context, username string) (u *app.User, er
 		res := user{}
 		err = r.db.GetContext(ctx, &res, query, username)
 		if err != nil {
-			return fmt.Errorf("get user by id: %w", convertErr(err))
+			return fmt.Errorf("get context: %w", convertErr(err))
 		}
 
 		u = res.convert()
@@ -211,13 +212,13 @@ func (r *Repo) ListUserByUsername(ctx context.Context, username string, p app.Se
 		res := make([]user, 0, p.Limit)
 		err = r.db.SelectContext(ctx, &res, query, "%"+username+"%", p.Limit, p.Offset)
 		if err != nil {
-			return fmt.Errorf("get users by username like: %w", convertErr(err))
+			return fmt.Errorf("select context: %w", convertErr(err))
 		}
 
 		const getTotal = `SELECT count(*) OVER() AS total FROM users WHERE name LIKE $1`
 		err = r.db.GetContext(ctx, &total, getTotal, "%"+username+"%")
 		if err != nil {
-			return fmt.Errorf("get total: %w", err)
+			return fmt.Errorf("get context: %w", err)
 		}
 
 		users = make([]app.User, len(res))

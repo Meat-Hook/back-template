@@ -15,6 +15,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/microservices/user/internal/app"
 	"github.com/go-openapi/loads"
 	swag_middleware "github.com/go-openapi/runtime/middleware"
+	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog"
 	"github.com/sebest/xff"
 )
@@ -27,8 +28,8 @@ type (
 	application interface {
 		VerificationEmail(ctx context.Context, email string) error
 		VerificationUsername(ctx context.Context, username string) error
-		CreateUser(ctx context.Context, email string, username string, pass string) (int, error)
-		UserByID(ctx context.Context, session app.Session, id int) (*app.User, error)
+		CreateUser(ctx context.Context, email string, username string, pass string) (uuid.UUID, error)
+		UserByID(ctx context.Context, session app.Session, id uuid.UUID) (*app.User, error)
 		DeleteUser(ctx context.Context, session app.Session) error
 		ListUserByUsername(ctx context.Context, session app.Session, username string, page app.SearchParams) ([]app.User, int, error)
 		UpdateUsername(ctx context.Context, session app.Session, username string) error
@@ -97,12 +98,12 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 
 func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger) {
 	ctx := r.Context()
-	userID := 0
+	userID := uuid.Nil
 	if session != nil {
 		userID = session.UserID
 	}
 
-	logger := zerolog.Ctx(r.Context()).With().Int(log.User, userID).Logger()
+	logger := zerolog.Ctx(r.Context()).With().Stringer(log.User, userID).Logger()
 
 	return ctx, logger
 }

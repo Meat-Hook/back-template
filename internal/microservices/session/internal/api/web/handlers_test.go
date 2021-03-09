@@ -9,6 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/api/web/generated/client/operations"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/internal/microservices/session/internal/app"
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 )
 
@@ -20,7 +21,7 @@ func TestService_Login(t *testing.T) {
 			Value: "token",
 		}
 		user = app.User{
-			ID:    1,
+			ID:    uuid.Must(uuid.NewV4()),
 			Email: "email@email.com",
 			Name:  "password",
 		}
@@ -46,7 +47,7 @@ func TestService_Login(t *testing.T) {
 			user.Email, "notValidPass",
 			nil, nil, app.ErrNotValidPassword, nil, APIError(app.ErrNotValidPassword.Error()),
 		},
-		"err_internal": {
+		"err_any": {
 			"randomEmail@email.com", "notValidPass",
 			nil, nil, errAny, nil, APIError("Internal Server Error"),
 		},
@@ -104,7 +105,7 @@ func TestService_Logout(t *testing.T) {
 		want   *models.Error
 	}{
 		{"success", nil, nil},
-		{"err_internal", errAny, APIError("Internal Server Error")},
+		{"err_any", errAny, APIError("Internal Server Error")},
 	}
 
 	for _, tc := range testCases {
