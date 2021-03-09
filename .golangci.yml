@@ -464,6 +464,7 @@ linters:
   #   - govet
   enable-all: true
   disable:
+    - errorlint
     - dogsled # questionable
     - dupl
     - ifshort # questionable
