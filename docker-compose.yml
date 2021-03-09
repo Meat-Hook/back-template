@@ -2,18 +2,6 @@ version: '3.8'
 
 services:
 
-  prometheus:
-    image: prom/prometheus:v2.24.1
-    container_name: prometheus
-    ports:
-      - 9090:9090
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    volumes:
-      - "./volume/prometheus-data:/prometheus/"
-      - "./config/prometheus/:/etc/prometheus/"
-    restart: always
-
   user-service:
     build:
       context: .
