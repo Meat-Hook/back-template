@@ -14,6 +14,9 @@ import (
 
 // Auto start automate migration to database.
 func Auto(ctx context.Context, logger zerolog.Logger, db *sql.DB, dir string) error {
+	logger.Info().Msg("started migration...")
+	defer logger.Info().Msg("finished migration")
+
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
