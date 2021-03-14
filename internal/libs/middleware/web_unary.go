@@ -96,6 +96,6 @@ func Health(next http.Handler) http.Handler {
 
 		logger := zerolog.Ctx(r.Context())
 		w.WriteHeader(http.StatusOK)
-		logger.Info().Msg("handled discovery checker")
+		logger.Debug().Msg("handled discovery checker")
 	})
 }
