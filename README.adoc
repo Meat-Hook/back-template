@@ -1,5 +1,7 @@
 = Back-template.
 
+[![Coverage Status](https://coveralls.io/repos/github/Meat-Hook/back-template/badge.svg?branch=master)](https://coveralls.io/github/Meat-Hook/gback-template?branch=master)
+
 Репозиторий содержит шаблон для проектов, процент покрытия тестов высокий,
 есть интеграционные тесты, которые запускаются с dockertest, чтобы затянуть инстанс базы.
 
