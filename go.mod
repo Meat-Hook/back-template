@@ -26,22 +26,24 @@ require (
 	github.com/nats-io/jwt v1.2.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
 	github.com/nats-io/nats.go v1.10.0
+	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/ory/dockertest/v3 v3.6.2
 	github.com/prometheus/client_golang v1.9.0
-	github.com/prometheus/common v0.18.0 // indirect
+	github.com/prometheus/common v0.19.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.20.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
+	go.mongodb.org/mongo-driver v1.5.0 // indirect
+	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b
+	golang.org/x/net v0.0.0-20210315170653-34ac3e1c2000
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210308170721-88b6017d0656 // indirect
+	golang.org/x/sys v0.0.0-20210315160823-c6e025ad8005 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20210303154014-9728d6b83eeb // indirect
+	google.golang.org/genproto v0.0.0-20210315173758-2651cd453018 // indirect
 	google.golang.org/grpc v1.36.0
 	google.golang.org/protobuf v1.25.0
 )
