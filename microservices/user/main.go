@@ -192,7 +192,7 @@ func main() {
 }
 
 const (
-	name     = `user` // Service name.
+	name     = `user`
 	dbDriver = `postgres`
 )
 

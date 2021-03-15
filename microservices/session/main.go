@@ -191,7 +191,7 @@ func main() {
 }
 
 const (
-	name     = `session` // Service name.
+	name     = `session`
 	dbDriver = `postgres`
 )
 
