@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
-	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -17,12 +17,12 @@ import (
 
 // Client to user microservice.
 type Client struct {
-	conn pb.UserClient
+	conn pb.UserServiceClient
 }
 
 // New build and returns new client to microservice user.
 func New(conn grpc.ClientConnInterface) *Client {
-	return &Client{conn: pb.NewUserClient(conn)}
+	return &Client{conn: pb.NewUserServiceClient(conn)}
 }
 
 // User contains main user info.
@@ -45,7 +45,7 @@ func (c *Client) Access(ctx context.Context, email, pass string) (*User, error) 
 		log.ReqID: []string{log.ReqIDFromCtx(ctx)},
 	})
 
-	res, err := c.conn.Access(ctx, &pb.RequestAccess{
+	res, err := c.conn.Access(ctx, &pb.AccessRequest{
 		Email:    email,
 		Password: pass,
 	})

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package session.v1;
+
+option go_package = ".;pb";
+
+// Internal service API fot check user session by auth token.
+service SessionService {
+  // Session get session info by token.
+  rpc Session (SessionRequest) returns (SessionResponse);
+}
+
+// Request.
+message SessionRequest {
+  // Contains auth token.
+  string token = 1;
+}
+
+// Response.
+message SessionResponse {
+  // Contains session UUID.
+  string        id = 1;
+  // Contains user UUID.
+  string   user_id = 2;
+}

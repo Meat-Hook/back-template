@@ -4,8 +4,8 @@ package rpc
 import (
 	"context"
 
-	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 )
@@ -24,7 +24,7 @@ type api struct {
 
 // New register service by grpc.Server and register metrics.
 func New(application users, srv *grpc.Server) *grpc.Server {
-	pb.RegisterUserServer(srv, &api{app: application})
+	pb.RegisterUserServiceServer(srv, &api{app: application})
 
 	prometheus.Register(srv)
 

@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
-	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -17,12 +17,12 @@ import (
 
 // Client to session microservice.
 type Client struct {
-	conn pb.SessionClient
+	conn pb.SessionServiceClient
 }
 
 // New build and returns new client to microservice session.
 func New(conn grpc.ClientConnInterface) *Client {
-	return &Client{conn: pb.NewSessionClient(conn)}
+	return &Client{conn: pb.NewSessionServiceClient(conn)}
 }
 
 // Session contains main session info.
@@ -42,7 +42,7 @@ func (c *Client) Session(ctx context.Context, token string) (*Session, error) {
 		log.ReqID: []string{log.ReqIDFromCtx(ctx)},
 	})
 
-	res, err := c.conn.Session(ctx, &pb.RequestSession{
+	res, err := c.conn.Session(ctx, &pb.SessionRequest{
 		Token: token,
 	})
 	switch {
@@ -52,13 +52,13 @@ func (c *Client) Session(ctx context.Context, token string) (*Session, error) {
 		return nil, fmt.Errorf("session: %w", err)
 	}
 
-	uid, err := uuid.FromString(res.UserID)
+	uid, err := uuid.FromString(res.UserId)
 	if err != nil {
 		return nil, fmt.Errorf("parse uuid: %w", err)
 	}
 
 	return &Session{
-		ID:     res.ID,
+		ID:     res.Id,
 		UserID: uid,
 	}, nil
 }

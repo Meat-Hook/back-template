@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 // Access check user access by email and pass.
-func (a *api) Access(ctx context.Context, req *pb.RequestAccess) (*pb.UserInfo, error) {
+func (a *api) Access(ctx context.Context, req *pb.AccessRequest) (*pb.AccessResponse, error) {
 	info, err := a.app.Access(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, apiError(err)
@@ -20,8 +20,8 @@ func (a *api) Access(ctx context.Context, req *pb.RequestAccess) (*pb.UserInfo, 
 	return apiUser(info), nil
 }
 
-func apiUser(user *app.User) *pb.UserInfo {
-	return &pb.UserInfo{
+func apiUser(user *app.User) *pb.AccessResponse {
+	return &pb.AccessResponse{
 		Id:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,

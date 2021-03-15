@@ -6,10 +6,9 @@ package session_test
 
 import (
 	context "context"
-	reflect "reflect"
-
 	client "github.com/Meat-Hook/back-template/microservices/session/client"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MocksessionSvc is a mock of sessionSvc interface

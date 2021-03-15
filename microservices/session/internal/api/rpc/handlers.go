@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 // Session get user session by raw token.
-func (a *api) Session(ctx context.Context, req *pb.RequestSession) (*pb.SessionInfo, error) {
+func (a *api) Session(ctx context.Context, req *pb.SessionRequest) (*pb.SessionResponse, error) {
 	info, err := a.app.Session(ctx, req.Token)
 	if err != nil {
 		return nil, apiError(err)
@@ -20,10 +20,10 @@ func (a *api) Session(ctx context.Context, req *pb.RequestSession) (*pb.SessionI
 	return apiSession(info), nil
 }
 
-func apiSession(session *app.Session) *pb.SessionInfo {
-	return &pb.SessionInfo{
-		ID:     session.ID,
-		UserID: session.UserID.String(),
+func apiSession(session *app.Session) *pb.SessionResponse {
+	return &pb.SessionResponse{
+		Id:     session.ID,
+		UserId: session.UserID.String(),
 	}
 }
 

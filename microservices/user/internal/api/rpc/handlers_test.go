@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -23,7 +23,7 @@ var (
 		Name:  "email@email.com",
 	}
 
-	rpcUser = pb.UserInfo{
+	rpcUser = pb.AccessResponse{
 		Id:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,
@@ -45,7 +45,7 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 
 	testCases := map[string]struct {
 		user    *app.User
-		want    *pb.UserInfo
+		want    *pb.AccessResponse
 		appErr  error
 		wantErr error
 	}{
@@ -68,7 +68,7 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
 
-			res, err := c.Access(ctx, &pb.RequestAccess{
+			res, err := c.Access(ctx, &pb.AccessRequest{
 				Email:    email,
 				Password: pass,
 			})

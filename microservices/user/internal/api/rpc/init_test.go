@@ -9,7 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	librpc "github.com/Meat-Hook/back-template/internal/libs/rpc"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc"
-	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc/pb"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (pb.UserClient, *Mockusers, *require.Assertions) {
+func start(t *testing.T) (pb.UserServiceClient, *Mockusers, *require.Assertions) {
 	t.Helper()
 	r := require.New(t)
 
@@ -54,5 +54,5 @@ func start(t *testing.T) (pb.UserClient, *Mockusers, *require.Assertions) {
 		cancel()
 	})
 
-	return pb.NewUserClient(conn), mockApp, r
+	return pb.NewUserServiceClient(conn), mockApp, r
 }

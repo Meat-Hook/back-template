@@ -1,0 +1,16 @@
+version: v1beta1
+build:
+  roots:
+    - proto
+
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - OTHER
+
+breaking:
+  use:
+    - FILE
+    - PACKAGE
+    - WIRE

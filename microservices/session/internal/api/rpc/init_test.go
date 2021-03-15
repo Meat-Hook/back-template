@@ -9,7 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/internal/libs/metrics"
 	librpc "github.com/Meat-Hook/back-template/internal/libs/rpc"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc"
-	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc/pb"
+	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (pb.SessionClient, *Mocksessions, *require.Assertions) {
+func start(t *testing.T) (pb.SessionServiceClient, *Mocksessions, *require.Assertions) {
 	t.Helper()
 	r := require.New(t)
 
@@ -54,5 +54,5 @@ func start(t *testing.T) (pb.SessionClient, *Mocksessions, *require.Assertions) 
 		cancel()
 	})
 
-	return pb.NewSessionClient(conn), mockApp, r
+	return pb.NewSessionServiceClient(conn), mockApp, r
 }

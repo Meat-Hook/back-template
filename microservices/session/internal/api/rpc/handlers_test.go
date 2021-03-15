@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc/pb"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -22,9 +22,9 @@ var (
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 
-	rpcUser = pb.SessionInfo{
-		ID:     "id",
-		UserID: sessionInfo.UserID.String(),
+	rpcUser = pb.SessionResponse{
+		Id:     "id",
+		UserId: sessionInfo.UserID.String(),
 	}
 )
 
@@ -40,7 +40,7 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 
 	testCases := map[string]struct {
 		session *app.Session
-		want    *pb.SessionInfo
+		want    *pb.SessionResponse
 		appErr  error
 		wantErr error
 	}{
@@ -63,7 +63,7 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 
 			mockApp.EXPECT().Session(gomock.Any(), token).Return(tc.session, tc.appErr)
 
-			res, err := c.Session(ctx, &pb.RequestSession{Token: token})
+			res, err := c.Session(ctx, &pb.SessionRequest{Token: token})
 			assert.ErrorIs(err, tc.wantErr)
 			assert.True(proto.Equal(tc.want, res))
 		})

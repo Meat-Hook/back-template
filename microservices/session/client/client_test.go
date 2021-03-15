@@ -8,7 +8,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/microservices/session/client"
-	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc/pb"
+	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -86,15 +86,15 @@ func TestClient_Access(t *testing.T) {
 	}
 
 	// success
-	mock.EXPECT().Session(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RequestSession{
+	mock.EXPECT().Session(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.SessionRequest{
 		Token: token,
-	}}).Return(&pb.SessionInfo{
-		ID:     session.ID,
-		UserID: session.UserID.String(),
+	}}).Return(&pb.SessionResponse{
+		Id:     session.ID,
+		UserId: session.UserID.String(),
 	}, nil)
 
 	// err any
-	mock.EXPECT().Session(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RequestSession{
+	mock.EXPECT().Session(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.SessionRequest{
 		Token: notValidToken,
 	}}).Return(nil, errAny)
 

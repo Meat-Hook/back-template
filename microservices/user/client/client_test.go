@@ -8,7 +8,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/internal/libs/log"
 	"github.com/Meat-Hook/back-template/microservices/user/client"
-	"github.com/Meat-Hook/back-template/microservices/user/internal/api/rpc/pb"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -81,10 +81,10 @@ func TestClient_Access(t *testing.T) {
 	}
 
 	// success
-	mock.EXPECT().Access(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RequestAccess{
+	mock.EXPECT().Access(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.AccessRequest{
 		Email:    user.Email,
 		Password: pass,
-	}}).Return(&pb.UserInfo{
+	}}).Return(&pb.AccessResponse{
 		Id:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,
@@ -92,7 +92,7 @@ func TestClient_Access(t *testing.T) {
 
 	// err_any
 	mock.EXPECT().
-		Access(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RequestAccess{}}).
+		Access(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.AccessRequest{}}).
 		Return(nil, errAny)
 
 	for name, tc := range testCases {
