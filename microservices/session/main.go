@@ -191,7 +191,7 @@ func main() {
 }
 
 const (
-	name     = `session`
+	name     = `session` // Service name.
 	dbDriver = `postgres`
 )
 
@@ -242,7 +242,6 @@ func start(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("build external api: %w", err)
 	}
-
 
 	return runner.Start(
 		c.Context,
