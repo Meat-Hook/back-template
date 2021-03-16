@@ -11,19 +11,22 @@ RUN go mod download
 
 COPY . .
 
-ENV GO111MODULE=on
-ENV CGO_ENABLED=0
-ENV GOOS=linux
-ENV GOARCH=amd64
+ARG GO111MODULE=on
+ARG CGO_ENABLED=0
+ARG GOOS=linux
+ARG GOARCH=amd64
+ARG SERVICE
 
-RUN go build ./microservices/user
+RUN go build ./microservices/$SERVICE
 
 FROM scratch
 
 WORKDIR /bin
 
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /build/user user
-COPY ./microservices/user/migrate/ migrate/
+ARG SERVICE
 
-CMD ./user
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /build/$SERVICE $SERVICE
+COPY ./microservices/$SERVICE/migrate/ migrate/
+
+CMD ./$SERVICE

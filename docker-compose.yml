@@ -5,7 +5,9 @@ services:
   user-service:
     build:
       context: .
-      dockerfile: microservices/user/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SERVICE: user
     image: user-service
     container_name: user-service
     restart: always
@@ -45,7 +47,9 @@ services:
   session-service:
     build:
       context: .
-      dockerfile: microservices/session/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SERVICE: session
     image: session-service
     container_name: session-service
     restart: always
