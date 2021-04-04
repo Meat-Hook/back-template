@@ -43,44 +43,49 @@ job "user" {
       }
     }
 
-    service {
-      name = "caddy"
-
-      check {
-        name = "alive"
-        type = "tcp"
-        port = "http"
-        interval = "10s"
-        timeout = "2s"
-
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
-
-      check {
-        name = "alive"
-        type = "tcp"
-        port = "https"
-        interval = "10s"
-        timeout = "2s"
-
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
-    }
-
     task "serve" {
       driver = "docker"
 
       resources {
         cpu = 100
         memory = 128
+      }
+
+      service {
+        name = "user-svc"
+
+        check {
+          name = "http-server-check"
+          type = "http"
+          protocol = "http"
+          port = "http"
+          path = "/health"
+          interval = "10s"
+          timeout = "2s"
+          method = "GET"
+
+          check_restart {
+            limit = 5
+            grace = "10s"
+            ignore_warnings = false
+          }
+        }
+
+        check {
+          name = "metric-server-check"
+          type = "tcp"
+          port = "metric"
+          interval = "10s"
+          timeout = "2s"
+
+          check_restart {
+            limit = 5
+            grace = "10s"
+            ignore_warnings = false
+          }
+        }
+
+        // TODO: Add gRPC health-check.
       }
 
       config {

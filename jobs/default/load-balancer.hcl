@@ -33,32 +33,32 @@ job "traefik" {
       }
     }
 
-    service {
-      name = "load-balancer"
-
-      port = "http"
-
-      check {
-        name = "alive"
-        type = "tcp"
-        port = "http"
-        interval = "10s"
-        timeout = "2s"
-
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
-    }
-
     task "serve" {
       driver = "docker"
 
       resources {
         cpu = 100
         memory = 128
+      }
+
+      service {
+        name = "load-balancer"
+
+        port = "http"
+
+        check {
+          name = "alive"
+          type = "tcp"
+          port = "http"
+          interval = "10s"
+          timeout = "2s"
+
+          check_restart {
+            limit = 3
+            grace = "60s"
+            ignore_warnings = false
+          }
+        }
       }
 
       config {
