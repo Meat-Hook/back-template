@@ -6,10 +6,11 @@ package client_test
 
 import (
 	context "context"
+	reflect "reflect"
+
 	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
-	reflect "reflect"
 )
 
 // MockSessionServiceClient is a mock of SessionServiceClient interface

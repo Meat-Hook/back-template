@@ -1,6 +1,6 @@
 job "cockroach" {
   namespace = "default"
-  type = "service"
+  type = "system"
   region = "global"
 
   datacenters = [
@@ -19,7 +19,7 @@ job "cockroach" {
     stagger = "30s"
   }
 
-  group "master" {
+  group "databases" {
     restart {
       interval = "30m"
       attempts = 5
@@ -29,30 +29,31 @@ job "cockroach" {
 
     network {
       port "http" {
-        static = 8080
+        static = 3000
+        to = 8080
       }
-      port "http" {
-        static = 8080
+      port "tcp" {
+        static = 26257
       }
     }
 
     task "serve" {
-      driver = "docker"
+      driver = "exec"
 
       resources {
-        cpu = 100
-        memory = 128
+        cpu = 200
+        memory = 256
       }
 
       service {
-        name = "load-balancer"
+        name = "cockroach"
 
-        port = "http"
+        port = "tcp"
 
         check {
           name = "alive"
           type = "tcp"
-          port = "http"
+          port = "tcp"
           interval = "10s"
           timeout = "2s"
 
@@ -65,42 +66,23 @@ job "cockroach" {
       }
 
       config {
-        image = "traefik:v2.4"
+        artifact {
+          source = "https://binaries.cockroachdb.com/cockroach-v20.2.7.linux-amd64.tgz"
+        }
 
-        network_mode = "host"
-
-        ports = [
-          "http",
-        ]
-
-        volumes = [
-          "local/traefik.yml:/etc/traefik/traefik.yml",
+        command = "cockroach"
+        args = [
+          "start",
+          "--certs-dir=certs/",
+          "--store=data",
+          "--listen-addr=X.X.X.X:26257",
+          "--join=X.X.X.X:26257,X.X.X.X:26258,X.X.X.X:26259"
         ]
       }
 
       logs {
         max_files = 10
         max_file_size = 2
-      }
-
-      template {
-        data = <<EOF
-entryPoints:
-  web:
-   address: ":8080"
-
-providers:
-  consulCatalog:
-    prefix: "load-balancer"
-    refreshInterval: 30s
-    requireConsistent: true
-    endpoint:
-      datacenter: dc1
-      address: consul.service.consul:8500
-
-EOF
-
-        destination = "local/traefik.yml"
       }
     }
   }
