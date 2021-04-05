@@ -1,10 +1,10 @@
 job "user" {
   namespace = "default"
-  type = "system"
+  type = "service"
   region = "global"
 
   datacenters = [
-    "dc1",
+    "home",
   ]
 
   update {
@@ -44,14 +44,17 @@ job "user" {
     }
 
     service {
-      name = "caddy"
+      name = "user-service"
+      tags = ["http"]
 
       check {
-        name = "alive"
-        type = "tcp"
+        name = "http-health"
+        type = "http"
         port = "http"
+        path = "/health"
         interval = "10s"
         timeout = "2s"
+        expose = true
 
         check_restart {
           limit = 3
@@ -59,20 +62,11 @@ job "user" {
           ignore_warnings = false
         }
       }
+    }
 
-      check {
-        name = "alive"
-        type = "tcp"
-        port = "https"
-        interval = "10s"
-        timeout = "2s"
-
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
+    service {
+      name = "user-service"
+      tags = ["grpc"]
     }
 
     task "serve" {
@@ -84,16 +78,7 @@ job "user" {
       }
 
       config {
-        image = "caddy:2-alpine"
-
-        ports = [
-          "http",
-          "https",
-        ]
-
-        volumes = [
-          "configs/Caddyfile:/etc/caddy/Caddyfile",
-        ]
+        image = "back-template/user-service:dev"
       }
 
       logs {

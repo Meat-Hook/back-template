@@ -13,7 +13,7 @@ bind_addr = "X.X.X.X"
 retry_join = ["X.X.X.X", "X.X.X.X"]
 
 acl = {
-  enabled = false
+  enabled = true
   default_policy = "allow"
   enable_token_persistence = true
 }
