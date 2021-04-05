@@ -37,46 +37,46 @@ job "Caddy" {
       }
     }
 
-    service {
-      name = "reverse-proxy"
-
-      port = "https"
-
-      tags = [
-        "https",
-        "system",
-      ]
-
-      check {
-        name = "alive"
-        type = "tcp"
-        port = "http"
-        interval = "10s"
-        timeout = "2s"
-
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
-
-      check {
-        name = "alive"
-        type = "tcp"
-        port = "https"
-        interval = "10s"
-        timeout = "2s"
-
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
-    }
-
     task "serve" {
+      service {
+        name = "reverse-proxy"
+
+        port = "https"
+
+        tags = [
+          "https",
+          "system",
+        ]
+
+        check {
+          name = "alive"
+          type = "tcp"
+          port = "http"
+          interval = "10s"
+          timeout = "2s"
+
+          check_restart {
+            limit = 3
+            grace = "60s"
+            ignore_warnings = false
+          }
+        }
+
+        check {
+          name = "alive"
+          type = "tcp"
+          port = "https"
+          interval = "10s"
+          timeout = "2s"
+
+          check_restart {
+            limit = 3
+            grace = "60s"
+            ignore_warnings = false
+          }
+        }
+      }
+
       driver = "docker"
 
       resources {

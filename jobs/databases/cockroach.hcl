@@ -1,10 +1,10 @@
-job "traefik" {
+job "cockroach" {
   namespace = "default"
-  type = "system"
+  type = "service"
   region = "global"
 
   datacenters = [
-    "dc1",
+    "home",
   ]
 
   update {
@@ -19,7 +19,7 @@ job "traefik" {
     stagger = "30s"
   }
 
-  group "load-balancer" {
+  group "master" {
     restart {
       interval = "30m"
       attempts = 5
@@ -28,6 +28,9 @@ job "traefik" {
     }
 
     network {
+      port "http" {
+        static = 8080
+      }
       port "http" {
         static = 8080
       }
