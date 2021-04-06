@@ -1,4 +1,4 @@
-job "traefik" {
+job "fabio" {
   namespace = "default"
   type = "system"
   region = "global"

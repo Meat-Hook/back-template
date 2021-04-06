@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/repo"
 	"github.com/gofrs/uuid"

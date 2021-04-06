@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/migrater"
+	"github.com/Meat-Hook/back-template/libs/migrater"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/dockertest/v3"

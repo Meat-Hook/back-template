@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Meat-Hook/back-template/internal/libs/log"
+	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

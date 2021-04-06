@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/internal/libs/log"
+	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/Meat-Hook/back-template/microservices/session/client"
 	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/gofrs/uuid"

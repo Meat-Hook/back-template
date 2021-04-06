@@ -4,7 +4,7 @@ package rpc
 import (
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/middleware"
+	"github.com/Meat-Hook/back-template/libs/middleware"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/rs/zerolog"

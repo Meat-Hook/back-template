@@ -1,0 +1,59 @@
+version: 0.1
+log:
+  accesslog:
+    disabled: true
+  level: info
+  formatter: json
+  fields:
+    service: registry
+    environment: home-server
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+    maxthreads: 25 # min for registry working
+  delete:
+    enabled: false
+  cache:
+    blobdescriptor: redis
+  maintenance:
+    uploadpurging:
+      enabled: true
+      age: 8760h # one year
+      interval: 730h # one month
+      dryrun: true
+    readonly:
+      enabled: false
+  redirect:
+    disable: false
+
+#auth: # without auth check
+#  htpasswd:
+#    realm: basic-realm
+#    path: /path/to/htpasswd
+http:
+  addr: 0.0.0.0:5000
+  prefix: /meat-hook/registry/
+  host: https://meathook-registry.ru
+  secret: SET_SECRET_RANDOM_TOKEN
+  relativeurls: false
+  draintimeout: 60s
+redis:
+  addr: redis.consul.service:6379
+  db: 0
+  dialtimeout: 10ms
+  readtimeout: 10ms
+  writetimeout: 10ms
+  pool:
+    maxidle: 16
+    maxactive: 64
+    idletimeout: 300s
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3
+  tcp:
+    - addr: redis.consul.service:6379
+      timeout: 3s
+      interval: 10s
+      threshold: 3

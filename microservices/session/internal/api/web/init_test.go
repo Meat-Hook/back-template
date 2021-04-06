@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/api/web"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/api/web/generated/client"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/api/web/generated/client/operations"

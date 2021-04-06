@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/Meat-Hook/back-template/internal/libs/log"
-	"github.com/Meat-Hook/back-template/internal/libs/metrics"
-	"github.com/Meat-Hook/back-template/internal/libs/middleware"
+	"github.com/Meat-Hook/back-template/libs/log"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/middleware"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/api/web/generated/restapi/operations"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"

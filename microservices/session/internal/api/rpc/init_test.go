@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/internal/libs/metrics"
-	librpc "github.com/Meat-Hook/back-template/internal/libs/rpc"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+	librpc "github.com/Meat-Hook/back-template/libs/rpc"
 	"github.com/Meat-Hook/back-template/microservices/session/internal/api/rpc"
 	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/golang/mock/gomock"

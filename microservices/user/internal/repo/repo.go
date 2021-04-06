@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"

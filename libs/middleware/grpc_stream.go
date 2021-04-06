@@ -3,8 +3,8 @@ package middleware
 import (
 	"errors"
 
-	"github.com/Meat-Hook/back-template/internal/libs/log"
-	"github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/log"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"

@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/internal/libs/log"
+	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/Meat-Hook/back-template/microservices/user/internal/app"
 	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/gofrs/uuid"
