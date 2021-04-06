@@ -4,7 +4,7 @@ job "Caddy" {
   region = "global"
 
   datacenters = [
-    "dalaran",
+    "DC",
   ]
 
   update {
@@ -104,19 +104,26 @@ job "Caddy" {
 
       template {
         data = <<EOF
-http://meat-hook.com {
+https://domain.com {
   reverse_proxy http://load-balancer.service.consul:8080
 }
 
-http://meathook-consul.ru {
+https://domain-consul.ru {
   reverse_proxy http://consul.service.consul:8500
   basicauth {
      Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
   }
 }
 
-http://meathook-nomad.ru {
+https://domain-nomad.ru {
   reverse_proxy http://nomad-client.service.consul:4646
+  basicauth {
+     Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
+  }
+}
+
+https://domain-database.ru {
+  reverse_proxy http://database.service.consul:5000
   basicauth {
      Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
   }

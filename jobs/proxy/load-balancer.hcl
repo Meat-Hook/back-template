@@ -4,7 +4,7 @@ job "traefik" {
   region = "global"
 
   datacenters = [
-    "dc1",
+    "DC",
   ]
 
   update {
