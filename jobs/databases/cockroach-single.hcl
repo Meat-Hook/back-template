@@ -27,8 +27,8 @@ job "cockroach" {
 
     volume "data" {
       type = "host"
-      source = "cockroach-data"
       read_only = false
+      source = "cockroach-data"
     }
 
     restart {
