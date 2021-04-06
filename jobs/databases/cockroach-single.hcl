@@ -18,7 +18,6 @@ job "cockroach" {
   }
 
   group "databases" {
-
     volume "certs" {
       type = "host"
       read_only = true
@@ -46,18 +45,6 @@ job "cockroach" {
     task "serve" {
       driver = "exec"
 
-      volume_mount {
-        volume = "certs"
-        destination = "/opt/cockroach/certs"
-        read_only = true
-      }
-
-      volume_mount {
-        volume = "data"
-        destination = "/opt/cockroach/data/"
-        read_only = false
-      }
-
       resources {
         cpu = 500
         memory = 256
@@ -67,6 +54,12 @@ job "cockroach" {
         name = "cockroach"
 
         port = "tcp"
+
+        tags = [
+          "database",
+          "single",
+          "exec",
+        ]
 
         check {
           name = "alive-tcp"
@@ -97,20 +90,37 @@ job "cockroach" {
         }
       }
 
-      artifact {
-        source = "https://binaries.cockroachdb.com/cockroach-vX.X.X.linux-amd64.tgz"
-      }
-
       config {
         command = "cockroach"
         args = [
           "start-single-node",
-          "--certs-dir","/opt/cockroach/certs",
-          "--store","/opt/cockroach/data",
-          "--host","X.X.X.X",
-          "--port","${NOMAD_PORT_tcp}",
-          "--http-port","${NOMAD_PORT_http}"
+          "--certs-dir",
+          "/opt/cockroach/certs",
+          "--store",
+          "/opt/cockroach/data",
+          "--host",
+          "X.X.X.X",
+          "--port",
+          "${NOMAD_PORT_tcp}",
+          "--http-port",
+          "${NOMAD_PORT_http}"
         ]
+      }
+
+      volume_mount {
+        volume = "certs"
+        destination = "/opt/cockroach/certs"
+        read_only = true
+      }
+
+      volume_mount {
+        volume = "data"
+        destination = "/opt/cockroach/data/"
+        read_only = false
+      }
+
+      artifact {
+        source = "https://binaries.cockroachdb.com/cockroach-vX.X.X.linux-amd64.tgz"
       }
 
       logs {

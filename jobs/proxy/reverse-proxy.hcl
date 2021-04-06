@@ -31,13 +31,19 @@ job "Caddy" {
       port "http" {
         static = 80
       }
-
       port "https" {
         static = 443
       }
     }
 
     task "serve" {
+      driver = "docker"
+
+      resources {
+        cpu = 100
+        memory = 128
+      }
+
       service {
         name = "reverse-proxy"
 
@@ -45,7 +51,8 @@ job "Caddy" {
 
         tags = [
           "https",
-          "system",
+          "docker",
+          "reverse-proxy",
         ]
 
         check {
@@ -75,13 +82,6 @@ job "Caddy" {
             ignore_warnings = false
           }
         }
-      }
-
-      driver = "docker"
-
-      resources {
-        cpu = 100
-        memory = 128
       }
 
       config {
