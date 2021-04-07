@@ -16,7 +16,6 @@ require (
 	github.com/go-openapi/validate v0.20.2
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.5.0
-	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/jackc/pgtype v1.7.0
@@ -38,11 +37,11 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
-	golang.org/x/net v0.0.0-20210331212208-0fccb6fa2b5c
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210403161142-5e06dd20ab57 // indirect
 	golang.org/x/text v0.3.6 // indirect
-	google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1 // indirect
-	google.golang.org/grpc v1.36.1
+	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46 // indirect
+	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.26.0
 )

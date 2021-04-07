@@ -1,0 +1,49 @@
+package rpc
+
+import (
+	"context"
+	"errors"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+// Access check user access by email and pass.
+func (a *api) Access(ctx context.Context, req *pb.AccessRequest) (*pb.AccessResponse, error) {
+	info, err := a.app.Access(ctx, req.Email, req.Password)
+	if err != nil {
+		return nil, apiError(err)
+	}
+
+	return apiUser(info), nil
+}
+
+func apiUser(user *app.User) *pb.AccessResponse {
+	return &pb.AccessResponse{
+		Id:    user.ID.String(),
+		Name:  user.Name,
+		Email: user.Email,
+	}
+}
+
+func apiError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	code := codes.Internal
+	switch {
+	case errors.Is(err, app.ErrNotFound):
+		code = codes.NotFound
+	case errors.Is(err, app.ErrNotValidPassword):
+		code = codes.InvalidArgument
+	case errors.Is(err, context.DeadlineExceeded):
+		code = codes.DeadlineExceeded
+	case errors.Is(err, context.Canceled):
+		code = codes.Canceled
+	}
+
+	return status.Error(code, err.Error())
+}

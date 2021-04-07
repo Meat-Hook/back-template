@@ -17,7 +17,7 @@ ARG GOOS=linux
 ARG GOARCH=amd64
 ARG SERVICE
 
-RUN go build ./microservices/$SERVICE
+RUN go build ./cmd/$SERVICE
 
 FROM scratch
 
@@ -27,6 +27,6 @@ ARG SERVICE
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /build/$SERVICE $SERVICE
-COPY ./microservices/$SERVICE/migrate/ migrate/
+COPY ./cmd/$SERVICE/migrate/ migrate/
 
 CMD ./$SERVICE

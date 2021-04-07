@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package user.v1;
 
-option go_package = ".;pb";
+option go_package = "github.com/Meat-Hook/back-template/proto/go/user/v1;pb";
 
 // Internal service API for getting user info for login.
 service UserService {
