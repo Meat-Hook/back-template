@@ -299,7 +299,7 @@ linters-settings:
     #   - atomicalign
     enable-all: true
     disable:
-       - fieldalignment
+      - fieldalignment
     #disable-all: false
   depguard:
     list-type: blacklist
@@ -612,7 +612,6 @@ issues:
       linters:
         - testpackage
 
-    # For importing legacy microservices into the monolith.
     - path: (^|/)old/
       linters: # all but depguard:
         - asciicheck

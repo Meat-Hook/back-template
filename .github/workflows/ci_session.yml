@@ -3,12 +3,12 @@ name: CI_SESSION
 on:
   push:
     paths:
-      - 'microservices/session/*'
+      - 'cmd/session/*'
     branches:
       - main
   pull_request:
     paths:
-      - 'microservices/session/*'
+      - 'cmd/session/*'
     branches:
       - main
 
@@ -21,7 +21,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: v1.38.0
-          working-directory: microservices/session/
+          working-directory: cmd/session/
 
   test:
     runs-on: self-hosted
@@ -36,5 +36,5 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Start test.
-        run: go test -race ./microservices/session/...
+        run: go test -race ./cmd/session/...
 
