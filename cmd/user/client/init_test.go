@@ -6,9 +6,9 @@ import (
 	"net"
 	"testing"
 
+	"github.com/Meat-Hook/back-template/cmd/user/client"
 	"github.com/Meat-Hook/back-template/libs/log"
 	librpc "github.com/Meat-Hook/back-template/libs/rpc"
-	"github.com/Meat-Hook/back-template/cmd/user/client"
 	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/xid"

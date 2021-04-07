@@ -1,4 +1,4 @@
-job "Caddy" {
+job "caddy" {
   namespace = "default"
   type = "system"
   region = "global"
@@ -122,8 +122,8 @@ https://domain-nomad.ru {
   }
 }
 
-https://domain-database.ru {
-  reverse_proxy http://database.service.consul:5000
+https://domain-cockroach.ru {
+  reverse_proxy http://cockroach-single.service.consul:3500
   basicauth {
      Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
   }

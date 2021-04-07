@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	"github.com/Meat-Hook/back-template/libs/log"
 	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"

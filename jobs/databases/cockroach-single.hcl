@@ -1,4 +1,4 @@
-job "cockroach" {
+job "cockroach-single-node" {
   namespace = "default"
   type = "service"
   region = "global"
@@ -6,6 +6,11 @@ job "cockroach" {
   datacenters = [
     "DC",
   ]
+
+  constraint {
+    attribute = "${attr.unique.hostname}"
+    value = "ADDR"
+  }
 
   update {
     max_parallel = 1
@@ -38,27 +43,31 @@ job "cockroach" {
     }
 
     network {
-      port "http" {}
-      port "tcp" {}
+      port "http" {
+        static = 3500
+      }
+      port "tcp" {
+        static = 26257
+      }
     }
 
     task "serve" {
-      driver = "exec"
+      driver = "docker"
 
       resources {
-        cpu = 500
-        memory = 256
+        cpu = 1000
+        memory = 1024
       }
 
       service {
-        name = "cockroach"
+        name = "cockroach-single"
 
         port = "tcp"
 
         tags = [
           "database",
           "single",
-          "exec",
+          "docker",
         ]
 
         check {
@@ -91,7 +100,15 @@ job "cockroach" {
       }
 
       config {
-        command = "cockroach"
+        image = "cockroachdb/cockroach:v20.2.7"
+
+        ports = [
+          "http",
+          "tcp",
+        ]
+
+        hostname = "cockroach-single.service.consul"
+
         args = [
           "start-single-node",
           "--certs-dir",
@@ -99,7 +116,7 @@ job "cockroach" {
           "--store",
           "/opt/cockroach/data",
           "--host",
-          "X.X.X.X",
+          "cockroach-single.service.consul",
           "--port",
           "${NOMAD_PORT_tcp}",
           "--http-port",
@@ -117,10 +134,6 @@ job "cockroach" {
         volume = "data"
         destination = "/opt/cockroach/data/"
         read_only = false
-      }
-
-      artifact {
-        source = "https://binaries.cockroachdb.com/cockroach-vX.X.X.linux-amd64.tgz"
       }
 
       logs {

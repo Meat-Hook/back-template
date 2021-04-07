@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"

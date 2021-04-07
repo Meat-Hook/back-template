@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/Meat-Hook/back-template/cmd/session/client"
+	"github.com/Meat-Hook/back-template/libs/log"
 	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
