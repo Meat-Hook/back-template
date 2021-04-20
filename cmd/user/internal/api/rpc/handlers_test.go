@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"

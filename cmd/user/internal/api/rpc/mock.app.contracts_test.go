@@ -12,30 +12,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// Mockusers is a mock of users interface
+// Mockusers is a mock of users interface.
 type Mockusers struct {
 	ctrl     *gomock.Controller
 	recorder *MockusersMockRecorder
 }
 
-// MockusersMockRecorder is the mock recorder for Mockusers
+// MockusersMockRecorder is the mock recorder for Mockusers.
 type MockusersMockRecorder struct {
 	mock *Mockusers
 }
 
-// NewMockusers creates a new mock instance
+// NewMockusers creates a new mock instance.
 func NewMockusers(ctrl *gomock.Controller) *Mockusers {
 	mock := &Mockusers{ctrl: ctrl}
 	mock.recorder = &MockusersMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *Mockusers) EXPECT() *MockusersMockRecorder {
 	return m.recorder
 }
 
-// Access mocks base method
+// Access mocks base method.
 func (m *Mockusers) Access(ctx context.Context, email, password string) (*app.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Access", ctx, email, password)
@@ -44,7 +44,7 @@ func (m *Mockusers) Access(ctx context.Context, email, password string) (*app.Us
 	return ret0, ret1
 }
 
-// Access indicates an expected call of Access
+// Access indicates an expected call of Access.
 func (mr *MockusersMockRecorder) Access(ctx, email, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Access", reflect.TypeOf((*Mockusers)(nil).Access), ctx, email, password)

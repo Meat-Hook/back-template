@@ -12,15 +12,10 @@
 заданных контрактов бизнес логики.
 
 # Для старта нужно
-
 -   docker-compose up --build
-
 Для остановки
-
 -   docker-compose down
 
-# Docs
-
+# docker-compose
 -   документация модуля user - <http://localhost:8080/user/api/v1/docs>
-
 -   документация модуля session - <http://localhost:8081/session/api/v1/docs>

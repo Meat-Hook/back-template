@@ -1,15 +1,15 @@
-job "cockroach-single-node" {
+job "cockroach-single" {
   namespace = "default"
   type = "service"
   region = "global"
 
   datacenters = [
-    "DC",
+    "home",
   ]
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    value = "ADDR"
+    value = "home-server"
   }
 
   update {
@@ -35,6 +35,12 @@ job "cockroach-single-node" {
       source = "cockroach-data"
     }
 
+    ephemeral_disk {
+      migrate = true
+      size = 10240
+      sticky = true
+    }
+
     restart {
       interval = "30m"
       attempts = 5
@@ -43,11 +49,73 @@ job "cockroach-single-node" {
     }
 
     network {
+      mode = "bridge"
       port "http" {
-        static = 3500
+        static = 8080
+        to = 8080
       }
       port "tcp" {
         static = 26257
+        to = 26257
+      }
+    }
+
+    // admin dashboard
+    service {
+      name = "cockroach-dashboard"
+
+      port = "http"
+
+      tags = [
+        "database",
+        "single",
+        "docker",
+        "admin",
+      ]
+
+      check {
+        name = "alive-http"
+        type = "tcp"
+        port = "http"
+        interval = "10s"
+        timeout = "2s"
+
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
+      }
+    }
+
+    // database
+    service {
+      name = "cockroach-single"
+
+      port = "tcp"
+
+      tags = [
+        "database",
+        "single",
+        "docker",
+      ]
+
+      connect {
+        sidecar_service {}
+
+        sidecar_task {
+          resources {
+            cpu = 250
+            memory = 512
+          }
+
+          logs {
+            max_files = 10
+            max_file_size = 2
+          }
+
+          shutdown_delay = "5s"
+        }
       }
     }
 
@@ -59,46 +127,6 @@ job "cockroach-single-node" {
         memory = 1024
       }
 
-      service {
-        name = "cockroach-single"
-
-        port = "tcp"
-
-        tags = [
-          "database",
-          "single",
-          "docker",
-        ]
-
-        check {
-          name = "alive-tcp"
-          type = "tcp"
-          port = "tcp"
-          interval = "10s"
-          timeout = "2s"
-
-          check_restart {
-            limit = 3
-            grace = "60s"
-            ignore_warnings = false
-          }
-        }
-
-        check {
-          name = "alive-http"
-          type = "tcp"
-          port = "http"
-          interval = "10s"
-          timeout = "2s"
-
-          check_restart {
-            limit = 3
-            grace = "60s"
-            ignore_warnings = false
-          }
-        }
-      }
-
       config {
         image = "cockroachdb/cockroach:v20.2.7"
 
@@ -107,20 +135,14 @@ job "cockroach-single-node" {
           "tcp",
         ]
 
-        hostname = "cockroach-single.service.consul"
-
         args = [
           "start-single-node",
           "--certs-dir",
           "/opt/cockroach/certs",
           "--store",
-          "/opt/cockroach/data",
+          "/opt/cockroach/data/single-node/",
           "--host",
-          "cockroach-single.service.consul",
-          "--port",
-          "${NOMAD_PORT_tcp}",
-          "--http-port",
-          "${NOMAD_PORT_http}"
+          "0.0.0.0",
         ]
       }
 

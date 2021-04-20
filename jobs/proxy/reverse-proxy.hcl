@@ -36,52 +36,64 @@ job "caddy" {
       }
     }
 
+    service {
+      name = "reverse-proxy"
+
+      port = "https"
+
+      tags = [
+        "https",
+        "docker",
+        "reverse-proxy",
+      ]
+
+      check {
+        name = "alive"
+        type = "tcp"
+        port = "https"
+        interval = "10s"
+        timeout = "2s"
+
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
+      }
+    }
+
+    service {
+      name = "reverse-proxy"
+
+      port = "http"
+
+      tags = [
+        "http",
+        "docker",
+        "reverse-proxy",
+      ]
+
+      check {
+        name = "alive"
+        type = "tcp"
+        port = "http"
+        interval = "10s"
+        timeout = "2s"
+
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
+      }
+    }
+
     task "serve" {
       driver = "docker"
 
       resources {
         cpu = 100
         memory = 128
-      }
-
-      service {
-        name = "reverse-proxy"
-
-        port = "https"
-
-        tags = [
-          "https",
-          "docker",
-          "reverse-proxy",
-        ]
-
-        check {
-          name = "alive"
-          type = "tcp"
-          port = "http"
-          interval = "10s"
-          timeout = "2s"
-
-          check_restart {
-            limit = 3
-            grace = "60s"
-            ignore_warnings = false
-          }
-        }
-
-        check {
-          name = "alive"
-          type = "tcp"
-          port = "https"
-          interval = "10s"
-          timeout = "2s"
-
-          check_restart {
-            limit = 3
-            grace = "60s"
-            ignore_warnings = false
-          }
-        }
       }
 
       config {
@@ -118,14 +130,14 @@ https://domain-consul.ru {
 https://domain-nomad.ru {
   reverse_proxy http://nomad-client.service.consul:4646
   basicauth {
-     Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
+     admin JDJhJDE0JGZXSFh0L3lKL0x3M2RDTWNvMUhoWk9yQlQ2TTVveEFKZ2x6anh2MHZwLlYySnNDeTBWU0oy
   }
 }
 
-https://domain-cockroach.ru {
+https://domain-database.ru {
   reverse_proxy http://cockroach-single.service.consul:3500
   basicauth {
-     Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
+     admin JDJhJDE0JGZXSFh0L3lKL0x3M2RDTWNvMUhoWk9yQlQ2TTVveEFKZ2x6anh2MHZwLlYySnNDeTBWU0oy
   }
 }
 EOF
