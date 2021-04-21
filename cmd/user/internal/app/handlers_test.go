@@ -111,9 +111,9 @@ func TestModule_CreateUser(t *testing.T) {
 		want     uuid.UUID
 		wantErr  error
 	}{
-		"success":          {email, username, pass, wantID, nil},
-		"err_save_user":    {email, existUserName, pass, uuid.Nil, app.ErrUsernameExist},
-		"err_hashing":      {notValidEmail, username, unknownPass, uuid.Nil, errAny},
+		"success":       {email, username, pass, wantID, nil},
+		"err_save_user": {email, existUserName, pass, uuid.Nil, app.ErrUsernameExist},
+		"err_hashing":   {notValidEmail, username, unknownPass, uuid.Nil, errAny},
 	}
 
 	for name, tc := range testCases {
