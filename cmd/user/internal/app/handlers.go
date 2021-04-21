@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gofrs/uuid"
 )
 
 // VerificationEmail check exists or not user email.
