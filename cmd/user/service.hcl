@@ -4,7 +4,7 @@ job "user" {
   region = "global"
 
   datacenters = [
-    "home",
+    "dc",
   ]
 
   constraint {
@@ -159,8 +159,8 @@ job "user" {
       template {
         data = <<EOH
 DB_NAME="user_db"
-DB_USER="edgar"
-DB_PASS="251277"
+DB_USER="user"
+DB_PASS="PASS"
 DB_HOST="cockroach-single.service.consul"
 DB_PORT="26257"
 DB_SSL_MODE="require"
