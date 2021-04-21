@@ -14,7 +14,6 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/notification"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/repo"
 	wrapper "github.com/Meat-Hook/back-template/cmd/user/internal/session"
 	"github.com/Meat-Hook/back-template/libs/hash"
@@ -26,7 +25,6 @@ import (
 	"github.com/go-openapi/loads"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
@@ -62,17 +60,18 @@ var (
 		EnvVars:  []string{"DB_HOST"},
 		Required: true,
 	}
+	dbSSLMode = &cli.StringFlag{
+		Name:     "db-ssl",
+		Aliases:  []string{"S"},
+		Usage:    "database ssl mode",
+		EnvVars:  []string{"DB_SSL_MODE"},
+		Required: true,
+	}
 	dbPort = &cli.IntFlag{
 		Name:     "db-port",
 		Aliases:  []string{"P"},
 		Usage:    "database port",
 		EnvVars:  []string{"DB_PORT"},
-		Required: true,
-	}
-	natsAddr = &cli.StringFlag{
-		Name:     "nats",
-		Usage:    "nats server address",
-		EnvVars:  []string{"NATS"},
 		Required: true,
 	}
 	sessionSrv = &cli.StringFlag{
@@ -166,7 +165,7 @@ func main() {
 		Description: "Microservice for working with user info.",
 		Commands:    []*cli.Command{version},
 		Flags: []cli.Flag{
-			dbName, dbPass, dbUser, dbPort, dbHost, natsAddr,
+			dbName, dbPass, dbUser, dbPort, dbHost, dbSSLMode,
 			sessionSrv, host, grpcPort, httpPort, metricPort,
 			migrate, migrateDir,
 		},
@@ -209,8 +208,8 @@ func start(c *cli.Context) error {
 	// init database connection
 	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
 	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable", c.String(dbHost.Name), c.Int(dbPort.Name), c.String(dbUser.Name),
-		c.String(dbPass.Name), c.String(dbName.Name)))
+		"password=%s dbname=%s sslmode=%s", c.String(dbHost.Name), c.Int(dbPort.Name), c.String(dbUser.Name),
+		c.String(dbPass.Name), c.String(dbName.Name), c.String(dbSSLMode.Name)))
 	if err != nil {
 		return fmt.Errorf("DB connect: %w", err)
 	}
@@ -223,13 +222,6 @@ func start(c *cli.Context) error {
 		}
 	}
 
-	natsConn, err := nats.Connect(c.String(natsAddr.Name))
-	if err != nil {
-		return fmt.Errorf("nats connect: %w", err)
-	}
-	defer log.WarnIfFail(logger, natsConn.Drain)
-	defer natsConn.Close()
-
 	grpcConn, err := librpc.Client(c.Context, c.String(sessionSrv.Name))
 	if err != nil {
 		return fmt.Errorf("build lib rpc: %w", err)
@@ -238,9 +230,8 @@ func start(c *cli.Context) error {
 
 	r := repo.New(db, &dbMetric)
 	hasher := hash.New()
-	queueNotification := notification.New(natsConn)
 
-	module := app.New(r, hasher, queueNotification, wrapper.New(sessionSvcClient))
+	module := app.New(r, hasher, wrapper.New(sessionSvcClient))
 
 	apiMetric := metrics.HTTP(name, restapi.FlatSwaggerJSON)
 	internalAPI := rpc.New(module, librpc.Server(logger))

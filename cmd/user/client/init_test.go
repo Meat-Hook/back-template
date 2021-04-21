@@ -9,14 +9,14 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/user/client"
 	"github.com/Meat-Hook/back-template/libs/log"
 	librpc "github.com/Meat-Hook/back-template/libs/rpc"
-	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
 
-//go:generate mockgen -source=../../../proto/go/user/v1/user_grpc.pb.go -destination mock.app.contracts_test.go -package client_test
+//go:generate mockgen -source=../../../proto/gen/go/user/v1/user_grpc.pb.go -destination mock.app.contracts_test.go -package client_test
 
 var (
 	reqID = xid.New()

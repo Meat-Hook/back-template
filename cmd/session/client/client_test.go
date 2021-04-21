@@ -8,7 +8,7 @@ import (
 
 	"github.com/Meat-Hook/back-template/cmd/session/client"
 	"github.com/Meat-Hook/back-template/libs/log"
-	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/codes"

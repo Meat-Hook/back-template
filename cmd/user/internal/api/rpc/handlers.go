@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

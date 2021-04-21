@@ -5,7 +5,7 @@ import (
 	"context"
 
 	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	pb "github.com/Meat-Hook/back-template/proto/go/session/v1"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 )

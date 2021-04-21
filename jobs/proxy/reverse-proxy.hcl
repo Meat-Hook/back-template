@@ -14,8 +14,6 @@ job "caddy" {
     healthy_deadline = "5m"
     progress_deadline = "10m"
     auto_revert = true
-    auto_promote = true
-    canary = 1
     stagger = "30s"
   }
 
@@ -34,6 +32,63 @@ job "caddy" {
       port "https" {
         static = 443
       }
+      dns {
+        servers = [
+          "192.168.31.116",
+        ]
+      }
+    }
+
+    service {
+      name = "reverse-proxy"
+
+      port = "https"
+
+      tags = [
+        "https",
+        "docker",
+        "reverse-proxy",
+      ]
+
+      check {
+        name = "alive"
+        type = "tcp"
+        port = "https"
+        interval = "10s"
+        timeout = "2s"
+
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
+      }
+    }
+
+    service {
+      name = "reverse-proxy"
+
+      port = "http"
+
+      tags = [
+        "http",
+        "docker",
+        "reverse-proxy",
+      ]
+
+      check {
+        name = "alive"
+        type = "tcp"
+        port = "http"
+        interval = "10s"
+        timeout = "2s"
+
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
+      }
     }
 
     task "serve" {
@@ -42,46 +97,6 @@ job "caddy" {
       resources {
         cpu = 100
         memory = 128
-      }
-
-      service {
-        name = "reverse-proxy"
-
-        port = "https"
-
-        tags = [
-          "https",
-          "docker",
-          "reverse-proxy",
-        ]
-
-        check {
-          name = "alive"
-          type = "tcp"
-          port = "http"
-          interval = "10s"
-          timeout = "2s"
-
-          check_restart {
-            limit = 3
-            grace = "60s"
-            ignore_warnings = false
-          }
-        }
-
-        check {
-          name = "alive"
-          type = "tcp"
-          port = "https"
-          interval = "10s"
-          timeout = "2s"
-
-          check_restart {
-            limit = 3
-            grace = "60s"
-            ignore_warnings = false
-          }
-        }
       }
 
       config {
@@ -105,27 +120,28 @@ job "caddy" {
       template {
         data = <<EOF
 https://domain.com {
-  reverse_proxy http://load-balancer.service.consul:8080
+  reverse_proxy /user/* user-http.service.consul:10000
+  reverse_proxy /session/* session-http.service.consul:10001
 }
 
 https://domain-consul.ru {
   reverse_proxy http://consul.service.consul:8500
   basicauth {
-     Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
+     admin JDJhJDE0JGZXSFh0L3lKL0x3M2RDTWNvMUhoWk9yQlQ2TTVveEFKZ2x6anh2MHZwLlYySnNDeTBWU0oy
   }
 }
 
 https://domain-nomad.ru {
   reverse_proxy http://nomad-client.service.consul:4646
   basicauth {
-     Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
+     admin JDJhJDE0JGZXSFh0L3lKL0x3M2RDTWNvMUhoWk9yQlQ2TTVveEFKZ2x6anh2MHZwLlYySnNDeTBWU0oy
   }
 }
 
-https://domain-cockroach.ru {
+https://domain-database.ru {
   reverse_proxy http://cockroach-single.service.consul:3500
   basicauth {
-     Edgar JDJhJDE0JDBxVTlkMENWUUZSZEVyemtSeURhaGVoLmRKb0FOZUtqY2dGMHVpTGs0cDlXbVg3RVRLeVE2
+     admin JDJhJDE0JGZXSFh0L3lKL0x3M2RDTWNvMUhoWk9yQlQ2TTVveEFKZ2x6anh2MHZwLlYySnNDeTBWU0oy
   }
 }
 EOF

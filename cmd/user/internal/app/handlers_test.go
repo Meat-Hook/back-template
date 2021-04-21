@@ -2,7 +2,6 @@ package app_test
 
 import (
 	"context"
-	"strings"
 	"testing"
 	"time"
 
@@ -91,11 +90,7 @@ func TestModule_CreateUser(t *testing.T) {
 		wantID        = uuid.Must(uuid.NewV4())
 	)
 
-	mocks.hasher.EXPECT().Hashing(pass).Return([]byte(pass), nil).Times(3)
-	mocks.notification.EXPECT().Send(ctx, email, app.Message{
-		Kind:    app.Welcome,
-		Content: app.WelcomeText,
-	}).Return(nil).Times(2)
+	mocks.hasher.EXPECT().Hashing(pass).Return([]byte(pass), nil).Times(2)
 	mocks.repo.EXPECT().Save(ctx, app.User{
 		Email:    email,
 		Name:     username,
@@ -107,12 +102,6 @@ func TestModule_CreateUser(t *testing.T) {
 		Name:     existUserName,
 		PassHash: []byte(pass),
 	}).Return(uuid.Nil, app.ErrUsernameExist)
-
-	mocks.notification.EXPECT().Send(ctx, strings.ToLower(notValidEmail), app.Message{
-		Kind:    app.Welcome,
-		Content: app.WelcomeText,
-	}).Return(errAny)
-
 	mocks.hasher.EXPECT().Hashing(unknownPass).Return(nil, errAny)
 
 	testCases := map[string]struct {
@@ -124,7 +113,6 @@ func TestModule_CreateUser(t *testing.T) {
 	}{
 		"success":          {email, username, pass, wantID, nil},
 		"err_save_user":    {email, existUserName, pass, uuid.Nil, app.ErrUsernameExist},
-		"err_notification": {notValidEmail, username, pass, uuid.Nil, errAny},
 		"err_hashing":      {notValidEmail, username, unknownPass, uuid.Nil, errAny},
 	}
 

@@ -44,7 +44,7 @@ type UpdatePassword struct {
 func (o *UpdatePassword) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewUpdatePasswordParams()
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
@@ -53,7 +53,7 @@ func (o *UpdatePassword) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if aCtx != nil {
-		r = aCtx
+		*r = *aCtx
 	}
 	var principal *app.Session
 	if uprinc != nil {

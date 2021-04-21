@@ -9,7 +9,7 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/rpc"
 	"github.com/Meat-Hook/back-template/libs/metrics"
 	librpc "github.com/Meat-Hook/back-template/libs/rpc"
-	pb "github.com/Meat-Hook/back-template/proto/go/user/v1"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
