@@ -23,7 +23,7 @@ type (
 		// Save saves the new user session in a database.
 		// Errors: unknown.
 		Save(context.Context, Session) error
-		// Session returns user session by session id.
+		// ByID returns user session by session id.
 		// Errors: ErrNotFound, unknown.
 		ByID(context.Context, string) (*Session, error)
 		// Delete removes user session.

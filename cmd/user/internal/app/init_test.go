@@ -18,7 +18,6 @@ var (
 type mocks struct {
 	hasher       *MockHasher
 	repo         *MockRepo
-	notification *MockNotification
 	auth         *MockAuth
 }
 
@@ -29,15 +28,13 @@ func start(t *testing.T) (*app.Module, *mocks, *require.Assertions) {
 
 	mockRepo := NewMockRepo(ctrl)
 	mockHasher := NewMockHasher(ctrl)
-	mockNotification := NewMockNotification(ctrl)
 	mockAuth := NewMockAuth(ctrl)
 
-	module := app.New(mockRepo, mockHasher, mockNotification, mockAuth)
+	module := app.New(mockRepo, mockHasher, mockAuth)
 
 	mocks := &mocks{
 		hasher:       mockHasher,
 		repo:         mockRepo,
-		notification: mockNotification,
 		auth:         mockAuth,
 	}
 

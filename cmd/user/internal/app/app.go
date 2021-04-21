@@ -55,28 +55,12 @@ type (
 		Compare(hashedPassword []byte, password []byte) bool
 	}
 
-	// Notification module for working with alerts for registered users.
-	Notification interface {
-		// Send sends a message to the user based on their contact information.
-		// Errors: unknown.
-		Send(ctx context.Context, contact string, msg Message) error
-	}
-
 	// Auth module for get user session by token.
 	Auth interface {
 		// Session returns user session by his token.
 		// Errors: ErrNotFound, unknown.
 		Session(ctx context.Context, token string) (*Session, error)
 	}
-
-	// Message contains notification info.
-	Message struct {
-		Kind    MessageKind
-		Content string
-	}
-
-	// MessageKind selects the type of message to be sent.
-	MessageKind uint8
 
 	// SearchParams params for search users.
 	SearchParams struct {
@@ -104,30 +88,18 @@ type (
 	Module struct {
 		user         Repo
 		hash         Hasher
-		notification Notification
 		auth         Auth
 	}
 )
 
 // New build and returns new Module for working with user info.
-func New(r Repo, h Hasher, n Notification, a Auth) *Module {
+func New(r Repo, h Hasher, a Auth) *Module {
 	return &Module{
 		user:         r,
 		hash:         h,
-		notification: n,
 		auth:         a,
 	}
 }
-
-// Message enums.
-const (
-	Welcome MessageKind = iota + 1
-)
-
-// Message text.
-const (
-	WelcomeText = `Welcome`
-)
 
 // VerificationEmail check exists or not user email.
 func (m *Module) VerificationEmail(ctx context.Context, email string) error {
@@ -162,16 +134,6 @@ func (m *Module) CreateUser(ctx context.Context, email, username, password strin
 		return uuid.Nil, fmt.Errorf("hash hashing: %w", err)
 	}
 	email = strings.ToLower(email)
-
-	msg := Message{
-		Kind:    Welcome,
-		Content: WelcomeText,
-	}
-
-	err = m.notification.Send(ctx, email, msg)
-	if err != nil {
-		return uuid.Nil, fmt.Errorf("notification send: %w", err)
-	}
 
 	newUser := User{
 		Email:    email,

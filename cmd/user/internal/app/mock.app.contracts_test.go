@@ -192,43 +192,6 @@ func (mr *MockHasherMockRecorder) Hashing(password interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hashing", reflect.TypeOf((*MockHasher)(nil).Hashing), password)
 }
 
-// MockNotification is a mock of Notification interface.
-type MockNotification struct {
-	ctrl     *gomock.Controller
-	recorder *MockNotificationMockRecorder
-}
-
-// MockNotificationMockRecorder is the mock recorder for MockNotification.
-type MockNotificationMockRecorder struct {
-	mock *MockNotification
-}
-
-// NewMockNotification creates a new mock instance.
-func NewMockNotification(ctrl *gomock.Controller) *MockNotification {
-	mock := &MockNotification{ctrl: ctrl}
-	mock.recorder = &MockNotificationMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockNotification) EXPECT() *MockNotificationMockRecorder {
-	return m.recorder
-}
-
-// Send mocks base method.
-func (m *MockNotification) Send(ctx context.Context, contact string, msg app.Message) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Send", ctx, contact, msg)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Send indicates an expected call of Send.
-func (mr *MockNotificationMockRecorder) Send(ctx, contact, msg interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockNotification)(nil).Send), ctx, contact, msg)
-}
-
 // MockAuth is a mock of Auth interface.
 type MockAuth struct {
 	ctrl     *gomock.Controller

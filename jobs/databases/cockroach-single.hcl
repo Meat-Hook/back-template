@@ -4,12 +4,12 @@ job "cockroach-single" {
   region = "global"
 
   datacenters = [
-    "home",
+    "dc",
   ]
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    value = "home-server"
+    value = "addr"
   }
 
   update {
@@ -49,7 +49,7 @@ job "cockroach-single" {
     }
 
     network {
-      mode = "bridge"
+      mode = "host"
       port "http" {
         static = 8080
         to = 8080
@@ -99,32 +99,14 @@ job "cockroach-single" {
         "single",
         "docker",
       ]
-
-      connect {
-        sidecar_service {}
-
-        sidecar_task {
-          resources {
-            cpu = 250
-            memory = 512
-          }
-
-          logs {
-            max_files = 10
-            max_file_size = 2
-          }
-
-          shutdown_delay = "5s"
-        }
-      }
     }
 
     task "serve" {
       driver = "docker"
 
       resources {
-        cpu = 1000
-        memory = 1024
+        cpu = 500
+        memory = 256
       }
 
       config {
