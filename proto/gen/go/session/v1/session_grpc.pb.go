@@ -12,7 +12,6 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // SessionServiceClient is the client API for SessionService service.
@@ -64,7 +63,7 @@ type UnsafeSessionServiceServer interface {
 }
 
 func RegisterSessionServiceServer(s grpc.ServiceRegistrar, srv SessionServiceServer) {
-	s.RegisterService(&SessionService_ServiceDesc, srv)
+	s.RegisterService(&_SessionService_serviceDesc, srv)
 }
 
 func _SessionService_Session_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -85,10 +84,7 @@ func _SessionService_Session_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-// SessionService_ServiceDesc is the grpc.ServiceDesc for SessionService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var SessionService_ServiceDesc = grpc.ServiceDesc{
+var _SessionService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "session.v1.SessionService",
 	HandlerType: (*SessionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
