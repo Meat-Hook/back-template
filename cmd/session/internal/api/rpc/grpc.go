@@ -4,7 +4,7 @@ package rpc
 import (
 	"context"
 
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
@@ -15,7 +15,7 @@ import (
 // For convenient testing.
 type sessions interface {
 	// Session get user session by his token.
-	Session(ctx context.Context, token string) (*app2.Session, error)
+	Session(ctx context.Context, token string) (*app.Session, error)
 }
 
 type api struct {

@@ -9,11 +9,12 @@ import (
 	"context"
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // CreateUserHandlerFunc turns a function with the right signature into a create user handler
@@ -67,7 +68,7 @@ type CreateUserOKBody struct {
 
 	// id
 	// Format: uuid
-	ID models2.UserID `json:"id,omitempty"`
+	ID models.UserID `json:"id,omitempty"`
 }
 
 // Validate validates this create user o k body

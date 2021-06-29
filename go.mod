@@ -20,7 +20,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/jackc/pgtype v1.7.0
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/jmoiron/sqlx v1.3.3
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.1
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/o1egl/paseto/v2 v2.1.1

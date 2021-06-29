@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	unautnError "github.com/go-openapi/errors"
 )
 
@@ -16,13 +16,13 @@ const (
 	authTimeout     = 250 * time.Millisecond
 )
 
-func (svc *service) cookieKeyAuth(raw string) (*app2.Session, error) {
+func (svc *service) cookieKeyAuth(raw string) (*app.Session, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), authTimeout)
 	defer cancel()
 
 	session, err := svc.app.Session(ctx, parseToken(raw, cookieTokenName))
 	switch {
-	case errors.Is(err, app2.ErrNotFound):
+	case errors.Is(err, app.ErrNotFound):
 		return nil, unautnError.Unauthenticated("session")
 	case err != nil:
 		return nil, fmt.Errorf("auth: %w", err)

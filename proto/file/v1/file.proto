@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package file.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/Meat-Hook/back-template/proto/go/file/v1;pb";
+
+// Internal service API fot upload and download files.
+service FileService {
+  // Upload file to database.
+  rpc Upload (stream UploadRequest) returns (UploadResponse);
+  // Set file metadata.
+  rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
+  // Delete file.
+  rpc Delete (DeleteRequest) returns (DeleteResponse);
+}
+
+// Request.
+message UploadRequest {
+  // Contains file chunk.
+  Chunk chunk = 1;
+}
+
+// Response.
+message UploadResponse {
+  // Contains file id.
+  UUID file_id = 1;
+}
+
+// Request.
+message SetMetadataRequest {
+  // Contains file id.
+  UUID file_id = 1;
+  // File metadata.
+  Metadata metadata = 2;
+}
+
+// Response.
+message SetMetadataResponse {
+  // Empty.
+  google.protobuf.Empty empty = 1;
+}
+
+// Request.
+message DeleteRequest {
+  // Contains file id.
+  UUID file_id = 1;
+}
+
+// Response.
+message DeleteResponse {
+  // Empty.
+  google.protobuf.Empty empty = 1;
+}
+
+// Contains uuid.
+message UUID {
+  // Presents uuid.
+  string value = 1;
+}
+
+// Contains byte chunk.
+message Chunk {
+  // Byte content.
+  bytes content = 1;
+}
+
+// Contains file metadata.
+message Metadata {
+  // Contains metadata like a json.
+  google.protobuf.Struct details = 3;
+}

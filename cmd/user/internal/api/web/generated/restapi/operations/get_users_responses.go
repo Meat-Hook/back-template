@@ -8,9 +8,10 @@ package operations
 import (
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // GetUsersOKCode is the HTTP code returned for type GetUsersOK
@@ -69,7 +70,7 @@ type GetUsersDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models2.Error `json:"body,omitempty"`
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewGetUsersDefault creates GetUsersDefault with default headers values
@@ -95,13 +96,13 @@ func (o *GetUsersDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the get users default response
-func (o *GetUsersDefault) WithPayload(payload *models2.Error) *GetUsersDefault {
+func (o *GetUsersDefault) WithPayload(payload *models.Error) *GetUsersDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get users default response
-func (o *GetUsersDefault) SetPayload(payload *models2.Error) {
+func (o *GetUsersDefault) SetPayload(payload *models.Error) {
 	o.Payload = payload
 }
 

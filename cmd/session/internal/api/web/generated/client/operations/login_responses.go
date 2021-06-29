@@ -9,9 +9,10 @@ import (
 	"fmt"
 	"io"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/models"
 )
 
 // LoginReader is a Reader for the Login structure.
@@ -55,13 +56,13 @@ type LoginOK struct {
 	 */
 	SetCookie string
 
-	Payload *models2.User
+	Payload *models.User
 }
 
 func (o *LoginOK) Error() string {
 	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
 }
-func (o *LoginOK) GetPayload() *models2.User {
+func (o *LoginOK) GetPayload() *models.User {
 	return o.Payload
 }
 
@@ -74,7 +75,7 @@ func (o *LoginOK) readResponse(response runtime.ClientResponse, consumer runtime
 		o.SetCookie = hdrSetCookie
 	}
 
-	o.Payload = new(models2.User)
+	o.Payload = new(models.User)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -98,7 +99,7 @@ Generic error response.
 type LoginDefault struct {
 	_statusCode int
 
-	Payload *models2.Error
+	Payload *models.Error
 }
 
 // Code gets the status code for the login default response
@@ -109,13 +110,13 @@ func (o *LoginDefault) Code() int {
 func (o *LoginDefault) Error() string {
 	return fmt.Sprintf("[POST /login][%d] login default  %+v", o._statusCode, o.Payload)
 }
-func (o *LoginDefault) GetPayload() *models2.Error {
+func (o *LoginDefault) GetPayload() *models.Error {
 	return o.Payload
 }
 
 func (o *LoginDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models2.Error)
+	o.Payload = new(models.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

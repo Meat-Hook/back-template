@@ -8,9 +8,10 @@ package operations
 import (
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // UpdatePasswordNoContentCode is the HTTP code returned for type UpdatePasswordNoContent
@@ -49,7 +50,7 @@ type UpdatePasswordDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models2.Error `json:"body,omitempty"`
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewUpdatePasswordDefault creates UpdatePasswordDefault with default headers values
@@ -75,13 +76,13 @@ func (o *UpdatePasswordDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the update password default response
-func (o *UpdatePasswordDefault) WithPayload(payload *models2.Error) *UpdatePasswordDefault {
+func (o *UpdatePasswordDefault) WithPayload(payload *models.Error) *UpdatePasswordDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the update password default response
-func (o *UpdatePasswordDefault) SetPayload(payload *models2.Error) {
+func (o *UpdatePasswordDefault) SetPayload(payload *models.Error) {
 	o.Payload = payload
 }
 

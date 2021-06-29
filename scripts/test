@@ -1,3 +1,14 @@
-#!$SHEBANG$
+#!/bin/bash
 
-$END$
+# Start Dockerfile linter.
+hadolint Dockerfile
+# Start shel linter.
+shellcheck env.sh.dist scripts/*
+# Start buf lint.
+buf lint
+# Start golang linter.
+golangci-lint run
+# Start buf breaking check.
+buf breaking --against '.git#branch=master'
+# Start golang test.
+gotestsum -- -race "$@" ./...

@@ -1,17 +1,17 @@
 --up
-create table sessions
+CREATE TABLE sessions
 (
-    id         BYTES NOT NULL,
-    token      text  not null,
-    ip         inet  not null,
-    user_agent text  not null,
-    user_id    UUID  not null,
-    created_at timestamp default now(),
-    updated_at timestamp default now(),
+    id         UUID      NOT NULL,
+    token      TEXT      NOT NULL,
+    ip         INET      NOT NULL,
+    user_agent TEXT      NOT NULL,
+    user_id    UUID      NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    unique (token),
-    primary key (id)
+    UNIQUE (token),
+    PRIMARY KEY (id)
 );
 
 --down
-drop table sessions;
+DROP TABLE sessions;

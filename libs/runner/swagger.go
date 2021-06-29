@@ -8,13 +8,13 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type swagger interface {
+type swaggerServer interface {
 	Serve() error
 	Shutdown() error
 }
 
-// HTTP run http server.
-func HTTP(logger zerolog.Logger, srv swagger, host string, port int) func(context.Context) error {
+// Swagger run swagger http server.
+func Swagger(logger zerolog.Logger, srv swaggerServer, host string, port int) func(context.Context) error {
 	return func(ctx context.Context) error {
 		errc := make(chan error, 1)
 		go func() { errc <- srv.Serve() }()

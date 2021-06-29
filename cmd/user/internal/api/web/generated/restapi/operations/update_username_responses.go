@@ -8,9 +8,10 @@ package operations
 import (
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // UpdateUsernameNoContentCode is the HTTP code returned for type UpdateUsernameNoContent
@@ -49,7 +50,7 @@ type UpdateUsernameDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models2.Error `json:"body,omitempty"`
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewUpdateUsernameDefault creates UpdateUsernameDefault with default headers values
@@ -75,13 +76,13 @@ func (o *UpdateUsernameDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the update username default response
-func (o *UpdateUsernameDefault) WithPayload(payload *models2.Error) *UpdateUsernameDefault {
+func (o *UpdateUsernameDefault) WithPayload(payload *models.Error) *UpdateUsernameDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the update username default response
-func (o *UpdateUsernameDefault) SetPayload(payload *models2.Error) {
+func (o *UpdateUsernameDefault) SetPayload(payload *models.Error) {
 	o.Payload = payload
 }
 

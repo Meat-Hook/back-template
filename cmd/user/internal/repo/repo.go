@@ -4,58 +4,65 @@ package repo
 import (
 	"context"
 	"fmt"
-	"time"
 
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
-	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"
 )
 
-var _ app2.Repo = &Repo{}
+var _ app.Repo = &Repo{}
 
 type (
 	// Repo provided data from and to database.
 	Repo struct {
 		db     *sqlx.DB
-		metric *metrics2.Database
+		metric *metrics.Database
 	}
 
 	user struct {
-		ID        uuid.UUID `db:"id"`
-		Email     string    `db:"email"`
-		Name      string    `db:"name"`
-		PassHash  []byte    `db:"pass_hash"`
-		CreatedAt time.Time `db:"created_at"`
-		UpdatedAt time.Time `db:"updated_at"`
+		ID        uuid.UUID        `db:"id"`
+		Email     string           `db:"email"`
+		Name      string           `db:"name"`
+		PassHash  []byte           `db:"pass_hash"`
+		CreatedAt pgtype.Timestamp `db:"created_at"`
+		UpdatedAt pgtype.Timestamp `db:"updated_at"`
 	}
 )
 
-func convert(u app2.User) *user {
+func convert(u app.User) *user {
 	return &user{
-		ID:        u.ID,
-		Email:     u.Email,
-		Name:      u.Name,
-		PassHash:  u.PassHash,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
+		ID:       u.ID,
+		Email:    u.Email,
+		Name:     u.Name,
+		PassHash: u.PassHash,
+		CreatedAt: pgtype.Timestamp{
+			Time:             u.CreatedAt,
+			Status:           pgtype.Present,
+			InfinityModifier: pgtype.None,
+		},
+		UpdatedAt: pgtype.Timestamp{
+			Time:             u.UpdatedAt,
+			Status:           pgtype.Present,
+			InfinityModifier: pgtype.None,
+		},
 	}
 }
 
-func (u user) convert() *app2.User {
-	return &app2.User{
+func (u user) convert() *app.User {
+	return &app.User{
 		ID:        u.ID,
 		Email:     u.Email,
 		Name:      u.Name,
 		PassHash:  u.PassHash,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
+		CreatedAt: u.CreatedAt.Time,
+		UpdatedAt: u.UpdatedAt.Time,
 	}
 }
 
 // New build and returns user repo.
-func New(db *sqlx.DB, m *metrics2.Database) *Repo {
+func New(db *sqlx.DB, m *metrics.Database) *Repo {
 	return &Repo{
 		db:     db,
 		metric: m,
@@ -63,7 +70,7 @@ func New(db *sqlx.DB, m *metrics2.Database) *Repo {
 }
 
 // Save for implements app.Repo.
-func (r *Repo) Save(ctx context.Context, u app2.User) (id uuid.UUID, err error) {
+func (r *Repo) Save(ctx context.Context, u app.User) (id uuid.UUID, err error) {
 	err = r.metric.Collect(func() error {
 		newUser := convert(u)
 		const query = `
@@ -95,7 +102,7 @@ func (r *Repo) Save(ctx context.Context, u app2.User) (id uuid.UUID, err error) 
 }
 
 // Update for implements app.Repo.
-func (r *Repo) Update(ctx context.Context, u app2.User) error {
+func (r *Repo) Update(ctx context.Context, u app.User) error {
 	return r.metric.Collect(func() error {
 		updateUser := convert(u)
 
@@ -139,7 +146,7 @@ func (r *Repo) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 // ByID for implements app.Repo.
-func (r *Repo) ByID(ctx context.Context, id uuid.UUID) (u *app2.User, err error) {
+func (r *Repo) ByID(ctx context.Context, id uuid.UUID) (u *app.User, err error) {
 	err = r.metric.Collect(func() error {
 		const query = `select * from users where id = $1`
 
@@ -161,7 +168,7 @@ func (r *Repo) ByID(ctx context.Context, id uuid.UUID) (u *app2.User, err error)
 }
 
 // ByEmail for implements app.Repo.
-func (r *Repo) ByEmail(ctx context.Context, email string) (u *app2.User, err error) {
+func (r *Repo) ByEmail(ctx context.Context, email string) (u *app.User, err error) {
 	err = r.metric.Collect(func() error {
 		const query = `select * from users where email = $1`
 
@@ -183,7 +190,7 @@ func (r *Repo) ByEmail(ctx context.Context, email string) (u *app2.User, err err
 }
 
 // ByUsername for implements app.Repo.
-func (r *Repo) ByUsername(ctx context.Context, username string) (u *app2.User, err error) {
+func (r *Repo) ByUsername(ctx context.Context, username string) (u *app.User, err error) {
 	err = r.metric.Collect(func() error {
 		const query = `select * from users where name = $1`
 
@@ -205,7 +212,7 @@ func (r *Repo) ByUsername(ctx context.Context, username string) (u *app2.User, e
 }
 
 // ListUserByUsername for implements app.Repo.
-func (r *Repo) ListUserByUsername(ctx context.Context, username string, p app2.SearchParams) (users []app2.User, total int, err error) {
+func (r *Repo) ListUserByUsername(ctx context.Context, username string, p app.SearchParams) (users []app.User, total int, err error) {
 	err = r.metric.Collect(func() error {
 		const query = `SELECT * FROM users WHERE name LIKE $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`
 
@@ -221,7 +228,7 @@ func (r *Repo) ListUserByUsername(ctx context.Context, username string, p app2.S
 			return fmt.Errorf("get context: %w", err)
 		}
 
-		users = make([]app2.User, len(res))
+		users = make([]app.User, len(res))
 		for i := range res {
 			users[i] = *res[i].convert()
 		}

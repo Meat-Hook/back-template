@@ -9,23 +9,23 @@ import (
 	"syscall"
 	"time"
 
-	rpc3 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/rpc"
-	web2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web"
-	restapi2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/restapi"
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
-	auth2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/auth"
-	repo2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/repo"
-	users2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/users"
-	"github.com/Meat-Hook/back-template/internal/cmd/user/client"
-	log2 "github.com/Meat-Hook/back-template/internal/libs/log"
-	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
-	migrater2 "github.com/Meat-Hook/back-template/internal/libs/migrater"
-	rpc2 "github.com/Meat-Hook/back-template/internal/libs/rpc"
-	runner2 "github.com/Meat-Hook/back-template/internal/libs/runner"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/rpc"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/restapi"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/auth"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/repo"
+	wrapper "github.com/Meat-Hook/back-template/cmd/session/internal/users"
+	users "github.com/Meat-Hook/back-template/cmd/user/client"
+	"github.com/Meat-Hook/back-template/libs/log"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/migrater"
+	librpc "github.com/Meat-Hook/back-template/libs/rpc"
+	"github.com/Meat-Hook/back-template/libs/runner"
 	"github.com/go-openapi/loads"
+	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/rs/xid"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
@@ -96,7 +96,7 @@ var (
 		Name:       "grpc-port",
 		Usage:      "grpc service port",
 		EnvVars:    []string{"GRPC_PORT"},
-		Value:      runner2.GRPCServerPort,
+		Value:      runner.GRPCServerPort,
 		Required:   true,
 		HasBeenSet: true,
 	}
@@ -104,7 +104,7 @@ var (
 		Name:       "http-port",
 		Usage:      "http service port",
 		EnvVars:    []string{"HTTP_PORT"},
-		Value:      runner2.WebServerPort,
+		Value:      runner.WebServerPort,
 		Required:   true,
 		HasBeenSet: true,
 	}
@@ -112,7 +112,7 @@ var (
 		Name:       "metric-port",
 		Usage:      "metric service port",
 		EnvVars:    []string{"METRIC_PORT"},
-		Value:      runner2.MetricServerPort,
+		Value:      runner.MetricServerPort,
 		Required:   true,
 		HasBeenSet: true,
 	}
@@ -147,7 +147,7 @@ var (
 		Description:  "Command for getting service version.",
 		BashComplete: cli.DefaultAppComplete,
 		Action: func(context *cli.Context) error {
-			doc, err := loads.Analyzed(restapi2.FlatSwaggerJSON, "2.0")
+			doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
 			if err != nil {
 				logger.Fatal().Err(err).Msg("failed to get app version")
 			}
@@ -160,7 +160,7 @@ var (
 )
 
 func main() {
-	doc, err := loads.Analyzed(restapi2.FlatSwaggerJSON, "2.0")
+	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to get app version")
 	}
@@ -213,36 +213,36 @@ func start(c *cli.Context) error {
 	}
 
 	// init database connection
-	dbMetric := metrics2.DB(name, metrics2.MethodsOf(&repo2.Repo{})...)
+	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
 	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=%s", c.String(dbHost.Name), c.Int(dbPort.Name), c.String(dbUser.Name),
 		c.String(dbPass.Name), c.String(dbName.Name), c.String(dbSSLMode.Name)))
 	if err != nil {
 		return fmt.Errorf("DB connect: %w", err)
 	}
-	defer log2.WarnIfFail(logger, db.Close)
+	defer log.WarnIfFail(logger, db.Close)
 
 	if c.Bool(migrate.Name) {
-		err := migrater2.Auto(c.Context, logger.With().Str(log2.Name, "migrate").Logger(), db.DB, c.String(migrateDir.Name))
+		err := migrater.Auto(c.Context, logger.With().Str(log.Name, "migrate").Logger(), db.DB, c.String(migrateDir.Name))
 		if err != nil {
 			return fmt.Errorf("start auto migration: %w", err)
 		}
 	}
 
-	grpcConn, err := rpc2.Client(c.Context, c.String(userSrv.Name))
+	grpcConn, err := librpc.Client(c.Context, c.String(userSrv.Name))
 	if err != nil {
 		return fmt.Errorf("build lib rpc: %w", err)
 	}
-	usersSvcClient := client.New(grpcConn)
+	usersSvcClient := users.New(grpcConn)
 
-	r := repo2.New(db, &dbMetric)
-	authModule := auth2.New(c.String(authKey.Name))
+	r := repo.New(db, &dbMetric)
+	authModule := auth.New(c.String(authKey.Name))
 
-	module := app2.New(r, users2.New(usersSvcClient), authModule, idGen{})
+	module := app.New(r, wrapper.New(usersSvcClient), authModule, idGen{})
 
-	apiMetric := metrics2.HTTP(name, restapi2.FlatSwaggerJSON)
-	internalAPI := rpc3.New(module, rpc2.Server(logger))
-	externalAPI, err := web2.New(module, logger, &apiMetric, web2.Config{
+	apiMetric := metrics.HTTP(name, restapi.FlatSwaggerJSON)
+	internalAPI := rpc.New(module, librpc.Server(logger))
+	externalAPI, err := web.New(module, logger, &apiMetric, web.Config{
 		Host: appHost,
 		Port: c.Int(httpPort.Name),
 	})
@@ -250,11 +250,11 @@ func start(c *cli.Context) error {
 		return fmt.Errorf("build external api: %w", err)
 	}
 
-	return runner2.Start(
+	return runner.Start(
 		c.Context,
-		runner2.GRPC(logger.With().Str(log2.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
-		runner2.HTTP(logger.With().Str(log2.Name, "HTTP").Logger(), externalAPI, appHost, c.Int(httpPort.Name)),
-		runner2.Metric(logger.With().Str(log2.Name, "Metric").Logger(), appHost, c.Int(metricPort.Name)),
+		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
+		runner.Swagger(logger.With().Str(log.Name, "Swagger").Logger(), externalAPI, appHost, c.Int(httpPort.Name)),
+		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), appHost, c.Int(metricPort.Name)),
 	)
 }
 
@@ -263,7 +263,7 @@ func forceShutdown(ctx context.Context) {
 
 	<-ctx.Done()
 	time.Sleep(shutdownDelay)
-	doc, err := loads.Analyzed(restapi2.FlatSwaggerJSON, "2.0")
+	doc, err := loads.Analyzed(restapi.FlatSwaggerJSON, "2.0")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to get app version")
 	}
@@ -271,11 +271,11 @@ func forceShutdown(ctx context.Context) {
 	logger.Fatal().Str("version", doc.Version()).Msg("failed to graceful shutdown")
 }
 
-var _ app2.ID = &idGen{}
+var _ app.ID = &idGen{}
 
 type idGen struct{}
 
 // New for implements app.ID.
-func (i idGen) New() string {
-	return xid.New().String()
+func (i idGen) New() uuid.UUID {
+	return uuid.Must(uuid.NewV4())
 }

@@ -8,9 +8,10 @@ package operations
 import (
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // CreateUserOKCode is the HTTP code returned for type CreateUserOK
@@ -69,7 +70,7 @@ type CreateUserDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models2.Error `json:"body,omitempty"`
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewCreateUserDefault creates CreateUserDefault with default headers values
@@ -95,13 +96,13 @@ func (o *CreateUserDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the create user default response
-func (o *CreateUserDefault) WithPayload(payload *models2.Error) *CreateUserDefault {
+func (o *CreateUserDefault) WithPayload(payload *models.Error) *CreateUserDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the create user default response
-func (o *CreateUserDefault) SetPayload(payload *models2.Error) {
+func (o *CreateUserDefault) SetPayload(payload *models.Error) {
 	o.Payload = payload
 }
 

@@ -6,7 +6,7 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	operations2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/client/operations"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/client/operations"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -54,7 +54,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *SessionSer
 
 	cli := new(SessionService)
 	cli.Transport = transport
-	cli.Operations = operations2.New(transport, formats)
+	cli.Operations = operations.New(transport, formats)
 	return cli
 }
 
@@ -99,7 +99,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // SessionService is a client for session service
 type SessionService struct {
-	Operations operations2.ClientService
+	Operations operations.ClientService
 
 	Transport runtime.ClientTransport
 }

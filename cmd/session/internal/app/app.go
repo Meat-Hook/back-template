@@ -1,6 +1,6 @@
 package app
 
-// Module contains business logic for user methods.
+// Module contains business logic for session methods.
 type Module struct {
 	session Repo
 	user    Users

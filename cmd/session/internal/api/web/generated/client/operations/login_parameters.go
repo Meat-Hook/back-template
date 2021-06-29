@@ -10,11 +10,12 @@ import (
 	"net/http"
 	"time"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/models"
 )
 
 // NewLoginParams creates a new LoginParams object,
@@ -61,7 +62,7 @@ func NewLoginParamsWithHTTPClient(client *http.Client) *LoginParams {
 type LoginParams struct {
 
 	// Args.
-	Args *models2.LoginParam
+	Args *models.LoginParam
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,13 +118,13 @@ func (o *LoginParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithArgs adds the args to the login params
-func (o *LoginParams) WithArgs(args *models2.LoginParam) *LoginParams {
+func (o *LoginParams) WithArgs(args *models.LoginParam) *LoginParams {
 	o.SetArgs(args)
 	return o
 }
 
 // SetArgs adds the args to the login params
-func (o *LoginParams) SetArgs(args *models2.LoginParam) {
+func (o *LoginParams) SetArgs(args *models.LoginParam) {
 	o.Args = args
 }
 

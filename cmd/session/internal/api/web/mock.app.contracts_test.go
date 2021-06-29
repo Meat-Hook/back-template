@@ -6,75 +6,74 @@ package web_test
 
 import (
 	context "context"
-	reflect "reflect"
-
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	app "github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
-// Mockapplication is a mock of application interface.
+// Mockapplication is a mock of application interface
 type Mockapplication struct {
 	ctrl     *gomock.Controller
 	recorder *MockapplicationMockRecorder
 }
 
-// MockapplicationMockRecorder is the mock recorder for Mockapplication.
+// MockapplicationMockRecorder is the mock recorder for Mockapplication
 type MockapplicationMockRecorder struct {
 	mock *Mockapplication
 }
 
-// NewMockapplication creates a new mock instance.
+// NewMockapplication creates a new mock instance
 func NewMockapplication(ctrl *gomock.Controller) *Mockapplication {
 	mock := &Mockapplication{ctrl: ctrl}
 	mock.recorder = &MockapplicationMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *Mockapplication) EXPECT() *MockapplicationMockRecorder {
 	return m.recorder
 }
 
-// Login mocks base method.
-func (m *Mockapplication) Login(ctx context.Context, email, password string, origin app2.Origin) (*app2.User, *app2.Token, error) {
+// Login mocks base method
+func (m *Mockapplication) Login(ctx context.Context, email, password string, origin app.Origin) (*app.User, *app.Token, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, email, password, origin)
-	ret0, _ := ret[0].(*app2.User)
-	ret1, _ := ret[1].(*app2.Token)
+	ret0, _ := ret[0].(*app.User)
+	ret1, _ := ret[1].(*app.Token)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// Login indicates an expected call of Login.
+// Login indicates an expected call of Login
 func (mr *MockapplicationMockRecorder) Login(ctx, email, password, origin interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*Mockapplication)(nil).Login), ctx, email, password, origin)
 }
 
-// Logout mocks base method.
-func (m *Mockapplication) Logout(ctx context.Context, session app2.Session) error {
+// Logout mocks base method
+func (m *Mockapplication) Logout(ctx context.Context, session app.Session) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Logout", ctx, session)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Logout indicates an expected call of Logout.
+// Logout indicates an expected call of Logout
 func (mr *MockapplicationMockRecorder) Logout(ctx, session interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*Mockapplication)(nil).Logout), ctx, session)
 }
 
-// Session mocks base method.
-func (m *Mockapplication) Session(ctx context.Context, accessToken string) (*app2.Session, error) {
+// Session mocks base method
+func (m *Mockapplication) Session(ctx context.Context, accessToken string) (*app.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, accessToken)
-	ret0, _ := ret[0].(*app2.Session)
+	ret0, _ := ret[0].(*app.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Session indicates an expected call of Session.
+// Session indicates an expected call of Session
 func (mr *MockapplicationMockRecorder) Session(ctx, accessToken interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*Mockapplication)(nil).Session), ctx, accessToken)

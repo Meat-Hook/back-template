@@ -4,12 +4,12 @@ job "cockroach-single" {
   region = "global"
 
   datacenters = [
-    "dc",
+    "home-server",
   ]
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    value = "addr"
+    value = "home-server"
   }
 
   update {
@@ -51,7 +51,7 @@ job "cockroach-single" {
     network {
       mode = "host"
       port "http" {
-        static = 8080
+        static = 3636
         to = 8080
       }
       port "tcp" {
@@ -99,18 +99,32 @@ job "cockroach-single" {
         "single",
         "docker",
       ]
+
+      check {
+        name = "alive-tcp"
+        type = "tcp"
+        port = "tcp"
+        interval = "10s"
+        timeout = "2s"
+
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
+      }
     }
 
     task "serve" {
       driver = "docker"
 
       resources {
-        cpu = 500
-        memory = 256
+        cpu = 1024
+        memory = 2048
       }
 
       config {
-        image = "cockroachdb/cockroach:v20.2.7"
+        image = "cockroachdb/cockroach:v21.1.2"
 
         ports = [
           "http",

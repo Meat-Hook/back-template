@@ -5,11 +5,12 @@ package auth
 import (
 	"fmt"
 
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	"github.com/gofrs/uuid"
 	"github.com/o1egl/paseto/v2"
 )
 
-var _ app2.Auth = &Auth{}
+var _ app.Auth = &Auth{}
 
 // Auth is an implements app.Auth.
 // Responsible for working with authorization tokens, be it cookies or jwt.
@@ -25,11 +26,11 @@ func New(secretKey string) *Auth {
 }
 
 type jsonToken struct {
-	SessionID string `json:"session_id"`
+	SessionID uuid.UUID `json:"session_id"`
 }
 
 // Token need for implements app.Auth.
-func (a *Auth) Token(subject app2.Subject) (*app2.Token, error) {
+func (a *Auth) Token(subject app.Subject) (*app.Token, error) {
 	t := jsonToken{
 		SessionID: subject.SessionID,
 	}
@@ -39,7 +40,7 @@ func (a *Auth) Token(subject app2.Subject) (*app2.Token, error) {
 		return nil, fmt.Errorf("paseto encrypt: %w", err)
 	}
 
-	res := &app2.Token{
+	res := &app.Token{
 		Value: value,
 	}
 
@@ -47,17 +48,15 @@ func (a *Auth) Token(subject app2.Subject) (*app2.Token, error) {
 }
 
 // Subject need for implements app.Auth.
-func (a *Auth) Subject(token string) (*app2.Subject, error) {
-	t := jsonToken{
-		SessionID: token,
-	}
+func (a *Auth) Subject(token string) (*app.Subject, error) {
+	t := jsonToken{}
 
 	err := paseto.Decrypt(token, a.key, &t, nil)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", app2.ErrInvalidToken, err)
+		return nil, fmt.Errorf("%w: %s", app.ErrInvalidToken, err)
 	}
 
-	sub := &app2.Subject{
+	sub := &app.Subject{
 		SessionID: t.SessionID,
 	}
 

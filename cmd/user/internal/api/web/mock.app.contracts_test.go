@@ -6,52 +6,64 @@ package web_test
 
 import (
 	context "context"
-	reflect "reflect"
-
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
+	app "github.com/Meat-Hook/back-template/cmd/user/internal/app"
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
-// Mockapplication is a mock of application interface.
+// Mockapplication is a mock of application interface
 type Mockapplication struct {
 	ctrl     *gomock.Controller
 	recorder *MockapplicationMockRecorder
 }
 
-// MockapplicationMockRecorder is the mock recorder for Mockapplication.
+// MockapplicationMockRecorder is the mock recorder for Mockapplication
 type MockapplicationMockRecorder struct {
 	mock *Mockapplication
 }
 
-// NewMockapplication creates a new mock instance.
+// NewMockapplication creates a new mock instance
 func NewMockapplication(ctrl *gomock.Controller) *Mockapplication {
 	mock := &Mockapplication{ctrl: ctrl}
 	mock.recorder = &MockapplicationMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *Mockapplication) EXPECT() *MockapplicationMockRecorder {
 	return m.recorder
 }
 
-// Auth mocks base method.
-func (m *Mockapplication) Auth(ctx context.Context, raw string) (*app2.Session, error) {
+// VerificationEmail mocks base method
+func (m *Mockapplication) VerificationEmail(ctx context.Context, email string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Auth", ctx, raw)
-	ret0, _ := ret[0].(*app2.Session)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "VerificationEmail", ctx, email)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// Auth indicates an expected call of Auth.
-func (mr *MockapplicationMockRecorder) Auth(ctx, raw interface{}) *gomock.Call {
+// VerificationEmail indicates an expected call of VerificationEmail
+func (mr *MockapplicationMockRecorder) VerificationEmail(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*Mockapplication)(nil).Auth), ctx, raw)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerificationEmail", reflect.TypeOf((*Mockapplication)(nil).VerificationEmail), ctx, email)
 }
 
-// CreateUser mocks base method.
+// VerificationUsername mocks base method
+func (m *Mockapplication) VerificationUsername(ctx context.Context, username string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerificationUsername", ctx, username)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// VerificationUsername indicates an expected call of VerificationUsername
+func (mr *MockapplicationMockRecorder) VerificationUsername(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerificationUsername", reflect.TypeOf((*Mockapplication)(nil).VerificationUsername), ctx, username)
+}
+
+// CreateUser mocks base method
 func (m *Mockapplication) CreateUser(ctx context.Context, email, username, pass string) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, email, username, pass)
@@ -60,109 +72,96 @@ func (m *Mockapplication) CreateUser(ctx context.Context, email, username, pass 
 	return ret0, ret1
 }
 
-// CreateUser indicates an expected call of CreateUser.
+// CreateUser indicates an expected call of CreateUser
 func (mr *MockapplicationMockRecorder) CreateUser(ctx, email, username, pass interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*Mockapplication)(nil).CreateUser), ctx, email, username, pass)
 }
 
-// DeleteUser mocks base method.
-func (m *Mockapplication) DeleteUser(ctx context.Context, session app2.Session) error {
+// UserByID mocks base method
+func (m *Mockapplication) UserByID(ctx context.Context, session app.Session, id uuid.UUID) (*app.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserByID", ctx, session, id)
+	ret0, _ := ret[0].(*app.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserByID indicates an expected call of UserByID
+func (mr *MockapplicationMockRecorder) UserByID(ctx, session, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserByID", reflect.TypeOf((*Mockapplication)(nil).UserByID), ctx, session, id)
+}
+
+// DeleteUser mocks base method
+func (m *Mockapplication) DeleteUser(ctx context.Context, session app.Session) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", ctx, session)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteUser indicates an expected call of DeleteUser.
+// DeleteUser indicates an expected call of DeleteUser
 func (mr *MockapplicationMockRecorder) DeleteUser(ctx, session interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*Mockapplication)(nil).DeleteUser), ctx, session)
 }
 
-// ListUserByUsername mocks base method.
-func (m *Mockapplication) ListUserByUsername(ctx context.Context, session app2.Session, username string, page app2.SearchParams) ([]app2.User, int, error) {
+// ListUserByUsername mocks base method
+func (m *Mockapplication) ListUserByUsername(ctx context.Context, session app.Session, username string, page app.SearchParams) ([]app.User, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListUserByUsername", ctx, session, username, page)
-	ret0, _ := ret[0].([]app2.User)
+	ret0, _ := ret[0].([]app.User)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// ListUserByUsername indicates an expected call of ListUserByUsername.
+// ListUserByUsername indicates an expected call of ListUserByUsername
 func (mr *MockapplicationMockRecorder) ListUserByUsername(ctx, session, username, page interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUserByUsername", reflect.TypeOf((*Mockapplication)(nil).ListUserByUsername), ctx, session, username, page)
 }
 
-// UpdatePassword mocks base method.
-func (m *Mockapplication) UpdatePassword(ctx context.Context, session app2.Session, oldPass, newPass string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatePassword", ctx, session, oldPass, newPass)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdatePassword indicates an expected call of UpdatePassword.
-func (mr *MockapplicationMockRecorder) UpdatePassword(ctx, session, oldPass, newPass interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*Mockapplication)(nil).UpdatePassword), ctx, session, oldPass, newPass)
-}
-
-// UpdateUsername mocks base method.
-func (m *Mockapplication) UpdateUsername(ctx context.Context, session app2.Session, username string) error {
+// UpdateUsername mocks base method
+func (m *Mockapplication) UpdateUsername(ctx context.Context, session app.Session, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUsername", ctx, session, username)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// UpdateUsername indicates an expected call of UpdateUsername.
+// UpdateUsername indicates an expected call of UpdateUsername
 func (mr *MockapplicationMockRecorder) UpdateUsername(ctx, session, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsername", reflect.TypeOf((*Mockapplication)(nil).UpdateUsername), ctx, session, username)
 }
 
-// UserByID mocks base method.
-func (m *Mockapplication) UserByID(ctx context.Context, session app2.Session, id uuid.UUID) (*app2.User, error) {
+// UpdatePassword mocks base method
+func (m *Mockapplication) UpdatePassword(ctx context.Context, session app.Session, oldPass, newPass string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserByID", ctx, session, id)
-	ret0, _ := ret[0].(*app2.User)
+	ret := m.ctrl.Call(m, "UpdatePassword", ctx, session, oldPass, newPass)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword
+func (mr *MockapplicationMockRecorder) UpdatePassword(ctx, session, oldPass, newPass interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*Mockapplication)(nil).UpdatePassword), ctx, session, oldPass, newPass)
+}
+
+// Auth mocks base method
+func (m *Mockapplication) Auth(ctx context.Context, raw string) (*app.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Auth", ctx, raw)
+	ret0, _ := ret[0].(*app.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UserByID indicates an expected call of UserByID.
-func (mr *MockapplicationMockRecorder) UserByID(ctx, session, id interface{}) *gomock.Call {
+// Auth indicates an expected call of Auth
+func (mr *MockapplicationMockRecorder) Auth(ctx, raw interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserByID", reflect.TypeOf((*Mockapplication)(nil).UserByID), ctx, session, id)
-}
-
-// VerificationEmail mocks base method.
-func (m *Mockapplication) VerificationEmail(ctx context.Context, email string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "VerificationEmail", ctx, email)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// VerificationEmail indicates an expected call of VerificationEmail.
-func (mr *MockapplicationMockRecorder) VerificationEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerificationEmail", reflect.TypeOf((*Mockapplication)(nil).VerificationEmail), ctx, email)
-}
-
-// VerificationUsername mocks base method.
-func (m *Mockapplication) VerificationUsername(ctx context.Context, username string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "VerificationUsername", ctx, username)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// VerificationUsername indicates an expected call of VerificationUsername.
-func (mr *MockapplicationMockRecorder) VerificationUsername(ctx, username interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerificationUsername", reflect.TypeOf((*Mockapplication)(nil).VerificationUsername), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*Mockapplication)(nil).Auth), ctx, raw)
 }

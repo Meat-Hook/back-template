@@ -6,9 +6,9 @@ import (
 	"net"
 	"testing"
 
-	client2 "github.com/Meat-Hook/back-template/internal/cmd/user/client"
-	log2 "github.com/Meat-Hook/back-template/internal/libs/log"
-	"github.com/Meat-Hook/back-template/internal/libs/rpc"
+	"github.com/Meat-Hook/back-template/cmd/user/client"
+	"github.com/Meat-Hook/back-template/libs/log"
+	librpc "github.com/Meat-Hook/back-template/libs/rpc"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/xid"
@@ -20,17 +20,16 @@ import (
 
 var (
 	reqID = xid.New()
-	ctx   = log2.ReqIDWithCtx(context.Background(), reqID.String())
+	ctx   = log.ReqIDWithCtx(context.Background(), reqID.String())
 
 	errAny = errors.New("any err")
 )
 
-func start(t *testing.T) (*client2.Client, *MockUserServiceServer, *require.Assertions) {
+func start(t *testing.T) (*client.Client, *MockUserServiceServer, *require.Assertions) {
 	t.Helper()
 	r := require.New(t)
 
 	ctrl := gomock.NewController(t)
-	t.Cleanup(ctrl.Finish)
 	mock := NewMockUserServiceServer(ctrl)
 
 	srv := grpc.NewServer()
@@ -43,10 +42,10 @@ func start(t *testing.T) (*client2.Client, *MockUserServiceServer, *require.Asse
 		srv.Stop()
 	})
 
-	conn, err := rpc.Client(ctx, ln.Addr().String())
+	conn, err := librpc.Client(ctx, ln.Addr().String())
 	r.Nil(err)
 
-	svc := client2.New(conn)
+	svc := client.New(conn)
 
 	return svc, mock, r
 }

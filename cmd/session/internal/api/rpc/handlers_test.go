@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
@@ -17,21 +17,21 @@ import (
 
 var (
 	errAny      = errors.New("any err")
-	sessionInfo = app2.Session{
-		ID:     "id",
+	sessionInfo = app.Session{
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 
 	rpcUser = pb.SessionResponse{
-		Id:     "id",
+		Id:     sessionInfo.ID.String(),
 		UserId: sessionInfo.UserID.String(),
 	}
 )
 
-func TestService_GetUserByAuthToken(t *testing.T) {
+func TestApi_Session(t *testing.T) {
 	t.Parallel()
 
-	errNotFound := status.Error(codes.NotFound, app2.ErrNotFound.Error())
+	errNotFound := status.Error(codes.NotFound, app.ErrNotFound.Error())
 	errDeadline := status.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 	errCanceled := status.Error(codes.Canceled, context.Canceled.Error())
 	errInternal := status.Error(codes.Internal, errAny.Error())
@@ -39,13 +39,13 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 	const token = `accessToken`
 
 	testCases := map[string]struct {
-		session *app2.Session
+		session *app.Session
 		want    *pb.SessionResponse
 		appErr  error
 		wantErr error
 	}{
 		"success":       {&sessionInfo, &rpcUser, nil, nil},
-		"err_not_found": {nil, nil, app2.ErrNotFound, errNotFound},
+		"err_not_found": {nil, nil, app.ErrNotFound, errNotFound},
 		"err_deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
 		"err_canceled":  {nil, nil, context.Canceled, errCanceled},
 		"err_any":       {nil, nil, errAny, errInternal},

@@ -6,37 +6,36 @@ package client_test
 
 import (
 	context "context"
-	reflect "reflect"
-
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
+	reflect "reflect"
 )
 
-// MockUserServiceClient is a mock of UserServiceClient interface.
+// MockUserServiceClient is a mock of UserServiceClient interface
 type MockUserServiceClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockUserServiceClientMockRecorder
 }
 
-// MockUserServiceClientMockRecorder is the mock recorder for MockUserServiceClient.
+// MockUserServiceClientMockRecorder is the mock recorder for MockUserServiceClient
 type MockUserServiceClientMockRecorder struct {
 	mock *MockUserServiceClient
 }
 
-// NewMockUserServiceClient creates a new mock instance.
+// NewMockUserServiceClient creates a new mock instance
 func NewMockUserServiceClient(ctrl *gomock.Controller) *MockUserServiceClient {
 	mock := &MockUserServiceClient{ctrl: ctrl}
 	mock.recorder = &MockUserServiceClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockUserServiceClient) EXPECT() *MockUserServiceClientMockRecorder {
 	return m.recorder
 }
 
-// Access mocks base method.
+// Access mocks base method
 func (m *MockUserServiceClient) Access(ctx context.Context, in *pb.AccessRequest, opts ...grpc.CallOption) (*pb.AccessResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -49,37 +48,37 @@ func (m *MockUserServiceClient) Access(ctx context.Context, in *pb.AccessRequest
 	return ret0, ret1
 }
 
-// Access indicates an expected call of Access.
+// Access indicates an expected call of Access
 func (mr *MockUserServiceClientMockRecorder) Access(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Access", reflect.TypeOf((*MockUserServiceClient)(nil).Access), varargs...)
 }
 
-// MockUserServiceServer is a mock of UserServiceServer interface.
+// MockUserServiceServer is a mock of UserServiceServer interface
 type MockUserServiceServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockUserServiceServerMockRecorder
 }
 
-// MockUserServiceServerMockRecorder is the mock recorder for MockUserServiceServer.
+// MockUserServiceServerMockRecorder is the mock recorder for MockUserServiceServer
 type MockUserServiceServerMockRecorder struct {
 	mock *MockUserServiceServer
 }
 
-// NewMockUserServiceServer creates a new mock instance.
+// NewMockUserServiceServer creates a new mock instance
 func NewMockUserServiceServer(ctrl *gomock.Controller) *MockUserServiceServer {
 	mock := &MockUserServiceServer{ctrl: ctrl}
 	mock.recorder = &MockUserServiceServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockUserServiceServer) EXPECT() *MockUserServiceServerMockRecorder {
 	return m.recorder
 }
 
-// Access mocks base method.
+// Access mocks base method
 func (m *MockUserServiceServer) Access(arg0 context.Context, arg1 *pb.AccessRequest) (*pb.AccessResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Access", arg0, arg1)
@@ -88,42 +87,42 @@ func (m *MockUserServiceServer) Access(arg0 context.Context, arg1 *pb.AccessRequ
 	return ret0, ret1
 }
 
-// Access indicates an expected call of Access.
+// Access indicates an expected call of Access
 func (mr *MockUserServiceServerMockRecorder) Access(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Access", reflect.TypeOf((*MockUserServiceServer)(nil).Access), arg0, arg1)
 }
 
-// MockUnsafeUserServiceServer is a mock of UnsafeUserServiceServer interface.
+// MockUnsafeUserServiceServer is a mock of UnsafeUserServiceServer interface
 type MockUnsafeUserServiceServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockUnsafeUserServiceServerMockRecorder
 }
 
-// MockUnsafeUserServiceServerMockRecorder is the mock recorder for MockUnsafeUserServiceServer.
+// MockUnsafeUserServiceServerMockRecorder is the mock recorder for MockUnsafeUserServiceServer
 type MockUnsafeUserServiceServerMockRecorder struct {
 	mock *MockUnsafeUserServiceServer
 }
 
-// NewMockUnsafeUserServiceServer creates a new mock instance.
+// NewMockUnsafeUserServiceServer creates a new mock instance
 func NewMockUnsafeUserServiceServer(ctrl *gomock.Controller) *MockUnsafeUserServiceServer {
 	mock := &MockUnsafeUserServiceServer{ctrl: ctrl}
 	mock.recorder = &MockUnsafeUserServiceServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockUnsafeUserServiceServer) EXPECT() *MockUnsafeUserServiceServerMockRecorder {
 	return m.recorder
 }
 
-// mustEmbedUnimplementedUserServiceServer mocks base method.
+// mustEmbedUnimplementedUserServiceServer mocks base method
 func (m *MockUnsafeUserServiceServer) mustEmbedUnimplementedUserServiceServer() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "mustEmbedUnimplementedUserServiceServer")
 }
 
-// mustEmbedUnimplementedUserServiceServer indicates an expected call of mustEmbedUnimplementedUserServiceServer.
+// mustEmbedUnimplementedUserServiceServer indicates an expected call of mustEmbedUnimplementedUserServiceServer
 func (mr *MockUnsafeUserServiceServerMockRecorder) mustEmbedUnimplementedUserServiceServer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "mustEmbedUnimplementedUserServiceServer", reflect.TypeOf((*MockUnsafeUserServiceServer)(nil).mustEmbedUnimplementedUserServiceServer))

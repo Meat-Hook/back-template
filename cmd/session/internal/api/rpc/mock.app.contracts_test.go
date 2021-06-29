@@ -6,45 +6,44 @@ package rpc_test
 
 import (
 	context "context"
-	reflect "reflect"
-
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	app "github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
-// Mocksessions is a mock of sessions interface.
+// Mocksessions is a mock of sessions interface
 type Mocksessions struct {
 	ctrl     *gomock.Controller
 	recorder *MocksessionsMockRecorder
 }
 
-// MocksessionsMockRecorder is the mock recorder for Mocksessions.
+// MocksessionsMockRecorder is the mock recorder for Mocksessions
 type MocksessionsMockRecorder struct {
 	mock *Mocksessions
 }
 
-// NewMocksessions creates a new mock instance.
+// NewMocksessions creates a new mock instance
 func NewMocksessions(ctrl *gomock.Controller) *Mocksessions {
 	mock := &Mocksessions{ctrl: ctrl}
 	mock.recorder = &MocksessionsMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *Mocksessions) EXPECT() *MocksessionsMockRecorder {
 	return m.recorder
 }
 
-// Session mocks base method.
-func (m *Mocksessions) Session(ctx context.Context, token string) (*app2.Session, error) {
+// Session mocks base method
+func (m *Mocksessions) Session(ctx context.Context, token string) (*app.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, token)
-	ret0, _ := ret[0].(*app2.Session)
+	ret0, _ := ret[0].(*app.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Session indicates an expected call of Session.
+// Session indicates an expected call of Session
 func (mr *MocksessionsMockRecorder) Session(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*Mocksessions)(nil).Session), ctx, token)

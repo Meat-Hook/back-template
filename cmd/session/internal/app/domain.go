@@ -15,7 +15,7 @@ type (
 
 	// Subject contains info to be saved in token.
 	Subject struct {
-		SessionID string
+		SessionID uuid.UUID
 	}
 
 	// User contains user information.
@@ -33,7 +33,7 @@ type (
 
 	// Session contains session info for identify a user.
 	Session struct {
-		ID        string
+		ID        uuid.UUID
 		Origin    Origin
 		Token     Token
 		UserID    uuid.UUID

@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	rpc3 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/rpc"
-	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
-	rpc2 "github.com/Meat-Hook/back-template/internal/libs/rpc"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/rpc"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+	librpc "github.com/Meat-Hook/back-template/libs/rpc"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
@@ -17,7 +17,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	metrics2.InitMetrics()
+	metrics.InitMetrics()
 
 	os.Exit(m.Run())
 }
@@ -28,9 +28,8 @@ func start(t *testing.T) (pb.SessionServiceClient, *Mocksessions, *require.Asser
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMocksessions(ctrl)
-	t.Cleanup(ctrl.Finish)
 
-	server := rpc3.New(mockApp, rpc2.Server(zerolog.New(os.Stdout)))
+	server := rpc.New(mockApp, librpc.Server(zerolog.New(os.Stdout)))
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	r.Nil(err)

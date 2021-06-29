@@ -6,17 +6,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/internal/cmd/session/client"
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
+	session "github.com/Meat-Hook/back-template/cmd/session/client"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
-var _ app2.Auth = &Client{}
+var _ app.Auth = &Client{}
 
 //go:generate mockgen -source=session.go -destination mock.app.contracts_test.go -package session_test
 
 // For easy testing.
 type sessionSvc interface {
-	Session(ctx context.Context, token string) (*client.Session, error)
+	Session(ctx context.Context, token string) (*session.Session, error)
 }
 
 // Client wrapper for session microservice.
@@ -30,16 +30,16 @@ func New(svc sessionSvc) *Client {
 }
 
 // Session for implements app.Auth.
-func (c *Client) Session(ctx context.Context, token string) (*app2.Session, error) {
+func (c *Client) Session(ctx context.Context, token string) (*app.Session, error) {
 	res, err := c.session.Session(ctx, token)
 	switch {
-	case errors.Is(err, client.ErrNotFound):
-		return nil, app2.ErrNotFound
+	case errors.Is(err, session.ErrNotFound):
+		return nil, app.ErrNotFound
 	case err != nil:
 		return nil, fmt.Errorf("session: %w", err)
 	}
 
-	return &app2.Session{
+	return &app.Session{
 		ID:     res.ID,
 		UserID: res.UserID,
 	}, nil

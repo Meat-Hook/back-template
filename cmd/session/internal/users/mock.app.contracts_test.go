@@ -6,45 +6,44 @@ package users_test
 
 import (
 	context "context"
-	reflect "reflect"
-
-	client2 "github.com/Meat-Hook/back-template/internal/cmd/user/client"
+	client "github.com/Meat-Hook/back-template/cmd/user/client"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
-// MockuserSvc is a mock of userSvc interface.
+// MockuserSvc is a mock of userSvc interface
 type MockuserSvc struct {
 	ctrl     *gomock.Controller
 	recorder *MockuserSvcMockRecorder
 }
 
-// MockuserSvcMockRecorder is the mock recorder for MockuserSvc.
+// MockuserSvcMockRecorder is the mock recorder for MockuserSvc
 type MockuserSvcMockRecorder struct {
 	mock *MockuserSvc
 }
 
-// NewMockuserSvc creates a new mock instance.
+// NewMockuserSvc creates a new mock instance
 func NewMockuserSvc(ctrl *gomock.Controller) *MockuserSvc {
 	mock := &MockuserSvc{ctrl: ctrl}
 	mock.recorder = &MockuserSvcMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockuserSvc) EXPECT() *MockuserSvcMockRecorder {
 	return m.recorder
 }
 
-// Access mocks base method.
-func (m *MockuserSvc) Access(ctx context.Context, email, pass string) (*client2.User, error) {
+// Access mocks base method
+func (m *MockuserSvc) Access(ctx context.Context, email, pass string) (*client.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Access", ctx, email, pass)
-	ret0, _ := ret[0].(*client2.User)
+	ret0, _ := ret[0].(*client.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Access indicates an expected call of Access.
+// Access indicates an expected call of Access
 func (mr *MockuserSvcMockRecorder) Access(ctx, email, pass interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Access", reflect.TypeOf((*MockuserSvc)(nil).Access), ctx, email, pass)

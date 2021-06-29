@@ -8,9 +8,10 @@ package operations
 import (
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/models"
 )
 
 // LoginOKCode is the HTTP code returned for type LoginOK
@@ -29,7 +30,7 @@ type LoginOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models2.User `json:"body,omitempty"`
+	Payload *models.User `json:"body,omitempty"`
 }
 
 // NewLoginOK creates LoginOK with default headers values
@@ -50,13 +51,13 @@ func (o *LoginOK) SetSetCookie(setCookie string) {
 }
 
 // WithPayload adds the payload to the login o k response
-func (o *LoginOK) WithPayload(payload *models2.User) *LoginOK {
+func (o *LoginOK) WithPayload(payload *models.User) *LoginOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the login o k response
-func (o *LoginOK) SetPayload(payload *models2.User) {
+func (o *LoginOK) SetPayload(payload *models.User) {
 	o.Payload = payload
 }
 
@@ -91,7 +92,7 @@ type LoginDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models2.Error `json:"body,omitempty"`
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewLoginDefault creates LoginDefault with default headers values
@@ -117,13 +118,13 @@ func (o *LoginDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the login default response
-func (o *LoginDefault) WithPayload(payload *models2.Error) *LoginDefault {
+func (o *LoginDefault) WithPayload(payload *models.Error) *LoginDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the login default response
-func (o *LoginDefault) SetPayload(payload *models2.Error) {
+func (o *LoginDefault) SetPayload(payload *models.Error) {
 	o.Payload = payload
 }
 

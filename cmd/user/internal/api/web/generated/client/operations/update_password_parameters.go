@@ -10,11 +10,12 @@ import (
 	"net/http"
 	"time"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // NewUpdatePasswordParams creates a new UpdatePasswordParams object,
@@ -61,7 +62,7 @@ func NewUpdatePasswordParamsWithHTTPClient(client *http.Client) *UpdatePasswordP
 type UpdatePasswordParams struct {
 
 	// Args.
-	Args *models2.UpdatePassword
+	Args *models.UpdatePassword
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,13 +118,13 @@ func (o *UpdatePasswordParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithArgs adds the args to the update password params
-func (o *UpdatePasswordParams) WithArgs(args *models2.UpdatePassword) *UpdatePasswordParams {
+func (o *UpdatePasswordParams) WithArgs(args *models.UpdatePassword) *UpdatePasswordParams {
 	o.SetArgs(args)
 	return o
 }
 
 // SetArgs adds the args to the update password params
-func (o *UpdatePasswordParams) SetArgs(args *models2.UpdatePassword) {
+func (o *UpdatePasswordParams) SetArgs(args *models.UpdatePassword) {
 	o.Args = args
 }
 

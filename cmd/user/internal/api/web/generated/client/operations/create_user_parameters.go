@@ -10,11 +10,12 @@ import (
 	"net/http"
 	"time"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // NewCreateUserParams creates a new CreateUserParams object,
@@ -61,7 +62,7 @@ func NewCreateUserParamsWithHTTPClient(client *http.Client) *CreateUserParams {
 type CreateUserParams struct {
 
 	// Args.
-	Args *models2.CreateUserParams
+	Args *models.CreateUserParams
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,13 +118,13 @@ func (o *CreateUserParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithArgs adds the args to the create user params
-func (o *CreateUserParams) WithArgs(args *models2.CreateUserParams) *CreateUserParams {
+func (o *CreateUserParams) WithArgs(args *models.CreateUserParams) *CreateUserParams {
 	o.SetArgs(args)
 	return o
 }
 
 // SetArgs adds the args to the create user params
-func (o *CreateUserParams) SetArgs(args *models2.CreateUserParams) {
+func (o *CreateUserParams) SetArgs(args *models.CreateUserParams) {
 	o.Args = args
 }
 

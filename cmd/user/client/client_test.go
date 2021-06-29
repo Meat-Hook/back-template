@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	client2 "github.com/Meat-Hook/back-template/internal/cmd/user/client"
-	log2 "github.com/Meat-Hook/back-template/internal/libs/log"
+	"github.com/Meat-Hook/back-template/cmd/user/client"
+	"github.com/Meat-Hook/back-template/libs/log"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
@@ -47,7 +47,7 @@ func (r reqIDMatcher) Matches(x interface{}) bool {
 		return false
 	}
 
-	reqID := strings.Join(md.Get(log2.ReqID), "")
+	reqID := strings.Join(md.Get(log.ReqID), "")
 
 	return r.expect == reqID
 }
@@ -63,7 +63,7 @@ func TestClient_Access(t *testing.T) {
 	conn, mock, assert := start(t)
 
 	var (
-		user = &client2.User{
+		user = &client.User{
 			ID:    uuid.Must(uuid.NewV4()),
 			Email: "email@mail.com",
 			Name:  "username",
@@ -73,7 +73,7 @@ func TestClient_Access(t *testing.T) {
 
 	testCases := map[string]struct {
 		email, pass string
-		want        *client2.User
+		want        *client.User
 		wantErr     error
 	}{
 		"success": {user.Email, pass, user, nil},

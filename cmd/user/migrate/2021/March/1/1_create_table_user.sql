@@ -1,17 +1,17 @@
 --up
-create table users
+CREATE TABLE users
 (
-    id         UUID NOT NULL DEFAULT gen_random_uuid(),
-    email      text not null,
-    name       text not null,
-    pass_hash  bytea,
-    created_at timestamp     default now(),
-    updated_at timestamp     default now(),
+    id         UUID      NOT NULL DEFAULT GEN_RANDOM_UUID(),
+    email      TEXT      NOT NULL,
+    name       TEXT      NOT NULL,
+    pass_hash  BYTEA     NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    unique (email),
-    unique (name),
-    primary key (id)
+    UNIQUE (email),
+    UNIQUE (name),
+    PRIMARY KEY (id)
 );
 
 --down
-drop table users;
+DROP TABLE users;

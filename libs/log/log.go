@@ -15,7 +15,7 @@ const (
 	IP            = `ip`
 	ReqID         = `id`
 	User          = `user`
-	Err           = `err`
+	Err           = `error`
 	HandledStatus = `handled`
 	Duration      = `duration`
 	Host          = `host`

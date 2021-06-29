@@ -30,7 +30,7 @@ var (
 	}
 )
 
-func TestService_GetUserByAuthToken(t *testing.T) {
+func TestApi_Access(t *testing.T) {
 	t.Parallel()
 
 	errNotFound := status.Error(codes.NotFound, app.ErrNotFound.Error())

@@ -9,9 +9,10 @@ import (
 	"fmt"
 	"io"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // GetUserReader is a Reader for the GetUser structure.
@@ -50,19 +51,19 @@ func NewGetUserOK() *GetUserOK {
 OK
 */
 type GetUserOK struct {
-	Payload *models2.User
+	Payload *models.User
 }
 
 func (o *GetUserOK) Error() string {
 	return fmt.Sprintf("[GET /user][%d] getUserOK  %+v", 200, o.Payload)
 }
-func (o *GetUserOK) GetPayload() *models2.User {
+func (o *GetUserOK) GetPayload() *models.User {
 	return o.Payload
 }
 
 func (o *GetUserOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models2.User)
+	o.Payload = new(models.User)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -86,7 +87,7 @@ Generic error response.
 type GetUserDefault struct {
 	_statusCode int
 
-	Payload *models2.Error
+	Payload *models.Error
 }
 
 // Code gets the status code for the get user default response
@@ -97,13 +98,13 @@ func (o *GetUserDefault) Code() int {
 func (o *GetUserDefault) Error() string {
 	return fmt.Sprintf("[GET /user][%d] getUser default  %+v", o._statusCode, o.Payload)
 }
-func (o *GetUserDefault) GetPayload() *models2.Error {
+func (o *GetUserDefault) GetPayload() *models.Error {
 	return o.Payload
 }
 
 func (o *GetUserDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models2.Error)
+	o.Payload = new(models.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

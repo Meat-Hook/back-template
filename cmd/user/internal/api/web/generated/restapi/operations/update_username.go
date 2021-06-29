@@ -9,26 +9,27 @@ import (
 	"context"
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
 // UpdateUsernameHandlerFunc turns a function with the right signature into a update username handler
-type UpdateUsernameHandlerFunc func(UpdateUsernameParams, *app2.Session) UpdateUsernameResponder
+type UpdateUsernameHandlerFunc func(UpdateUsernameParams, *app.Session) UpdateUsernameResponder
 
 // Handle executing the request and returning a response
-func (fn UpdateUsernameHandlerFunc) Handle(params UpdateUsernameParams, principal *app2.Session) UpdateUsernameResponder {
+func (fn UpdateUsernameHandlerFunc) Handle(params UpdateUsernameParams, principal *app.Session) UpdateUsernameResponder {
 	return fn(params, principal)
 }
 
 // UpdateUsernameHandler interface for that can handle valid update username params
 type UpdateUsernameHandler interface {
-	Handle(UpdateUsernameParams, *app2.Session) UpdateUsernameResponder
+	Handle(UpdateUsernameParams, *app.Session) UpdateUsernameResponder
 }
 
 // NewUpdateUsername creates a new http.Handler for the update username operation
@@ -60,9 +61,9 @@ func (o *UpdateUsername) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		*r = *aCtx
 	}
-	var principal *app2.Session
+	var principal *app.Session
 	if uprinc != nil {
-		principal = uprinc.(*app2.Session) // this is really a app.Session, I promise
+		principal = uprinc.(*app.Session) // this is really a app.Session, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
@@ -82,7 +83,7 @@ type UpdateUsernameBody struct {
 
 	// username
 	// Required: true
-	Username *models2.Username `json:"username"`
+	Username *models.Username `json:"username"`
 }
 
 // Validate validates this update username body

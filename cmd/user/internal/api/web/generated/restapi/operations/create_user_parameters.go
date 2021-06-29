@@ -10,11 +10,12 @@ import (
 	"io"
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // NewCreateUserParams creates a new CreateUserParams object
@@ -38,7 +39,7 @@ type CreateUserParams struct {
 	  Required: true
 	  In: body
 	*/
-	Args *models2.CreateUserParams
+	Args *models.CreateUserParams
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -52,7 +53,7 @@ func (o *CreateUserParams) BindRequest(r *http.Request, route *middleware.Matche
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models2.CreateUserParams
+		var body models.CreateUserParams
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("args", "body", ""))

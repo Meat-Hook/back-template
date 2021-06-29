@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
-	repo2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/repo"
-	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/repo"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/gofrs/uuid"
 )
 
@@ -15,10 +15,10 @@ func TestRepo_Smoke(t *testing.T) {
 
 	db, assert := start(t)
 
-	m := metrics2.DB("user", metrics2.MethodsOf(&repo2.Repo{})...)
-	r := repo2.New(db, &m)
+	m := metrics.DB("user", metrics.MethodsOf(&repo.Repo{})...)
+	r := repo.New(db, &m)
 
-	user := app2.User{
+	user := app.User{
 		ID:        uuid.Nil,
 		Email:     "email@gmail.com",
 		Name:      "username",
@@ -38,12 +38,12 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.Nil(err)
 
 	_, err = r.Save(ctx, user2)
-	assert.ErrorIs(err, app2.ErrEmailExist)
+	assert.ErrorIs(err, app.ErrEmailExist)
 
 	user2.Email = "free@gmail.com"
 	user2.Name = user.Name
 	_, err = r.Save(ctx, user2)
-	assert.ErrorIs(err, app2.ErrUsernameExist)
+	assert.ErrorIs(err, app.ErrUsernameExist)
 
 	res, err := r.ByID(ctx, user.ID)
 	assert.Nil(err)
@@ -59,15 +59,15 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(user, *res)
 
-	listRes, total, err := r.ListUserByUsername(ctx, user.Name, app2.SearchParams{Limit: 5})
+	listRes, total, err := r.ListUserByUsername(ctx, user.Name, app.SearchParams{Limit: 5})
 	assert.Nil(err)
 	assert.Equal(1, total)
-	assert.Equal([]app2.User{user}, listRes)
+	assert.Equal([]app.User{user}, listRes)
 
 	err = r.Delete(ctx, id)
 	assert.Nil(err)
 
 	res, err = r.ByID(ctx, user.ID)
 	assert.Nil(res)
-	assert.ErrorIs(err, app2.ErrNotFound)
+	assert.ErrorIs(err, app.ErrNotFound)
 }

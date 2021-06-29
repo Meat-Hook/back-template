@@ -6,19 +6,20 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	operations2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/restapi/operations"
-	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/restapi/operations"
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 )
 
 //go:generate swagger generate server --target ../../generated --name SessionService --spec ../../../../../swagger.yml --principal github.com/Meat-Hook/back-template/cmd/session/internal/app.Session --exclude-main --strict-responders
 
-func configureFlags(api *operations2.SessionServiceAPI) {
+func configureFlags(api *operations.SessionServiceAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations2.SessionServiceAPI) http.Handler {
+func configureAPI(api *operations.SessionServiceAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -38,7 +39,7 @@ func configureAPI(api *operations2.SessionServiceAPI) http.Handler {
 
 	// Applies when the "Cookie" header is set
 	if api.CookieKeyAuth == nil {
-		api.CookieKeyAuth = func(token string) (*app2.Session, error) {
+		api.CookieKeyAuth = func(token string) (*app.Session, error) {
 			return nil, errors.NotImplemented("api key auth (cookieKey) Cookie from header param [Cookie] has not yet been implemented")
 		}
 	}
@@ -50,13 +51,13 @@ func configureAPI(api *operations2.SessionServiceAPI) http.Handler {
 	// api.APIAuthorizer = security.Authorized()
 
 	if api.LoginHandler == nil {
-		api.LoginHandler = operations2.LoginHandlerFunc(func(params operations2.LoginParams) operations2.LoginResponder {
-			return operations2.LoginNotImplemented()
+		api.LoginHandler = operations.LoginHandlerFunc(func(params operations.LoginParams) operations.LoginResponder {
+			return operations.LoginNotImplemented()
 		})
 	}
 	if api.LogoutHandler == nil {
-		api.LogoutHandler = operations2.LogoutHandlerFunc(func(params operations2.LogoutParams, principal *app2.Session) operations2.LogoutResponder {
-			return operations2.LogoutNotImplemented()
+		api.LogoutHandler = operations.LogoutHandlerFunc(func(params operations.LogoutParams, principal *app.Session) operations.LogoutResponder {
+			return operations.LogoutNotImplemented()
 		})
 	}
 

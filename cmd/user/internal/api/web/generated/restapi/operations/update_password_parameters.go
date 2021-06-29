@@ -10,11 +10,12 @@ import (
 	"io"
 	"net/http"
 
-	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // NewUpdatePasswordParams creates a new UpdatePasswordParams object
@@ -38,7 +39,7 @@ type UpdatePasswordParams struct {
 	  Required: true
 	  In: body
 	*/
-	Args *models2.UpdatePassword
+	Args *models.UpdatePassword
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -52,7 +53,7 @@ func (o *UpdatePasswordParams) BindRequest(r *http.Request, route *middleware.Ma
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models2.UpdatePassword
+		var body models.UpdatePassword
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("args", "body", ""))
