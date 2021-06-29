@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime"
@@ -18,8 +19,6 @@ import (
 	"github.com/go-openapi/spec"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 )
 
 // NewSessionServiceAPI creates a new SessionService instance
@@ -47,12 +46,12 @@ func NewSessionServiceAPI(spec *loads.Document) *SessionServiceAPI {
 		LoginHandler: LoginHandlerFunc(func(params LoginParams) LoginResponder {
 			return LoginNotImplemented()
 		}),
-		LogoutHandler: LogoutHandlerFunc(func(params LogoutParams, principal *app.Session) LogoutResponder {
+		LogoutHandler: LogoutHandlerFunc(func(params LogoutParams, principal *app2.Session) LogoutResponder {
 			return LogoutNotImplemented()
 		}),
 
 		// Applies when the "Cookie" header is set
-		CookieKeyAuth: func(token string) (*app.Session, error) {
+		CookieKeyAuth: func(token string) (*app2.Session, error) {
 			return nil, errors.NotImplemented("api key auth (cookieKey) Cookie from header param [Cookie] has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
@@ -95,7 +94,7 @@ type SessionServiceAPI struct {
 
 	// CookieKeyAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Cookie provided in the header
-	CookieKeyAuth func(string) (*app.Session, error)
+	CookieKeyAuth func(string) (*app2.Session, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +21,7 @@ type mocks struct {
 	auth   *MockAuth
 }
 
-func start(t *testing.T) (*app.Module, *mocks, *require.Assertions) {
+func start(t *testing.T) (*app2.Module, *mocks, *require.Assertions) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
@@ -30,7 +30,7 @@ func start(t *testing.T) (*app.Module, *mocks, *require.Assertions) {
 	mockHasher := NewMockHasher(ctrl)
 	mockAuth := NewMockAuth(ctrl)
 
-	module := app.New(mockRepo, mockHasher, mockAuth)
+	module := app2.New(mockRepo, mockHasher, mockAuth)
 
 	mocks := &mocks{
 		hasher: mockHasher,

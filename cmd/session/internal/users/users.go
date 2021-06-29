@@ -6,17 +6,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	user "github.com/Meat-Hook/back-template/cmd/user/client"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/internal/cmd/user/client"
 )
 
-var _ app.Users = &Client{}
+var _ app2.Users = &Client{}
 
 //go:generate mockgen -source=users.go -destination mock.app.contracts_test.go -package users_test
 
 // For easy testing.
 type userSvc interface {
-	Access(ctx context.Context, email, pass string) (*user.User, error)
+	Access(ctx context.Context, email, pass string) (*client.User, error)
 }
 
 // Client wrapper for users microservice.
@@ -30,18 +30,18 @@ func New(svc userSvc) *Client {
 }
 
 // Access for implements app.Users.
-func (c *Client) Access(ctx context.Context, email, password string) (*app.User, error) {
+func (c *Client) Access(ctx context.Context, email, password string) (*app2.User, error) {
 	res, err := c.users.Access(ctx, email, password)
 	switch {
-	case errors.Is(err, user.ErrNotFound):
-		return nil, app.ErrNotFound
-	case errors.Is(err, user.ErrNotValidPass):
-		return nil, app.ErrNotValidPassword
+	case errors.Is(err, client.ErrNotFound):
+		return nil, app2.ErrNotFound
+	case errors.Is(err, client.ErrNotValidPass):
+		return nil, app2.ErrNotValidPassword
 	case err != nil:
 		return nil, fmt.Errorf("user access: %w", err)
 	}
 
-	return &app.User{
+	return &app2.User{
 		ID:    res.ID,
 		Email: res.Email,
 		Name:  res.Name,

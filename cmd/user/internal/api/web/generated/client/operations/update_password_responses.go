@@ -9,10 +9,9 @@ import (
 	"fmt"
 	"io"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // UpdatePasswordReader is a Reader for the UpdatePassword structure.
@@ -76,7 +75,7 @@ Generic error response.
 type UpdatePasswordDefault struct {
 	_statusCode int
 
-	Payload *models.Error
+	Payload *models2.Error
 }
 
 // Code gets the status code for the update password default response
@@ -87,13 +86,13 @@ func (o *UpdatePasswordDefault) Code() int {
 func (o *UpdatePasswordDefault) Error() string {
 	return fmt.Sprintf("[PATCH /user/password][%d] updatePassword default  %+v", o._statusCode, o.Payload)
 }
-func (o *UpdatePasswordDefault) GetPayload() *models.Error {
+func (o *UpdatePasswordDefault) GetPayload() *models2.Error {
 	return o.Payload
 }
 
 func (o *UpdatePasswordDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models2.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

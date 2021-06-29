@@ -9,10 +9,9 @@ import (
 	"fmt"
 	"io"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // DeleteUserReader is a Reader for the DeleteUser structure.
@@ -76,7 +75,7 @@ Generic error response.
 type DeleteUserDefault struct {
 	_statusCode int
 
-	Payload *models.Error
+	Payload *models2.Error
 }
 
 // Code gets the status code for the delete user default response
@@ -87,13 +86,13 @@ func (o *DeleteUserDefault) Code() int {
 func (o *DeleteUserDefault) Error() string {
 	return fmt.Sprintf("[DELETE /user][%d] deleteUser default  %+v", o._statusCode, o.Payload)
 }
-func (o *DeleteUserDefault) GetPayload() *models.Error {
+func (o *DeleteUserDefault) GetPayload() *models2.Error {
 	return o.Payload
 }
 
 func (o *DeleteUserDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models2.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

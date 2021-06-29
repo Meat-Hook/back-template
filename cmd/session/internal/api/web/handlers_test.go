@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/client/operations"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	web2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web"
+	operations2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/client/operations"
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/models"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 )
@@ -17,10 +17,10 @@ func TestService_Login(t *testing.T) {
 	t.Parallel()
 
 	var (
-		token = app.Token{
+		token = app2.Token{
 			Value: "token",
 		}
-		user = app.User{
+		user = app2.User{
 			ID:    uuid.Must(uuid.NewV4()),
 			Email: "email@email.com",
 			Name:  "password",
@@ -29,23 +29,23 @@ func TestService_Login(t *testing.T) {
 
 	testCases := map[string]struct {
 		email, pass string
-		user        *app.User
-		token       *app.Token
+		user        *app2.User
+		token       *app2.Token
 		appErr      error
-		want        *models.User
-		wantErr     *models.Error
+		want        *models2.User
+		wantErr     *models2.Error
 	}{
 		"success": {
 			user.Email, "password",
-			&user, &token, nil, web.User(&user), nil,
+			&user, &token, nil, web2.User(&user), nil,
 		},
 		"err_not_found": {
 			"notExist@email.com", "password",
-			nil, nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error()),
+			nil, nil, app2.ErrNotFound, nil, APIError(app2.ErrNotFound.Error()),
 		},
 		"err_not_valid_password": {
 			user.Email, "notValidPass",
-			nil, nil, app.ErrNotValidPassword, nil, APIError(app.ErrNotValidPassword.Error()),
+			nil, nil, app2.ErrNotValidPassword, nil, APIError(app2.ErrNotValidPassword.Error()),
 		},
 		"err_any": {
 			"randomEmail@email.com", "notValidPass",
@@ -62,11 +62,11 @@ func TestService_Login(t *testing.T) {
 
 			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, gomock.Any()).Return(tc.user, tc.token, tc.appErr)
 
-			email := models.Email(tc.email)
-			password := models.Password(tc.pass)
+			email := models2.Email(tc.email)
+			password := models2.Password(tc.pass)
 
-			params := operations.NewLoginParams().
-				WithArgs(&models.LoginParam{
+			params := operations2.NewLoginParams().
+				WithArgs(&models2.LoginParam{
 					Email:    &email,
 					Password: &password,
 				})
@@ -85,13 +85,13 @@ func TestService_Login(t *testing.T) {
 func TestService_Logout(t *testing.T) {
 	t.Parallel()
 
-	session := app.Session{
+	session := app2.Session{
 		ID: "id",
-		Origin: app.Origin{
+		Origin: app2.Origin{
 			IP:        net.ParseIP("::1"),
 			UserAgent: "Go-http-client/1.1",
 		},
-		Token: app.Token{
+		Token: app2.Token{
 			Value: "token",
 		},
 		UserID:    user.ID,
@@ -102,7 +102,7 @@ func TestService_Logout(t *testing.T) {
 	testCases := []struct {
 		name   string
 		appErr error
-		want   *models.Error
+		want   *models2.Error
 	}{
 		{"success", nil, nil},
 		{"err_any", errAny, APIError("Internal Server Error")},
@@ -118,7 +118,7 @@ func TestService_Logout(t *testing.T) {
 			mockApp.EXPECT().Logout(gomock.Any(), session).Return(tc.appErr)
 			mockApp.EXPECT().Session(gomock.Any(), token).Return(&session, nil)
 
-			params := operations.NewLogoutParams()
+			params := operations2.NewLogoutParams()
 			_, err := client.Operations.Logout(params, apiKeyAuth)
 			assert.Equal(tc.want, errPayload(err))
 		})

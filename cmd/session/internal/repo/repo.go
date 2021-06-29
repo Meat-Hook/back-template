@@ -8,20 +8,20 @@ import (
 	"net"
 	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/libs/metrics"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"
 )
 
-var _ app.Repo = &Repo{}
+var _ app2.Repo = &Repo{}
 
 type (
 	// Repo provided data from and to database.
 	Repo struct {
 		db     *sqlx.DB
-		metric *metrics.Database
+		metric *metrics2.Database
 	}
 
 	session struct {
@@ -36,14 +36,14 @@ type (
 )
 
 // New build and returns user repo.
-func New(db *sqlx.DB, m *metrics.Database) *Repo {
+func New(db *sqlx.DB, m *metrics2.Database) *Repo {
 	return &Repo{
 		db:     db,
 		metric: m,
 	}
 }
 
-func convert(s app.Session) (*session, error) {
+func convert(s app2.Session) (*session, error) {
 	ip, err := inet(s.Origin.IP)
 	if err != nil {
 		return nil, fmt.Errorf("parse ip: %w", err)
@@ -60,14 +60,14 @@ func convert(s app.Session) (*session, error) {
 	}, nil
 }
 
-func (s session) convert() *app.Session {
-	return &app.Session{
+func (s session) convert() *app2.Session {
+	return &app2.Session{
 		ID: s.ID,
-		Origin: app.Origin{
+		Origin: app2.Origin{
 			IP:        s.IP.IPNet.IP,
 			UserAgent: s.UserAgent,
 		},
-		Token: app.Token{
+		Token: app2.Token{
 			Value: s.Token,
 		},
 		UserID:    s.UserID,
@@ -94,7 +94,7 @@ func inet(ip net.IP) (*pgtype.Inet, error) {
 }
 
 // Save for implements app.Repo.
-func (r *Repo) Save(ctx context.Context, session app.Session) error {
+func (r *Repo) Save(ctx context.Context, session app2.Session) error {
 	return r.metric.Collect(func() error {
 		newSession, err := convert(session)
 		if err != nil {
@@ -119,7 +119,7 @@ func (r *Repo) Save(ctx context.Context, session app.Session) error {
 }
 
 // ByID for implements app.Repo.
-func (r *Repo) ByID(ctx context.Context, sessionID string) (s *app.Session, err error) {
+func (r *Repo) ByID(ctx context.Context, sessionID string) (s *app2.Session, err error) {
 	err = r.metric.Collect(func() error {
 		const query = `select * from sessions where id = $1`
 

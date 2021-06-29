@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/client"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/client/operations"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/restapi"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/libs/metrics"
+	web2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web"
+	client2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/client"
+	operations2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/client/operations"
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/models"
+	restapi2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/restapi"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/swag"
 	"github.com/gofrs/uuid"
@@ -26,7 +26,7 @@ import (
 var (
 	errAny = errors.New("any error")
 
-	user = app.User{
+	user = app2.User{
 		ID:    uuid.Must(uuid.NewV4()),
 		Email: "email",
 		Name:  "username",
@@ -37,20 +37,20 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	metrics.InitMetrics()
+	metrics2.InitMetrics()
 
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (string, *Mockapplication, *client.SessionService, *require.Assertions) {
+func start(t *testing.T) (string, *Mockapplication, *client2.SessionService, *require.Assertions) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMockapplication(ctrl)
 
 	log := zerolog.New(os.Stdout)
-	m := metrics.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi.FlatSwaggerJSON)
-	server, err := web.New(mockApp, log, &m, web.Config{})
+	m := metrics2.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi2.FlatSwaggerJSON)
+	server, err := web2.New(mockApp, log, &m, web2.Config{})
 	assert.NoError(t, err, "web.New")
 	assert.NoError(t, server.Listen(), "server.Listen")
 
@@ -64,26 +64,26 @@ func start(t *testing.T) (string, *Mockapplication, *client.SessionService, *req
 		ctrl.Finish()
 	})
 
-	url := fmt.Sprintf("%s:%d", client.DefaultHost, server.Port)
+	url := fmt.Sprintf("%s:%d", client2.DefaultHost, server.Port)
 
-	transport := httptransport.New(url, client.DefaultBasePath, client.DefaultSchemes)
-	c := client.New(transport, nil)
+	transport := httptransport.New(url, client2.DefaultBasePath, client2.DefaultSchemes)
+	c := client2.New(transport, nil)
 
 	return url, mockApp, c, require.New(t)
 }
 
 // APIError returns model.Error with given msg.
-func APIError(msg string) *models.Error {
-	return &models.Error{
+func APIError(msg string) *models2.Error {
+	return &models2.Error{
 		Message: swag.String(msg),
 	}
 }
 
-func errPayload(err interface{}) *models.Error {
+func errPayload(err interface{}) *models2.Error {
 	switch err := err.(type) {
-	case *operations.LoginDefault:
+	case *operations2.LoginDefault:
 		return err.Payload
-	case *operations.LogoutDefault:
+	case *operations2.LogoutDefault:
 		return err.Payload
 	default:
 		return nil

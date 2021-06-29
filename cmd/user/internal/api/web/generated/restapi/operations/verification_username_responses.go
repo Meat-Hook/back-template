@@ -8,10 +8,9 @@ package operations
 import (
 	"net/http"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // VerificationUsernameNoContentCode is the HTTP code returned for type VerificationUsernameNoContent
@@ -50,7 +49,7 @@ type VerificationUsernameDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.Error `json:"body,omitempty"`
+	Payload *models2.Error `json:"body,omitempty"`
 }
 
 // NewVerificationUsernameDefault creates VerificationUsernameDefault with default headers values
@@ -76,13 +75,13 @@ func (o *VerificationUsernameDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the verification username default response
-func (o *VerificationUsernameDefault) WithPayload(payload *models.Error) *VerificationUsernameDefault {
+func (o *VerificationUsernameDefault) WithPayload(payload *models2.Error) *VerificationUsernameDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the verification username default response
-func (o *VerificationUsernameDefault) SetPayload(payload *models.Error) {
+func (o *VerificationUsernameDefault) SetPayload(payload *models2.Error) {
 	o.Payload = payload
 }
 

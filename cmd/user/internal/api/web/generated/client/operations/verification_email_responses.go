@@ -10,13 +10,12 @@ import (
 	"fmt"
 	"io"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // VerificationEmailReader is a Reader for the VerificationEmail structure.
@@ -80,7 +79,7 @@ Generic error response.
 type VerificationEmailDefault struct {
 	_statusCode int
 
-	Payload *models.Error
+	Payload *models2.Error
 }
 
 // Code gets the status code for the verification email default response
@@ -91,13 +90,13 @@ func (o *VerificationEmailDefault) Code() int {
 func (o *VerificationEmailDefault) Error() string {
 	return fmt.Sprintf("[POST /email/verification][%d] verificationEmail default  %+v", o._statusCode, o.Payload)
 }
-func (o *VerificationEmailDefault) GetPayload() *models.Error {
+func (o *VerificationEmailDefault) GetPayload() *models2.Error {
 	return o.Payload
 }
 
 func (o *VerificationEmailDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models2.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -115,7 +114,7 @@ type VerificationEmailBody struct {
 	// email
 	// Required: true
 	// Format: email
-	Email *models.Email `json:"email"`
+	Email *models2.Email `json:"email"`
 }
 
 // Validate validates this verification email body

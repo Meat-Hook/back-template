@@ -4,7 +4,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	"github.com/gofrs/uuid"
 )
 
@@ -25,33 +25,33 @@ func TestModule_Login(t *testing.T) {
 	)
 
 	var (
-		origin = app.Origin{
+		origin = app2.Origin{
 			IP:        net.ParseIP("192.100.10.4"),
 			UserAgent: "UserAgent",
 		}
-		user = app.User{
+		user = app2.User{
 			ID:    uuid.Must(uuid.NewV4()),
 			Email: email,
 			Name:  "username",
 		}
-		user2 = app.User{
+		user2 = app2.User{
 			ID:    uuid.Must(uuid.NewV4()),
 			Email: errSaveSessionEmail,
 			Name:  "username",
 		}
-		token = app.Token{
+		token = app2.Token{
 			Value: "token",
 		}
-		token2 = app.Token{
+		token2 = app2.Token{
 			Value: "token2",
 		}
-		session = app.Session{
+		session = app2.Session{
 			ID:     id,
 			Origin: origin,
 			Token:  token,
 			UserID: user.ID,
 		}
-		errSaveSession = app.Session{
+		errSaveSession = app2.Session{
 			ID:     id2,
 			Origin: origin,
 			Token:  token2,
@@ -61,23 +61,23 @@ func TestModule_Login(t *testing.T) {
 
 	mocks.users.EXPECT().Access(ctx, email, pass).Return(&user, nil)
 	mocks.users.EXPECT().Access(ctx, errSaveSessionEmail, pass).Return(&user2, nil)
-	mocks.users.EXPECT().Access(ctx, notValidEmail, pass).Return(nil, app.ErrNotFound)
+	mocks.users.EXPECT().Access(ctx, notValidEmail, pass).Return(nil, app2.ErrNotFound)
 	mocks.id.EXPECT().New().Return(id)
 	mocks.id.EXPECT().New().Return(id2)
-	mocks.auth.EXPECT().Token(app.Subject{SessionID: id}).Return(&token, nil)
-	mocks.auth.EXPECT().Token(app.Subject{SessionID: id2}).Return(&token2, nil)
+	mocks.auth.EXPECT().Token(app2.Subject{SessionID: id}).Return(&token, nil)
+	mocks.auth.EXPECT().Token(app2.Subject{SessionID: id2}).Return(&token2, nil)
 	mocks.repo.EXPECT().Save(ctx, session).Return(nil)
 	mocks.repo.EXPECT().Save(ctx, errSaveSession).Return(errAny)
 
 	testCases := map[string]struct {
 		email, password string
-		want            *app.User
-		wantToken       *app.Token
+		want            *app2.User
+		wantToken       *app2.Token
 		wantErr         error
 	}{
 		"success":       {email, pass, &user, &token, nil},
 		"err_any":       {errSaveSessionEmail, pass, nil, nil, errAny},
-		"err_not_found": {notValidEmail, pass, nil, nil, app.ErrNotFound},
+		"err_not_found": {notValidEmail, pass, nil, nil, app2.ErrNotFound},
 	}
 
 	for name, tc := range testCases {
@@ -96,13 +96,13 @@ func TestModule_Logout(t *testing.T) {
 
 	module, mocks, assert := start(t)
 
-	session := app.Session{
+	session := app2.Session{
 		ID: "id",
-		Origin: app.Origin{
+		Origin: app2.Origin{
 			IP:        net.ParseIP("192.100.10.4"),
 			UserAgent: "UserAgent",
 		},
-		Token: app.Token{
+		Token: app2.Token{
 			Value: "token",
 		},
 		UserID: uuid.Must(uuid.NewV4()),
@@ -111,7 +111,7 @@ func TestModule_Logout(t *testing.T) {
 	mocks.repo.EXPECT().Delete(ctx, session.ID).Return(nil)
 
 	testCases := map[string]struct {
-		session *app.Session
+		session *app2.Session
 		want    error
 	}{
 		"success": {&session, nil},
@@ -133,39 +133,39 @@ func TestModule_Session(t *testing.T) {
 
 	var (
 		token          = "token"
-		successSubject = app.Subject{SessionID: "ID"}
-		session        = app.Session{
+		successSubject = app2.Subject{SessionID: "ID"}
+		session        = app2.Session{
 			ID: successSubject.SessionID,
-			Origin: app.Origin{
+			Origin: app2.Origin{
 				IP:        net.ParseIP("192.100.10.4"),
 				UserAgent: "UserAgent",
 			},
-			Token: app.Token{
+			Token: app2.Token{
 				Value: token,
 			},
 			UserID: uuid.Must(uuid.NewV4()),
 		}
 
 		tokenNotFound           = "tokenNotFound"
-		subjectForNotFoundToken = app.Subject{SessionID: "NOT_FOUND"}
+		subjectForNotFoundToken = app2.Subject{SessionID: "NOT_FOUND"}
 
 		notValidToken = "notValidToken"
 	)
 
 	mocks.auth.EXPECT().Subject(token).Return(&successSubject, nil)
 	mocks.auth.EXPECT().Subject(tokenNotFound).Return(&subjectForNotFoundToken, nil)
-	mocks.auth.EXPECT().Subject(notValidToken).Return(nil, app.ErrInvalidToken)
+	mocks.auth.EXPECT().Subject(notValidToken).Return(nil, app2.ErrInvalidToken)
 	mocks.repo.EXPECT().ByID(ctx, successSubject.SessionID).Return(&session, nil)
-	mocks.repo.EXPECT().ByID(ctx, subjectForNotFoundToken.SessionID).Return(nil, app.ErrNotFound)
+	mocks.repo.EXPECT().ByID(ctx, subjectForNotFoundToken.SessionID).Return(nil, app2.ErrNotFound)
 
 	testCases := map[string]struct {
 		token   string
-		want    *app.Session
+		want    *app2.Session
 		wantErr error
 	}{
 		"success":           {token, &session, nil},
-		"err_not_found":     {tokenNotFound, nil, app.ErrNotFound},
-		"err_invalid_token": {notValidToken, nil, app.ErrInvalidToken},
+		"err_not_found":     {tokenNotFound, nil, app2.ErrNotFound},
+		"err_invalid_token": {notValidToken, nil, app2.ErrInvalidToken},
 	}
 
 	for name, tc := range testCases {

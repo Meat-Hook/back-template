@@ -9,13 +9,12 @@ import (
 	"context"
 	"net/http"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // VerificationUsernameHandlerFunc turns a function with the right signature into a verification username handler
@@ -69,7 +68,7 @@ type VerificationUsernameBody struct {
 
 	// username
 	// Required: true
-	Username *models.Username `json:"username"`
+	Username *models2.Username `json:"username"`
 }
 
 // Validate validates this verification username body

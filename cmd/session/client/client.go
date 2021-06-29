@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/libs/log"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	log2 "github.com/Meat-Hook/back-template/internal/libs/log"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
@@ -33,13 +33,13 @@ type Session struct {
 
 // Errors.
 var (
-	ErrNotFound = app.ErrNotFound
+	ErrNotFound = app2.ErrNotFound
 )
 
 // Session get user session by his auth token.
 func (c *Client) Session(ctx context.Context, token string) (*Session, error) {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.MD{
-		log.ReqID: []string{log.ReqIDFromCtx(ctx)},
+		log2.ReqID: []string{log2.ReqIDFromCtx(ctx)},
 	})
 
 	res, err := c.conn.Session(ctx, &pb.SessionRequest{

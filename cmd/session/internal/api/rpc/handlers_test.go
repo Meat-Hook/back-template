@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
@@ -17,7 +17,7 @@ import (
 
 var (
 	errAny      = errors.New("any err")
-	sessionInfo = app.Session{
+	sessionInfo = app2.Session{
 		ID:     "id",
 		UserID: uuid.Must(uuid.NewV4()),
 	}
@@ -31,7 +31,7 @@ var (
 func TestService_GetUserByAuthToken(t *testing.T) {
 	t.Parallel()
 
-	errNotFound := status.Error(codes.NotFound, app.ErrNotFound.Error())
+	errNotFound := status.Error(codes.NotFound, app2.ErrNotFound.Error())
 	errDeadline := status.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 	errCanceled := status.Error(codes.Canceled, context.Canceled.Error())
 	errInternal := status.Error(codes.Internal, errAny.Error())
@@ -39,13 +39,13 @@ func TestService_GetUserByAuthToken(t *testing.T) {
 	const token = `accessToken`
 
 	testCases := map[string]struct {
-		session *app.Session
+		session *app2.Session
 		want    *pb.SessionResponse
 		appErr  error
 		wantErr error
 	}{
 		"success":       {&sessionInfo, &rpcUser, nil, nil},
-		"err_not_found": {nil, nil, app.ErrNotFound, errNotFound},
+		"err_not_found": {nil, nil, app2.ErrNotFound, errNotFound},
 		"err_deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
 		"err_canceled":  {nil, nil, context.Canceled, errCanceled},
 		"err_any":       {nil, nil, errAny, errInternal},

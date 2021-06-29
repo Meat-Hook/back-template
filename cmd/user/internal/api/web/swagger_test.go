@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
+	restapi2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/restapi"
 	"github.com/go-openapi/loads"
 )
 
@@ -14,7 +14,7 @@ func TestServeSwagger(t *testing.T) {
 
 	url, _, _, assert := start(t)
 
-	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
+	swaggerSpec, err := loads.Embedded(restapi2.SwaggerJSON, restapi2.FlatSwaggerJSON)
 	assert.Nil(err)
 	basePath := swaggerSpec.BasePath()
 

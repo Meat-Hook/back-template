@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/client"
-	"github.com/Meat-Hook/back-template/libs/log"
+	client2 "github.com/Meat-Hook/back-template/internal/cmd/session/client"
+	log2 "github.com/Meat-Hook/back-template/internal/libs/log"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
@@ -52,7 +52,7 @@ func (r reqIDMatcher) Matches(x interface{}) bool {
 		return false
 	}
 
-	reqID := strings.Join(md.Get(log.ReqID), "")
+	reqID := strings.Join(md.Get(log2.ReqID), "")
 
 	return r.expect == reqID
 }
@@ -68,7 +68,7 @@ func TestClient_Access(t *testing.T) {
 	conn, mock, assert := start(t)
 
 	var (
-		session = &client.Session{
+		session = &client2.Session{
 			ID:     "sessionID",
 			UserID: uuid.Must(uuid.NewV4()),
 		}
@@ -78,7 +78,7 @@ func TestClient_Access(t *testing.T) {
 
 	testCases := map[string]struct {
 		token   string
-		want    *client.Session
+		want    *client2.Session
 		wantErr error
 	}{
 		"success": {token, session, nil},

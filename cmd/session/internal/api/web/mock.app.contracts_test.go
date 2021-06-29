@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	app "github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,11 +36,11 @@ func (m *Mockapplication) EXPECT() *MockapplicationMockRecorder {
 }
 
 // Login mocks base method.
-func (m *Mockapplication) Login(ctx context.Context, email, password string, origin app.Origin) (*app.User, *app.Token, error) {
+func (m *Mockapplication) Login(ctx context.Context, email, password string, origin app2.Origin) (*app2.User, *app2.Token, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, email, password, origin)
-	ret0, _ := ret[0].(*app.User)
-	ret1, _ := ret[1].(*app.Token)
+	ret0, _ := ret[0].(*app2.User)
+	ret1, _ := ret[1].(*app2.Token)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
@@ -52,7 +52,7 @@ func (mr *MockapplicationMockRecorder) Login(ctx, email, password, origin interf
 }
 
 // Logout mocks base method.
-func (m *Mockapplication) Logout(ctx context.Context, session app.Session) error {
+func (m *Mockapplication) Logout(ctx context.Context, session app2.Session) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Logout", ctx, session)
 	ret0, _ := ret[0].(error)
@@ -66,10 +66,10 @@ func (mr *MockapplicationMockRecorder) Logout(ctx, session interface{}) *gomock.
 }
 
 // Session mocks base method.
-func (m *Mockapplication) Session(ctx context.Context, accessToken string) (*app.Session, error) {
+func (m *Mockapplication) Session(ctx context.Context, accessToken string) (*app2.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, accessToken)
-	ret0, _ := ret[0].(*app.Session)
+	ret0, _ := ret[0].(*app2.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

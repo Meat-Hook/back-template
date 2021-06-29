@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/repo"
-	"github.com/Meat-Hook/back-template/libs/metrics"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	repo2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/repo"
+	metrics2 "github.com/Meat-Hook/back-template/internal/libs/metrics"
 	"github.com/gofrs/uuid"
 	"github.com/rs/xid"
 )
@@ -17,16 +17,16 @@ func TestRepo_Smoke(t *testing.T) {
 
 	db, assert := start(t)
 
-	m := metrics.DB("session", metrics.MethodsOf(&repo.Repo{})...)
-	r := repo.New(db, &m)
+	m := metrics2.DB("session", metrics2.MethodsOf(&repo2.Repo{})...)
+	r := repo2.New(db, &m)
 
-	session := app.Session{
+	session := app2.Session{
 		ID: xid.New().String(),
-		Origin: app.Origin{
+		Origin: app2.Origin{
 			IP:        net.ParseIP("192.100.10.4"),
 			UserAgent: "Mozilla/5.0",
 		},
-		Token: app.Token{
+		Token: app2.Token{
 			Value: "token",
 		},
 		UserID:    uuid.Must(uuid.NewV4()),
@@ -50,5 +50,5 @@ func TestRepo_Smoke(t *testing.T) {
 
 	res, err = r.ByID(ctx, session.ID)
 	assert.Nil(res)
-	assert.ErrorIs(err, app.ErrNotFound)
+	assert.ErrorIs(err, app2.ErrNotFound)
 }

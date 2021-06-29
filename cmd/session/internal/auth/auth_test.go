@@ -3,8 +3,8 @@ package auth_test
 import (
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/auth"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	auth2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/auth"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 )
@@ -13,9 +13,9 @@ func TestAuth_TokenAndSubject(t *testing.T) {
 	t.Parallel()
 
 	r := require.New(t)
-	a := auth.New("super-duper-secret-key-qwertyuio")
+	a := auth2.New("super-duper-secret-key-qwertyuio")
 
-	subject := app.Subject{SessionID: xid.New().String()}
+	subject := app2.Subject{SessionID: xid.New().String()}
 	appToken, err := a.Token(subject)
 	r.Nil(err)
 	r.NotNil(appToken)

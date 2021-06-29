@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/cmd/user/client"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
+	client2 "github.com/Meat-Hook/back-template/internal/cmd/user/client"
 	"github.com/gofrs/uuid"
 )
 
@@ -18,7 +18,7 @@ var (
 func TestClient_Access(t *testing.T) {
 	t.Parallel()
 
-	userInfo := &app.User{
+	userInfo := &app2.User{
 		ID:    uuid.Must(uuid.NewV4()),
 		Email: "email@mail.com",
 		Name:  "username",
@@ -26,12 +26,12 @@ func TestClient_Access(t *testing.T) {
 
 	testCases := map[string]struct {
 		email, pass string
-		want        *app.User
+		want        *app2.User
 		wantErr     error
 	}{
 		"success":            {userInfo.Email, "pass", userInfo, nil},
-		"err_not_found":      {"notFound@email.com", "pass", nil, app.ErrNotFound},
-		"err_not_valid_pass": {userInfo.Email, "notValidPass", nil, app.ErrNotValidPassword},
+		"err_not_found":      {"notFound@email.com", "pass", nil, app2.ErrNotFound},
+		"err_not_valid_pass": {userInfo.Email, "notValidPass", nil, app2.ErrNotValidPassword},
 		"err_any":            {"emailNotValid", "", nil, errAny},
 	}
 
@@ -52,12 +52,12 @@ func TestClient_Access(t *testing.T) {
 	}
 }
 
-func convert(want *app.User) *client.User {
+func convert(want *app2.User) *client2.User {
 	if want == nil {
 		return nil
 	}
 
-	return &client.User{
+	return &client2.User{
 		ID:    want.ID,
 		Email: want.Email,
 		Name:  want.Name,

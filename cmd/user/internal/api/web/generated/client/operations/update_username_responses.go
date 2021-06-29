@@ -10,13 +10,12 @@ import (
 	"fmt"
 	"io"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // UpdateUsernameReader is a Reader for the UpdateUsername structure.
@@ -80,7 +79,7 @@ Generic error response.
 type UpdateUsernameDefault struct {
 	_statusCode int
 
-	Payload *models.Error
+	Payload *models2.Error
 }
 
 // Code gets the status code for the update username default response
@@ -91,13 +90,13 @@ func (o *UpdateUsernameDefault) Code() int {
 func (o *UpdateUsernameDefault) Error() string {
 	return fmt.Sprintf("[PATCH /user/username][%d] updateUsername default  %+v", o._statusCode, o.Payload)
 }
-func (o *UpdateUsernameDefault) GetPayload() *models.Error {
+func (o *UpdateUsernameDefault) GetPayload() *models2.Error {
 	return o.Payload
 }
 
 func (o *UpdateUsernameDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models2.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -114,7 +113,7 @@ type UpdateUsernameBody struct {
 
 	// username
 	// Required: true
-	Username *models.Username `json:"username"`
+	Username *models2.Username `json:"username"`
 }
 
 // Validate validates this update username body

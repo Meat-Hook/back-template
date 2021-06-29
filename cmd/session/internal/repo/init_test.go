@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/libs/migrater"
+	migrater2 "github.com/Meat-Hook/back-template/internal/libs/migrater"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/dockertest/v3"
@@ -63,7 +63,7 @@ func start(t *testing.T) (*sqlx.DB, *require.Assertions) {
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
 
-	err = migrater.Auto(ctx, zerolog.New(os.Stderr), db.DB, migrateDir)
+	err = migrater2.Auto(ctx, zerolog.New(os.Stderr), db.DB, migrateDir)
 	r.Nil(err)
 
 	return db, r

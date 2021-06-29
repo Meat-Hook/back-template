@@ -1,14 +1,14 @@
 package web
 
 import (
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/go-openapi/swag"
 	"github.com/rs/zerolog"
 )
 
-func apiError(txt string) *models.Error {
-	return &models.Error{
+func apiError(txt string) *models2.Error {
+	return &models2.Error{
 		Message: swag.String(txt),
 	}
 }
@@ -20,8 +20,8 @@ func logs(log zerolog.Logger, err error) {
 }
 
 // Users conversion []app.User => []*models.User.
-func Users(u []app.User) []*models.User {
-	users := make([]*models.User, len(u))
+func Users(u []app2.User) []*models2.User {
+	users := make([]*models2.User, len(u))
 
 	for i := range users {
 		users[i] = User(&u[i])
@@ -31,12 +31,12 @@ func Users(u []app.User) []*models.User {
 }
 
 // User conversion app.User => models.User.
-func User(u *app.User) *models.User {
-	id := models.UserID(u.ID.String())
-	username := models.Username(u.Name)
-	email := models.Email(u.Email)
+func User(u *app2.User) *models2.User {
+	id := models2.UserID(u.ID.String())
+	username := models2.Username(u.Name)
+	email := models2.Email(u.Email)
 
-	return &models.User{
+	return &models2.User{
 		ID:       &id,
 		Username: &username,
 		Email:    &email,

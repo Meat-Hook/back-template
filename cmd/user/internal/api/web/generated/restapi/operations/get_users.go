@@ -10,27 +10,26 @@ import (
 	"net/http"
 	"strconv"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
 // GetUsersHandlerFunc turns a function with the right signature into a get users handler
-type GetUsersHandlerFunc func(GetUsersParams, *app.Session) GetUsersResponder
+type GetUsersHandlerFunc func(GetUsersParams, *app2.Session) GetUsersResponder
 
 // Handle executing the request and returning a response
-func (fn GetUsersHandlerFunc) Handle(params GetUsersParams, principal *app.Session) GetUsersResponder {
+func (fn GetUsersHandlerFunc) Handle(params GetUsersParams, principal *app2.Session) GetUsersResponder {
 	return fn(params, principal)
 }
 
 // GetUsersHandler interface for that can handle valid get users params
 type GetUsersHandler interface {
-	Handle(GetUsersParams, *app.Session) GetUsersResponder
+	Handle(GetUsersParams, *app2.Session) GetUsersResponder
 }
 
 // NewGetUsers creates a new http.Handler for the get users operation
@@ -62,9 +61,9 @@ func (o *GetUsers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		*r = *aCtx
 	}
-	var principal *app.Session
+	var principal *app2.Session
 	if uprinc != nil {
-		principal = uprinc.(*app.Session) // this is really a app.Session, I promise
+		principal = uprinc.(*app2.Session) // this is really a app.Session, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
@@ -89,7 +88,7 @@ type GetUsersOKBody struct {
 	// users
 	// Max Items: 100
 	// Unique: true
-	Users []*models.User `json:"users"`
+	Users []*models2.User `json:"users"`
 }
 
 // Validate validates this get users o k body

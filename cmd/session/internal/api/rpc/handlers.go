@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,7 +20,7 @@ func (a *api) Session(ctx context.Context, req *pb.SessionRequest) (*pb.SessionR
 	return apiSession(info), nil
 }
 
-func apiSession(session *app.Session) *pb.SessionResponse {
+func apiSession(session *app2.Session) *pb.SessionResponse {
 	return &pb.SessionResponse{
 		Id:     session.ID,
 		UserId: session.UserID.String(),
@@ -34,7 +34,7 @@ func apiError(err error) error {
 
 	code := codes.Internal
 	switch {
-	case errors.Is(err, app.ErrNotFound):
+	case errors.Is(err, app2.ErrNotFound):
 		code = codes.NotFound
 	case errors.Is(err, context.DeadlineExceeded):
 		code = codes.DeadlineExceeded

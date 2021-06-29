@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	"github.com/Meat-Hook/back-template/libs/log"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
+	log2 "github.com/Meat-Hook/back-template/internal/libs/log"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/user/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
@@ -34,15 +34,15 @@ type User struct {
 
 // Errors.
 var (
-	ErrNotFound     = app.ErrNotFound
-	ErrNotValidPass = app.ErrNotValidPassword
+	ErrNotFound     = app2.ErrNotFound
+	ErrNotValidPass = app2.ErrNotValidPassword
 )
 
 // Access get user info by his email and pass.
 // Needed for user auth.
 func (c *Client) Access(ctx context.Context, email, pass string) (*User, error) {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.MD{
-		log.ReqID: []string{log.ReqIDFromCtx(ctx)},
+		log2.ReqID: []string{log2.ReqIDFromCtx(ctx)},
 	})
 
 	res, err := c.conn.Access(ctx, &pb.AccessRequest{

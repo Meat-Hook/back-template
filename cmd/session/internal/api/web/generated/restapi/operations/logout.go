@@ -8,22 +8,21 @@ package operations
 import (
 	"net/http"
 
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 )
 
 // LogoutHandlerFunc turns a function with the right signature into a logout handler
-type LogoutHandlerFunc func(LogoutParams, *app.Session) LogoutResponder
+type LogoutHandlerFunc func(LogoutParams, *app2.Session) LogoutResponder
 
 // Handle executing the request and returning a response
-func (fn LogoutHandlerFunc) Handle(params LogoutParams, principal *app.Session) LogoutResponder {
+func (fn LogoutHandlerFunc) Handle(params LogoutParams, principal *app2.Session) LogoutResponder {
 	return fn(params, principal)
 }
 
 // LogoutHandler interface for that can handle valid logout params
 type LogoutHandler interface {
-	Handle(LogoutParams, *app.Session) LogoutResponder
+	Handle(LogoutParams, *app2.Session) LogoutResponder
 }
 
 // NewLogout creates a new http.Handler for the logout operation
@@ -55,9 +54,9 @@ func (o *Logout) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		*r = *aCtx
 	}
-	var principal *app.Session
+	var principal *app2.Session
 	if uprinc != nil {
-		principal = uprinc.(*app.Session) // this is really a app.Session, I promise
+		principal = uprinc.(*app2.Session) // this is really a app.Session, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

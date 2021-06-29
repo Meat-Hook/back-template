@@ -3,12 +3,12 @@ package users_test
 import (
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/users"
+	users2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/users"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
-func start(t *testing.T) (*users.Client, *MockuserSvc, *require.Assertions) {
+func start(t *testing.T) (*users2.Client, *MockuserSvc, *require.Assertions) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
@@ -16,5 +16,5 @@ func start(t *testing.T) (*users.Client, *MockuserSvc, *require.Assertions) {
 
 	mock := NewMockuserSvc(ctrl)
 
-	return users.New(mock), mock, require.New(t)
+	return users2.New(mock), mock, require.New(t)
 }

@@ -8,10 +8,9 @@ package operations
 import (
 	"net/http"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // VerificationEmailNoContentCode is the HTTP code returned for type VerificationEmailNoContent
@@ -50,7 +49,7 @@ type VerificationEmailDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.Error `json:"body,omitempty"`
+	Payload *models2.Error `json:"body,omitempty"`
 }
 
 // NewVerificationEmailDefault creates VerificationEmailDefault with default headers values
@@ -76,13 +75,13 @@ func (o *VerificationEmailDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the verification email default response
-func (o *VerificationEmailDefault) WithPayload(payload *models.Error) *VerificationEmailDefault {
+func (o *VerificationEmailDefault) WithPayload(payload *models2.Error) *VerificationEmailDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the verification email default response
-func (o *VerificationEmailDefault) SetPayload(payload *models.Error) {
+func (o *VerificationEmailDefault) SetPayload(payload *models2.Error) {
 	o.Payload = payload
 }
 

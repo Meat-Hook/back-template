@@ -20,12 +20,11 @@ import (
 	"syscall"
 	"time"
 
+	operations2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/restapi/operations"
 	"github.com/go-openapi/runtime/flagext"
 	"github.com/go-openapi/swag"
 	flags "github.com/jessevdk/go-flags"
 	"golang.org/x/net/netutil"
-
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/restapi/operations"
 )
 
 const (
@@ -43,7 +42,7 @@ func init() {
 }
 
 // NewServer creates a new api session service server but does not configure it
-func NewServer(api *operations.SessionServiceAPI) *Server {
+func NewServer(api *operations2.SessionServiceAPI) *Server {
 	s := new(Server)
 
 	s.shutdown = make(chan struct{})
@@ -95,7 +94,7 @@ type Server struct {
 	TLSWriteTimeout   time.Duration  `long:"tls-write-timeout" description:"maximum duration before timing out write of the response"`
 	httpsServerL      net.Listener
 
-	api          *operations.SessionServiceAPI
+	api          *operations2.SessionServiceAPI
 	handler      http.Handler
 	hasListeners bool
 	shutdown     chan struct{}
@@ -125,7 +124,7 @@ func (s *Server) Fatalf(f string, args ...interface{}) {
 }
 
 // SetAPI configures the server with the specified API. Needs to be called before Serve
-func (s *Server) SetAPI(api *operations.SessionServiceAPI) {
+func (s *Server) SetAPI(api *operations2.SessionServiceAPI) {
 	if api == nil {
 		s.api = nil
 		s.handler = nil

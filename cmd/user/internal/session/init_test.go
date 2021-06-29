@@ -3,12 +3,12 @@ package session_test
 import (
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/session"
+	session2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/session"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
-func start(t *testing.T) (*session.Client, *MocksessionSvc, *require.Assertions) {
+func start(t *testing.T) (*session2.Client, *MocksessionSvc, *require.Assertions) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
@@ -16,5 +16,5 @@ func start(t *testing.T) (*session.Client, *MocksessionSvc, *require.Assertions)
 
 	mock := NewMocksessionSvc(ctrl)
 
-	return session.New(mock), mock, require.New(t)
+	return session2.New(mock), mock, require.New(t)
 }

@@ -10,13 +10,12 @@ import (
 	"fmt"
 	"io"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // VerificationUsernameReader is a Reader for the VerificationUsername structure.
@@ -80,7 +79,7 @@ Generic error response.
 type VerificationUsernameDefault struct {
 	_statusCode int
 
-	Payload *models.Error
+	Payload *models2.Error
 }
 
 // Code gets the status code for the verification username default response
@@ -91,13 +90,13 @@ func (o *VerificationUsernameDefault) Code() int {
 func (o *VerificationUsernameDefault) Error() string {
 	return fmt.Sprintf("[POST /username/verification][%d] verificationUsername default  %+v", o._statusCode, o.Payload)
 }
-func (o *VerificationUsernameDefault) GetPayload() *models.Error {
+func (o *VerificationUsernameDefault) GetPayload() *models2.Error {
 	return o.Payload
 }
 
 func (o *VerificationUsernameDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models2.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -114,7 +113,7 @@ type VerificationUsernameBody struct {
 
 	// username
 	// Required: true
-	Username *models.Username `json:"username"`
+	Username *models2.Username `json:"username"`
 }
 
 // Validate validates this verification username body

@@ -4,17 +4,17 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/api/web/generated/restapi/operations"
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/models"
+	operations2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/api/web/generated/restapi/operations"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	"github.com/go-openapi/swag"
 	"github.com/rs/zerolog"
 )
 
-func (svc *service) login(params operations.LoginParams) operations.LoginResponder {
+func (svc *service) login(params operations2.LoginParams) operations2.LoginResponder {
 	ctx, log, remoteIP := fromRequest(params.HTTPRequest, nil)
 
-	origin := app.Origin{
+	origin := app2.Origin{
 		IP:        remoteIP,
 		UserAgent: params.HTTPRequest.Header.Get("User-Agent"),
 	}
@@ -23,47 +23,47 @@ func (svc *service) login(params operations.LoginParams) operations.LoginRespond
 	defer logs(log, err)
 	switch {
 	case err == nil:
-		return operations.NewLoginOK().WithPayload(User(u)).
+		return operations2.NewLoginOK().WithPayload(User(u)).
 			WithSetCookie(generateCookie(token.Value).String())
-	case errors.Is(err, app.ErrNotFound):
-		return operations.NewLoginDefault(http.StatusNotFound).WithPayload(apiError(app.ErrNotFound.Error()))
-	case errors.Is(err, app.ErrNotValidPassword):
-		return operations.NewLoginDefault(http.StatusBadRequest).WithPayload(apiError(app.ErrNotValidPassword.Error()))
+	case errors.Is(err, app2.ErrNotFound):
+		return operations2.NewLoginDefault(http.StatusNotFound).WithPayload(apiError(app2.ErrNotFound.Error()))
+	case errors.Is(err, app2.ErrNotValidPassword):
+		return operations2.NewLoginDefault(http.StatusBadRequest).WithPayload(apiError(app2.ErrNotValidPassword.Error()))
 	default:
-		return operations.NewLoginDefault(http.StatusInternalServerError).
+		return operations2.NewLoginDefault(http.StatusInternalServerError).
 			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
 	}
 }
 
-func (svc *service) logout(params operations.LogoutParams, session *app.Session) operations.LogoutResponder {
+func (svc *service) logout(params operations2.LogoutParams, session *app2.Session) operations2.LogoutResponder {
 	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.Logout(ctx, *session)
 	defer logs(log, err)
 	switch {
 	case err == nil:
-		return operations.NewLogoutNoContent()
+		return operations2.NewLogoutNoContent()
 	default:
-		return operations.NewLogoutDefault(http.StatusInternalServerError).
+		return operations2.NewLogoutDefault(http.StatusInternalServerError).
 			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
 	}
 }
 
 // User conversion app.User => models.User.
-func User(u *app.User) *models.User {
-	id := models.UserID(u.ID.String())
-	username := models.Username(u.Name)
-	email := models.Email(u.Email)
+func User(u *app2.User) *models2.User {
+	id := models2.UserID(u.ID.String())
+	username := models2.Username(u.Name)
+	email := models2.Email(u.Email)
 
-	return &models.User{
+	return &models2.User{
 		ID:       &id,
 		Username: &username,
 		Email:    &email,
 	}
 }
 
-func apiError(txt string) *models.Error {
-	return &models.Error{
+func apiError(txt string) *models2.Error {
+	return &models2.Error{
 		Message: swag.String(txt),
 	}
 }

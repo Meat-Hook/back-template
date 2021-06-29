@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	client "github.com/Meat-Hook/back-template/cmd/session/client"
+	client2 "github.com/Meat-Hook/back-template/internal/cmd/session/client"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,10 +36,10 @@ func (m *MocksessionSvc) EXPECT() *MocksessionSvcMockRecorder {
 }
 
 // Session mocks base method.
-func (m *MocksessionSvc) Session(ctx context.Context, token string) (*client.Session, error) {
+func (m *MocksessionSvc) Session(ctx context.Context, token string) (*client2.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, token)
-	ret0, _ := ret[0].(*client.Session)
+	ret0, _ := ret[0].(*client2.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

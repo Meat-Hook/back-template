@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	client "github.com/Meat-Hook/back-template/cmd/user/client"
+	client2 "github.com/Meat-Hook/back-template/internal/cmd/user/client"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,10 +36,10 @@ func (m *MockuserSvc) EXPECT() *MockuserSvcMockRecorder {
 }
 
 // Access mocks base method.
-func (m *MockuserSvc) Access(ctx context.Context, email, pass string) (*client.User, error) {
+func (m *MockuserSvc) Access(ctx context.Context, email, pass string) (*client2.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Access", ctx, email, pass)
-	ret0, _ := ret[0].(*client.User)
+	ret0, _ := ret[0].(*client2.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/lib/pq"
 )
 
@@ -20,7 +20,7 @@ func convertErr(err error) error {
 
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return app.ErrNotFound
+		return app2.ErrNotFound
 	case errors.As(err, &pqErr):
 		return constraint(err.(*pq.Error))
 	default:
@@ -31,9 +31,9 @@ func convertErr(err error) error {
 func constraint(pqErr *pq.Error) error {
 	switch {
 	case strings.HasSuffix(pqErr.Message, fmt.Sprintf("unique constraint \"%s\"", duplEmail)):
-		return app.ErrEmailExist
+		return app2.ErrEmailExist
 	case strings.HasSuffix(pqErr.Message, fmt.Sprintf("unique constraint \"%s\"", duplUsername)):
-		return app.ErrUsernameExist
+		return app2.ErrUsernameExist
 	default:
 		return pqErr
 	}

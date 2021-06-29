@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	app "github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,10 +36,10 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 }
 
 // ByID mocks base method.
-func (m *MockRepo) ByID(arg0 context.Context, arg1 string) (*app.Session, error) {
+func (m *MockRepo) ByID(arg0 context.Context, arg1 string) (*app2.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByID", arg0, arg1)
-	ret0, _ := ret[0].(*app.Session)
+	ret0, _ := ret[0].(*app2.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,7 +65,7 @@ func (mr *MockRepoMockRecorder) Delete(ctx, sessionID interface{}) *gomock.Call 
 }
 
 // Save mocks base method.
-func (m *MockRepo) Save(arg0 context.Context, arg1 app.Session) error {
+func (m *MockRepo) Save(arg0 context.Context, arg1 app2.Session) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Save", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -102,10 +102,10 @@ func (m *MockUsers) EXPECT() *MockUsersMockRecorder {
 }
 
 // Access mocks base method.
-func (m *MockUsers) Access(ctx context.Context, email, password string) (*app.User, error) {
+func (m *MockUsers) Access(ctx context.Context, email, password string) (*app2.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Access", ctx, email, password)
-	ret0, _ := ret[0].(*app.User)
+	ret0, _ := ret[0].(*app2.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -140,10 +140,10 @@ func (m *MockAuth) EXPECT() *MockAuthMockRecorder {
 }
 
 // Subject mocks base method.
-func (m *MockAuth) Subject(token string) (*app.Subject, error) {
+func (m *MockAuth) Subject(token string) (*app2.Subject, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Subject", token)
-	ret0, _ := ret[0].(*app.Subject)
+	ret0, _ := ret[0].(*app2.Subject)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -155,10 +155,10 @@ func (mr *MockAuthMockRecorder) Subject(token interface{}) *gomock.Call {
 }
 
 // Token mocks base method.
-func (m *MockAuth) Token(arg0 app.Subject) (*app.Token, error) {
+func (m *MockAuth) Token(arg0 app2.Subject) (*app2.Token, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Token", arg0)
-	ret0, _ := ret[0].(*app.Token)
+	ret0, _ := ret[0].(*app2.Token)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -8,22 +8,21 @@ package operations
 import (
 	"net/http"
 
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
 // GetUserHandlerFunc turns a function with the right signature into a get user handler
-type GetUserHandlerFunc func(GetUserParams, *app.Session) GetUserResponder
+type GetUserHandlerFunc func(GetUserParams, *app2.Session) GetUserResponder
 
 // Handle executing the request and returning a response
-func (fn GetUserHandlerFunc) Handle(params GetUserParams, principal *app.Session) GetUserResponder {
+func (fn GetUserHandlerFunc) Handle(params GetUserParams, principal *app2.Session) GetUserResponder {
 	return fn(params, principal)
 }
 
 // GetUserHandler interface for that can handle valid get user params
 type GetUserHandler interface {
-	Handle(GetUserParams, *app.Session) GetUserResponder
+	Handle(GetUserParams, *app2.Session) GetUserResponder
 }
 
 // NewGetUser creates a new http.Handler for the get user operation
@@ -55,9 +54,9 @@ func (o *GetUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		*r = *aCtx
 	}
-	var principal *app.Session
+	var principal *app2.Session
 	if uprinc != nil {
-		principal = uprinc.(*app.Session) // this is really a app.Session, I promise
+		principal = uprinc.(*app2.Session) // this is really a app.Session, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

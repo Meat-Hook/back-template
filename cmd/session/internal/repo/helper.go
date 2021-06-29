@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/session/internal/app"
 )
 
 func convertErr(err error) error {
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return app.ErrNotFound
+		return app2.ErrNotFound
 	default:
 		return err
 	}

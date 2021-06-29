@@ -8,10 +8,9 @@ package operations
 import (
 	"net/http"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // GetUserOKCode is the HTTP code returned for type GetUserOK
@@ -26,7 +25,7 @@ type GetUserOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.User `json:"body,omitempty"`
+	Payload *models2.User `json:"body,omitempty"`
 }
 
 // NewGetUserOK creates GetUserOK with default headers values
@@ -36,13 +35,13 @@ func NewGetUserOK() *GetUserOK {
 }
 
 // WithPayload adds the payload to the get user o k response
-func (o *GetUserOK) WithPayload(payload *models.User) *GetUserOK {
+func (o *GetUserOK) WithPayload(payload *models2.User) *GetUserOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get user o k response
-func (o *GetUserOK) SetPayload(payload *models.User) {
+func (o *GetUserOK) SetPayload(payload *models2.User) {
 	o.Payload = payload
 }
 
@@ -70,7 +69,7 @@ type GetUserDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.Error `json:"body,omitempty"`
+	Payload *models2.Error `json:"body,omitempty"`
 }
 
 // NewGetUserDefault creates GetUserDefault with default headers values
@@ -96,13 +95,13 @@ func (o *GetUserDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the get user default response
-func (o *GetUserDefault) WithPayload(payload *models.Error) *GetUserDefault {
+func (o *GetUserDefault) WithPayload(payload *models2.Error) *GetUserDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get user default response
-func (o *GetUserDefault) SetPayload(payload *models.Error) {
+func (o *GetUserDefault) SetPayload(payload *models2.Error) {
 	o.Payload = payload
 }
 

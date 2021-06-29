@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime"
@@ -18,8 +19,6 @@ import (
 	"github.com/go-openapi/spec"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
 // NewUserServiceAPI creates a new UserService instance
@@ -47,19 +46,19 @@ func NewUserServiceAPI(spec *loads.Document) *UserServiceAPI {
 		CreateUserHandler: CreateUserHandlerFunc(func(params CreateUserParams) CreateUserResponder {
 			return CreateUserNotImplemented()
 		}),
-		DeleteUserHandler: DeleteUserHandlerFunc(func(params DeleteUserParams, principal *app.Session) DeleteUserResponder {
+		DeleteUserHandler: DeleteUserHandlerFunc(func(params DeleteUserParams, principal *app2.Session) DeleteUserResponder {
 			return DeleteUserNotImplemented()
 		}),
-		GetUserHandler: GetUserHandlerFunc(func(params GetUserParams, principal *app.Session) GetUserResponder {
+		GetUserHandler: GetUserHandlerFunc(func(params GetUserParams, principal *app2.Session) GetUserResponder {
 			return GetUserNotImplemented()
 		}),
-		GetUsersHandler: GetUsersHandlerFunc(func(params GetUsersParams, principal *app.Session) GetUsersResponder {
+		GetUsersHandler: GetUsersHandlerFunc(func(params GetUsersParams, principal *app2.Session) GetUsersResponder {
 			return GetUsersNotImplemented()
 		}),
-		UpdatePasswordHandler: UpdatePasswordHandlerFunc(func(params UpdatePasswordParams, principal *app.Session) UpdatePasswordResponder {
+		UpdatePasswordHandler: UpdatePasswordHandlerFunc(func(params UpdatePasswordParams, principal *app2.Session) UpdatePasswordResponder {
 			return UpdatePasswordNotImplemented()
 		}),
-		UpdateUsernameHandler: UpdateUsernameHandlerFunc(func(params UpdateUsernameParams, principal *app.Session) UpdateUsernameResponder {
+		UpdateUsernameHandler: UpdateUsernameHandlerFunc(func(params UpdateUsernameParams, principal *app2.Session) UpdateUsernameResponder {
 			return UpdateUsernameNotImplemented()
 		}),
 		VerificationEmailHandler: VerificationEmailHandlerFunc(func(params VerificationEmailParams) VerificationEmailResponder {
@@ -70,7 +69,7 @@ func NewUserServiceAPI(spec *loads.Document) *UserServiceAPI {
 		}),
 
 		// Applies when the "Cookie" header is set
-		CookieKeyAuth: func(token string) (*app.Session, error) {
+		CookieKeyAuth: func(token string) (*app2.Session, error) {
 			return nil, errors.NotImplemented("api key auth (cookieKey) Cookie from header param [Cookie] has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
@@ -113,7 +112,7 @@ type UserServiceAPI struct {
 
 	// CookieKeyAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Cookie provided in the header
-	CookieKeyAuth func(string) (*app.Session, error)
+	CookieKeyAuth func(string) (*app2.Session, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer

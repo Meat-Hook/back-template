@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	app "github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,10 +37,10 @@ func (m *Mockapplication) EXPECT() *MockapplicationMockRecorder {
 }
 
 // Auth mocks base method.
-func (m *Mockapplication) Auth(ctx context.Context, raw string) (*app.Session, error) {
+func (m *Mockapplication) Auth(ctx context.Context, raw string) (*app2.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Auth", ctx, raw)
-	ret0, _ := ret[0].(*app.Session)
+	ret0, _ := ret[0].(*app2.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -67,7 +67,7 @@ func (mr *MockapplicationMockRecorder) CreateUser(ctx, email, username, pass int
 }
 
 // DeleteUser mocks base method.
-func (m *Mockapplication) DeleteUser(ctx context.Context, session app.Session) error {
+func (m *Mockapplication) DeleteUser(ctx context.Context, session app2.Session) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", ctx, session)
 	ret0, _ := ret[0].(error)
@@ -81,10 +81,10 @@ func (mr *MockapplicationMockRecorder) DeleteUser(ctx, session interface{}) *gom
 }
 
 // ListUserByUsername mocks base method.
-func (m *Mockapplication) ListUserByUsername(ctx context.Context, session app.Session, username string, page app.SearchParams) ([]app.User, int, error) {
+func (m *Mockapplication) ListUserByUsername(ctx context.Context, session app2.Session, username string, page app2.SearchParams) ([]app2.User, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListUserByUsername", ctx, session, username, page)
-	ret0, _ := ret[0].([]app.User)
+	ret0, _ := ret[0].([]app2.User)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -97,7 +97,7 @@ func (mr *MockapplicationMockRecorder) ListUserByUsername(ctx, session, username
 }
 
 // UpdatePassword mocks base method.
-func (m *Mockapplication) UpdatePassword(ctx context.Context, session app.Session, oldPass, newPass string) error {
+func (m *Mockapplication) UpdatePassword(ctx context.Context, session app2.Session, oldPass, newPass string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdatePassword", ctx, session, oldPass, newPass)
 	ret0, _ := ret[0].(error)
@@ -111,7 +111,7 @@ func (mr *MockapplicationMockRecorder) UpdatePassword(ctx, session, oldPass, new
 }
 
 // UpdateUsername mocks base method.
-func (m *Mockapplication) UpdateUsername(ctx context.Context, session app.Session, username string) error {
+func (m *Mockapplication) UpdateUsername(ctx context.Context, session app2.Session, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUsername", ctx, session, username)
 	ret0, _ := ret[0].(error)
@@ -125,10 +125,10 @@ func (mr *MockapplicationMockRecorder) UpdateUsername(ctx, session, username int
 }
 
 // UserByID mocks base method.
-func (m *Mockapplication) UserByID(ctx context.Context, session app.Session, id uuid.UUID) (*app.User, error) {
+func (m *Mockapplication) UserByID(ctx context.Context, session app2.Session, id uuid.UUID) (*app2.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserByID", ctx, session, id)
-	ret0, _ := ret[0].(*app.User)
+	ret0, _ := ret[0].(*app2.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

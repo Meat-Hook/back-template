@@ -9,13 +9,12 @@ import (
 	"context"
 	"net/http"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // VerificationEmailHandlerFunc turns a function with the right signature into a verification email handler
@@ -70,7 +69,7 @@ type VerificationEmailBody struct {
 	// email
 	// Required: true
 	// Format: email
-	Email *models.Email `json:"email"`
+	Email *models2.Email `json:"email"`
 }
 
 // Validate validates this verification email body

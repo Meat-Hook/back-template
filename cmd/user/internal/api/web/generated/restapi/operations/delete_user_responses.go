@@ -8,10 +8,9 @@ package operations
 import (
 	"net/http"
 
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 )
 
 // DeleteUserNoContentCode is the HTTP code returned for type DeleteUserNoContent
@@ -50,7 +49,7 @@ type DeleteUserDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.Error `json:"body,omitempty"`
+	Payload *models2.Error `json:"body,omitempty"`
 }
 
 // NewDeleteUserDefault creates DeleteUserDefault with default headers values
@@ -76,13 +75,13 @@ func (o *DeleteUserDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the delete user default response
-func (o *DeleteUserDefault) WithPayload(payload *models.Error) *DeleteUserDefault {
+func (o *DeleteUserDefault) WithPayload(payload *models2.Error) *DeleteUserDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the delete user default response
-func (o *DeleteUserDefault) SetPayload(payload *models.Error) {
+func (o *DeleteUserDefault) SetPayload(payload *models2.Error) {
 	o.Payload = payload
 }
 

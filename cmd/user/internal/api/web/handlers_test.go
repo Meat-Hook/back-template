@@ -3,10 +3,10 @@ package web_test
 import (
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/client/operations"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	web2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web"
+	operations2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/client/operations"
+	models2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/api/web/generated/models"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/gofrs/uuid"
@@ -19,10 +19,10 @@ func TestService_VerificationEmail(t *testing.T) {
 	testCases := map[string]struct {
 		email  string
 		appErr error
-		want   *models.Error
+		want   *models2.Error
 	}{
 		"success":         {"notExist@mail.com", nil, nil},
-		"err_email_exist": {"email@mail.com", app.ErrEmailExist, APIError(app.ErrEmailExist.Error())},
+		"err_email_exist": {"email@mail.com", app2.ErrEmailExist, APIError(app2.ErrEmailExist.Error())},
 		"err_any":         {"email@mail.com", errAny, APIError("Internal Server Error")},
 	}
 
@@ -35,9 +35,9 @@ func TestService_VerificationEmail(t *testing.T) {
 
 			mockApp.EXPECT().VerificationEmail(gomock.Any(), tc.email).Return(tc.appErr)
 
-			email := models.Email(tc.email)
-			params := operations.NewVerificationEmailParams().
-				WithArgs(operations.VerificationEmailBody{Email: &email})
+			email := models2.Email(tc.email)
+			params := operations2.NewVerificationEmailParams().
+				WithArgs(operations2.VerificationEmailBody{Email: &email})
 			_, err := client.Operations.VerificationEmail(params)
 			assert.Equal(tc.want, errPayload(err))
 		})
@@ -50,10 +50,10 @@ func TestService_VerificationUsername(t *testing.T) {
 	testCases := map[string]struct {
 		username string
 		appErr   error
-		want     *models.Error
+		want     *models2.Error
 	}{
 		"success":            {"freeUsername", nil, nil},
-		"err_username_exist": {"existUsername", app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
+		"err_username_exist": {"existUsername", app2.ErrUsernameExist, APIError(app2.ErrUsernameExist.Error())},
 		"err_any":            {"existUsername", errAny, APIError("Internal Server Error")},
 	}
 
@@ -66,9 +66,9 @@ func TestService_VerificationUsername(t *testing.T) {
 
 			mockApp.EXPECT().VerificationUsername(gomock.Any(), tc.username).Return(tc.appErr)
 
-			username := models.Username(tc.username)
-			params := operations.NewVerificationUsernameParams().
-				WithArgs(operations.VerificationUsernameBody{Username: &username})
+			username := models2.Username(tc.username)
+			params := operations2.NewVerificationUsernameParams().
+				WithArgs(operations2.VerificationUsernameBody{Username: &username})
 			_, err := client.Operations.VerificationUsername(params)
 			assert.Equal(tc.want, errPayload(err))
 		})
@@ -89,12 +89,12 @@ func TestService_CreateUser(t *testing.T) {
 	testCases := map[string]struct {
 		id      uuid.UUID
 		appErr  error
-		want    *operations.CreateUserOK
-		wantErr *models.Error
+		want    *operations2.CreateUserOK
+		wantErr *models2.Error
 	}{
-		"success":            {uid, nil, &operations.CreateUserOK{Payload: &operations.CreateUserOKBody{ID: models.UserID(uid.String())}}, nil},
-		"err_email_exist":    {uuid.Nil, app.ErrEmailExist, nil, APIError(app.ErrEmailExist.Error())},
-		"err_username_exist": {uuid.Nil, app.ErrUsernameExist, nil, APIError(app.ErrUsernameExist.Error())},
+		"success":            {uid, nil, &operations2.CreateUserOK{Payload: &operations2.CreateUserOKBody{ID: models2.UserID(uid.String())}}, nil},
+		"err_email_exist":    {uuid.Nil, app2.ErrEmailExist, nil, APIError(app2.ErrEmailExist.Error())},
+		"err_username_exist": {uuid.Nil, app2.ErrUsernameExist, nil, APIError(app2.ErrUsernameExist.Error())},
 		"err_any":            {uuid.Nil, errAny, nil, APIError("Internal Server Error")},
 	}
 
@@ -109,10 +109,10 @@ func TestService_CreateUser(t *testing.T) {
 				CreateUser(gomock.Any(), email, username, pass).
 				Return(tc.id, tc.appErr)
 
-			email := models.Email(email)
-			pass := models.Password(pass)
-			username := models.Username(username)
-			params := operations.NewCreateUserParams().WithArgs(&models.CreateUserParams{
+			email := models2.Email(email)
+			pass := models2.Password(pass)
+			username := models2.Username(username)
+			params := operations2.NewCreateUserParams().WithArgs(&models2.CreateUserParams{
 				Email:    &email,
 				Password: &pass,
 				Username: &username,
@@ -128,16 +128,16 @@ func TestService_CreateUser(t *testing.T) {
 func TestService_GetUser(t *testing.T) {
 	t.Parallel()
 
-	restUser := web.User(&user)
+	restUser := web2.User(&user)
 	testCases := map[string]struct {
 		arg     uuid.UUID
-		user    *app.User
+		user    *app2.User
 		appErr  error
-		want    *operations.GetUserOK
-		wantErr *models.Error
+		want    *operations2.GetUserOK
+		wantErr *models2.Error
 	}{
-		"success":       {user.ID, &user, nil, &operations.GetUserOK{Payload: restUser}, nil},
-		"err_not_found": {uuid.Must(uuid.NewV4()), nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error())},
+		"success":       {user.ID, &user, nil, &operations2.GetUserOK{Payload: restUser}, nil},
+		"err_not_found": {uuid.Must(uuid.NewV4()), nil, app2.ErrNotFound, nil, APIError(app2.ErrNotFound.Error())},
 		"err_any":       {uuid.Must(uuid.NewV4()), nil, errAny, nil, APIError("Internal Server Error")},
 	}
 
@@ -153,7 +153,7 @@ func TestService_GetUser(t *testing.T) {
 
 			uid := strfmt.UUID(tc.arg.String())
 
-			params := operations.NewGetUserParams().WithID(&uid)
+			params := operations2.NewGetUserParams().WithID(&uid)
 			res, err := client.Operations.GetUser(params, apiKeyAuth)
 			assert.Equal(tc.wantErr, errPayload(err))
 			assert.Equal(tc.want, res)
@@ -166,7 +166,7 @@ func TestService_DeleteUser(t *testing.T) {
 
 	testCases := map[string]struct {
 		appErr error
-		want   *models.Error
+		want   *models2.Error
 	}{
 		"success": {nil, nil},
 		"err_any": {errAny, APIError("Internal Server Error")},
@@ -182,7 +182,7 @@ func TestService_DeleteUser(t *testing.T) {
 			mockApp.EXPECT().DeleteUser(gomock.Any(), session).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
-			params := operations.NewDeleteUserParams()
+			params := operations2.NewDeleteUserParams()
 			_, err := client.Operations.DeleteUser(params, apiKeyAuth)
 			assert.Equal(tc.want, errPayload(err))
 		})
@@ -195,10 +195,10 @@ func TestServiceUpdatePassword(t *testing.T) {
 	testCases := map[string]struct {
 		oldPass, newPass string
 		appErr           error
-		want             *models.Error
+		want             *models2.Error
 	}{
 		"success":                {"old_pass", "NewPassword", nil, nil},
-		"err_not_valid_password": {"notCorrectPass", "NewPassword", app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
+		"err_not_valid_password": {"notCorrectPass", "NewPassword", app2.ErrNotValidPassword, APIError(app2.ErrNotValidPassword.Error())},
 		"err_any":                {"notCorrectPass2", "NewPassword", errAny, APIError("Internal Server Error")},
 	}
 
@@ -212,9 +212,9 @@ func TestServiceUpdatePassword(t *testing.T) {
 			mockApp.EXPECT().UpdatePassword(gomock.Any(), session, tc.oldPass, tc.newPass).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
-			newPass := models.Password(tc.newPass)
-			lastPass := models.Password(tc.oldPass)
-			params := operations.NewUpdatePasswordParams().WithArgs(&models.UpdatePassword{
+			newPass := models2.Password(tc.newPass)
+			lastPass := models2.Password(tc.oldPass)
+			params := operations2.NewUpdatePasswordParams().WithArgs(&models2.UpdatePassword{
 				New: &newPass,
 				Old: &lastPass,
 			})
@@ -231,11 +231,11 @@ func TestServiceUpdateUsername(t *testing.T) {
 
 	testCases := map[string]struct {
 		appErr error
-		want   *models.Error
+		want   *models2.Error
 	}{
 		"success":                    {nil, nil},
-		"err_username_exist":         {app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
-		"err_username_not_different": {app.ErrNotDifferent, APIError(app.ErrNotDifferent.Error())},
+		"err_username_exist":         {app2.ErrUsernameExist, APIError(app2.ErrUsernameExist.Error())},
+		"err_username_not_different": {app2.ErrNotDifferent, APIError(app2.ErrNotDifferent.Error())},
 		"err_any":                    {errAny, APIError("Internal Server Error")},
 	}
 
@@ -249,9 +249,9 @@ func TestServiceUpdateUsername(t *testing.T) {
 			mockApp.EXPECT().UpdateUsername(gomock.Any(), session, userName).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
-			userName := models.Username(userName)
-			params := operations.NewUpdateUsernameParams().
-				WithArgs(operations.UpdateUsernameBody{Username: &userName})
+			userName := models2.Username(userName)
+			params := operations2.NewUpdateUsernameParams().
+				WithArgs(operations2.UpdateUsernameBody{Username: &userName})
 
 			_, err := client.Operations.UpdateUsername(params, apiKeyAuth)
 			assert.Equal(tc.want, errPayload(err))
@@ -265,13 +265,13 @@ func TestServiceGetUsers(t *testing.T) {
 	const userName = `zergsL`
 
 	testCases := map[string]struct {
-		users     []app.User
+		users     []app2.User
 		appErr    error
-		want      *operations.GetUsersOK
+		want      *operations2.GetUsersOK
 		wantTotal int32
-		wantErr   *models.Error
+		wantErr   *models2.Error
 	}{
-		"success": {[]app.User{user}, nil, &operations.GetUsersOK{Payload: &operations.GetUsersOKBody{Total: swag.Int32(1), Users: web.Users([]app.User{user})}}, 1, nil},
+		"success": {[]app2.User{user}, nil, &operations2.GetUsersOK{Payload: &operations2.GetUsersOKBody{Total: swag.Int32(1), Users: web2.Users([]app2.User{user})}}, 1, nil},
 		"err_any": {nil, errAny, nil, 0, APIError("Internal Server Error")},
 	}
 
@@ -283,11 +283,11 @@ func TestServiceGetUsers(t *testing.T) {
 			_, mockApp, client, assert := start(t)
 
 			mockApp.EXPECT().
-				ListUserByUsername(gomock.Any(), session, userName, app.SearchParams{Limit: 10}).
+				ListUserByUsername(gomock.Any(), session, userName, app2.SearchParams{Limit: 10}).
 				Return(tc.users, len(tc.users), tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
-			params := operations.NewGetUsersParams().
+			params := operations2.NewGetUsersParams().
 				WithLimit(10).
 				WithOffset(swag.Int32(0)).
 				WithUsername(userName)

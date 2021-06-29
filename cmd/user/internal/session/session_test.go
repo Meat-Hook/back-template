@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/client"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	client2 "github.com/Meat-Hook/back-template/internal/cmd/session/client"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	"github.com/gofrs/uuid"
 )
 
@@ -18,18 +18,18 @@ var (
 func TestClient_Session(t *testing.T) {
 	t.Parallel()
 
-	sessionInfo := &app.Session{
+	sessionInfo := &app2.Session{
 		ID:     "id",
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 
 	testCases := map[string]struct {
 		token   string
-		want    *app.Session
+		want    *app2.Session
 		wantErr error
 	}{
 		"success":       {"validToken", sessionInfo, nil},
-		"err_not_found": {"notFoundToken", nil, app.ErrNotFound},
+		"err_not_found": {"notFoundToken", nil, app2.ErrNotFound},
 		"err_any":       {"notValidToken", nil, errAny},
 	}
 
@@ -48,12 +48,12 @@ func TestClient_Session(t *testing.T) {
 	}
 }
 
-func convert(want *app.Session) *client.Session {
+func convert(want *app2.Session) *client2.Session {
 	if want == nil {
 		return nil
 	}
 
-	return &client.Session{
+	return &client2.Session{
 		ID:     want.ID,
 		UserID: want.UserID,
 	}

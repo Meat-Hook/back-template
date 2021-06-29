@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	app "github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	app2 "github.com/Meat-Hook/back-template/internal/cmd/user/internal/app"
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,10 +37,10 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 }
 
 // ByEmail mocks base method.
-func (m *MockRepo) ByEmail(arg0 context.Context, arg1 string) (*app.User, error) {
+func (m *MockRepo) ByEmail(arg0 context.Context, arg1 string) (*app2.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByEmail", arg0, arg1)
-	ret0, _ := ret[0].(*app.User)
+	ret0, _ := ret[0].(*app2.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -52,10 +52,10 @@ func (mr *MockRepoMockRecorder) ByEmail(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // ByID mocks base method.
-func (m *MockRepo) ByID(arg0 context.Context, arg1 uuid.UUID) (*app.User, error) {
+func (m *MockRepo) ByID(arg0 context.Context, arg1 uuid.UUID) (*app2.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByID", arg0, arg1)
-	ret0, _ := ret[0].(*app.User)
+	ret0, _ := ret[0].(*app2.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -67,10 +67,10 @@ func (mr *MockRepoMockRecorder) ByID(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // ByUsername mocks base method.
-func (m *MockRepo) ByUsername(arg0 context.Context, arg1 string) (*app.User, error) {
+func (m *MockRepo) ByUsername(arg0 context.Context, arg1 string) (*app2.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByUsername", arg0, arg1)
-	ret0, _ := ret[0].(*app.User)
+	ret0, _ := ret[0].(*app2.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,10 +96,10 @@ func (mr *MockRepoMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // ListUserByUsername mocks base method.
-func (m *MockRepo) ListUserByUsername(arg0 context.Context, arg1 string, arg2 app.SearchParams) ([]app.User, int, error) {
+func (m *MockRepo) ListUserByUsername(arg0 context.Context, arg1 string, arg2 app2.SearchParams) ([]app2.User, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListUserByUsername", arg0, arg1, arg2)
-	ret0, _ := ret[0].([]app.User)
+	ret0, _ := ret[0].([]app2.User)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -112,7 +112,7 @@ func (mr *MockRepoMockRecorder) ListUserByUsername(arg0, arg1, arg2 interface{})
 }
 
 // Save mocks base method.
-func (m *MockRepo) Save(arg0 context.Context, arg1 app.User) (uuid.UUID, error) {
+func (m *MockRepo) Save(arg0 context.Context, arg1 app2.User) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Save", arg0, arg1)
 	ret0, _ := ret[0].(uuid.UUID)
@@ -127,7 +127,7 @@ func (mr *MockRepoMockRecorder) Save(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockRepo) Update(arg0 context.Context, arg1 app.User) error {
+func (m *MockRepo) Update(arg0 context.Context, arg1 app2.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -216,10 +216,10 @@ func (m *MockAuth) EXPECT() *MockAuthMockRecorder {
 }
 
 // Session mocks base method.
-func (m *MockAuth) Session(ctx context.Context, token string) (*app.Session, error) {
+func (m *MockAuth) Session(ctx context.Context, token string) (*app2.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, token)
-	ret0, _ := ret[0].(*app.Session)
+	ret0, _ := ret[0].(*app2.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
