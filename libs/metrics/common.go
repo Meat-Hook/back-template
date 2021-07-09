@@ -11,11 +11,12 @@ var PanicsTotal struct{ prometheus.Counter }
 
 // InitMetrics must be called once before using this package.
 // It registers and initializes metrics used by this package.
-func InitMetrics() {
+func InitMetrics(reg *prometheus.Registry) {
 	PanicsTotal.Counter = promauto.NewCounter(
 		prometheus.CounterOpts{
 			Name: "panics_total",
 			Help: "Amount of recovered panics.",
 		},
 	)
+	reg.MustRegister(PanicsTotal)
 }

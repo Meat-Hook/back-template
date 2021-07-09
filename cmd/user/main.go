@@ -9,8 +9,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-openapi/loads"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"github.com/rs/zerolog"
+	"github.com/urfave/cli/v2"
+
 	session "github.com/Meat-Hook/back-template/cmd/session/client"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/rpc"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
@@ -22,11 +27,6 @@ import (
 	"github.com/Meat-Hook/back-template/libs/migrater"
 	librpc "github.com/Meat-Hook/back-template/libs/rpc"
 	"github.com/Meat-Hook/back-template/libs/runner"
-	"github.com/go-openapi/loads"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-	"github.com/rs/zerolog"
-	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -234,7 +234,7 @@ func start(c *cli.Context) error {
 	module := app.New(r, hasher, wrapper.New(sessionSvcClient))
 
 	apiMetric := metrics.HTTP(name, restapi.FlatSwaggerJSON)
-	internalAPI := rpc.New(module, librpc.Server(logger))
+	// internalAPI := rpc.New(module, librpc.Server(logger))
 	externalAPI, err := web.New(module, logger, &apiMetric, web.Config{
 		Host: appHost,
 		Port: c.Int(httpPort.Name),
@@ -245,7 +245,7 @@ func start(c *cli.Context) error {
 
 	return runner.Start(
 		c.Context,
-		runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
+		// runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
 		runner.Swagger(logger.With().Str(log.Name, "Swagger").Logger(), externalAPI, appHost, c.Int(httpPort.Name)),
 		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), appHost, c.Int(metricPort.Name)),
 	)

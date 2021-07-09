@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // FileServiceClient is the client API for FileService service.
@@ -34,7 +35,7 @@ func NewFileServiceClient(cc grpc.ClientConnInterface) FileServiceClient {
 }
 
 func (c *fileServiceClient) Upload(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_FileService_serviceDesc.Streams[0], "/file.v1.FileService/Upload", opts...)
+	stream, err := c.cc.NewStream(ctx, &FileService_ServiceDesc.Streams[0], "/file.v1.FileService/Upload", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +120,7 @@ type UnsafeFileServiceServer interface {
 }
 
 func RegisterFileServiceServer(s grpc.ServiceRegistrar, srv FileServiceServer) {
-	s.RegisterService(&_FileService_serviceDesc, srv)
+	s.RegisterService(&FileService_ServiceDesc, srv)
 }
 
 func _FileService_Upload_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -184,7 +185,10 @@ func _FileService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-var _FileService_serviceDesc = grpc.ServiceDesc{
+// FileService_ServiceDesc is the grpc.ServiceDesc for FileService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var FileService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "file.v1.FileService",
 	HandlerType: (*FileServiceServer)(nil),
 	Methods: []grpc.MethodDesc{

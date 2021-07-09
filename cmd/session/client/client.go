@@ -5,14 +5,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	"github.com/Meat-Hook/back-template/libs/log"
-	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/libs/log"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 )
 
 // Client to session microservice.

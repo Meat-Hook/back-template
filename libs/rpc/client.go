@@ -6,13 +6,14 @@ import (
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
 
-// Client build and returns new grpc client conn.
-func Client(ctx context.Context, addr string) (*grpc.ClientConn, error) {
+// Dial creates a gRPC client connection to the given target.
+func Dial(ctx context.Context, logger zerolog.Logger, addr string, metrics *grpc_prometheus.ClientMetrics) (*grpc.ClientConn, error) {
 	conn, err := grpc.DialContext(ctx, addr,
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
 			Time:                50 * time.Second,
@@ -20,10 +21,14 @@ func Client(ctx context.Context, addr string) (*grpc.ClientConn, error) {
 			PermitWithoutStream: true,
 		}),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
-			prometheus.UnaryClientInterceptor,
+			metrics.UnaryClientInterceptor(),
+			MakeUnaryClientLogger(logger),
+			UnaryClientAccessLog,
 		)),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(
-			prometheus.StreamClientInterceptor,
+			metrics.StreamClientInterceptor(),
+			MakeStreamClientLogger(logger),
+			StreamClientAccessLog,
 		)),
 		grpc.WithReadBufferSize(68*1024),
 		grpc.WithInsecure(),

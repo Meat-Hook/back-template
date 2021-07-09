@@ -10,17 +10,18 @@ import (
 // Log name.
 const (
 	Func          = `func`
-	HTTPMethod    = `method`
+	HTTPMethod    = `http-method`
 	Code          = `code`
 	IP            = `ip`
-	ReqID         = `id`
+	ReqID         = `req-id`
 	User          = `user`
-	Err           = `error`
+	PanicReason   = `panic-reason`
 	HandledStatus = `handled`
 	Duration      = `duration`
 	Host          = `host`
 	Port          = `port`
 	Name          = `name`
+	DBMethod      = `db-method`
 )
 
 // WarnIfFail logs if callback finished with error.
