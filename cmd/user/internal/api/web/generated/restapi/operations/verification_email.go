@@ -6,7 +6,9 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -71,6 +73,26 @@ type VerificationEmailBody struct {
 	// Required: true
 	// Format: email
 	Email *models.Email `json:"email"`
+}
+
+// UnmarshalJSON unmarshals this object while disallowing additional properties from JSON
+func (o *VerificationEmailBody) UnmarshalJSON(data []byte) error {
+	var props struct {
+
+		// email
+		// Required: true
+		// Format: email
+		Email *models.Email `json:"email"`
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&props); err != nil {
+		return err
+	}
+
+	o.Email = props.Email
+	return nil
 }
 
 // Validate validates this verification email body

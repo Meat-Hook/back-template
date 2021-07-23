@@ -11,89 +11,85 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// UserServiceClient is the client API for UserService service.
+// ServiceClient is the client API for Service service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UserServiceClient interface {
+type ServiceClient interface {
 	// Access get user info by login args.
 	Access(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessResponse, error)
 }
 
-type userServiceClient struct {
+type serviceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
-	return &userServiceClient{cc}
+func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
+	return &serviceClient{cc}
 }
 
-func (c *userServiceClient) Access(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessResponse, error) {
+func (c *serviceClient) Access(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessResponse, error) {
 	out := new(AccessResponse)
-	err := c.cc.Invoke(ctx, "/user.v1.UserService/Access", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.v1.Service/Access", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UserServiceServer is the server API for UserService service.
-// All implementations should embed UnimplementedUserServiceServer
+// ServiceServer is the server API for Service service.
+// All implementations should embed UnimplementedServiceServer
 // for forward compatibility
-type UserServiceServer interface {
+type ServiceServer interface {
 	// Access get user info by login args.
 	Access(context.Context, *AccessRequest) (*AccessResponse, error)
 }
 
-// UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedUserServiceServer struct {
+// UnimplementedServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) Access(context.Context, *AccessRequest) (*AccessResponse, error) {
+func (UnimplementedServiceServer) Access(context.Context, *AccessRequest) (*AccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Access not implemented")
 }
 
-// UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UserServiceServer will
+// UnsafeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServiceServer will
 // result in compilation errors.
-type UnsafeUserServiceServer interface {
-	mustEmbedUnimplementedUserServiceServer()
+type UnsafeServiceServer interface {
+	mustEmbedUnimplementedServiceServer()
 }
 
-func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
-	s.RegisterService(&UserService_ServiceDesc, srv)
+func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
+	s.RegisterService(&_Service_serviceDesc, srv)
 }
 
-func _UserService_Access_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_Access_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AccessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).Access(ctx, in)
+		return srv.(ServiceServer).Access(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.v1.UserService/Access",
+		FullMethod: "/user.v1.Service/Access",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Access(ctx, req.(*AccessRequest))
+		return srv.(ServiceServer).Access(ctx, req.(*AccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.v1.UserService",
-	HandlerType: (*UserServiceServer)(nil),
+var _Service_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "user.v1.Service",
+	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Access",
-			Handler:    _UserService_Access_Handler,
+			Handler:    _Service_Access_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

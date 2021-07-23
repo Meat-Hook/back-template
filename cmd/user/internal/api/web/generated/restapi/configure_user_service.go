@@ -70,6 +70,16 @@ func configureAPI(api *operations.UserServiceAPI) http.Handler {
 			return operations.GetUsersNotImplemented()
 		})
 	}
+	if api.LoginHandler == nil {
+		api.LoginHandler = operations.LoginHandlerFunc(func(params operations.LoginParams) operations.LoginResponder {
+			return operations.LoginNotImplemented()
+		})
+	}
+	if api.LogoutHandler == nil {
+		api.LogoutHandler = operations.LogoutHandlerFunc(func(params operations.LogoutParams, principal *app.Session) operations.LogoutResponder {
+			return operations.LogoutNotImplemented()
+		})
+	}
 	if api.UpdatePasswordHandler == nil {
 		api.UpdatePasswordHandler = operations.UpdatePasswordHandlerFunc(func(params operations.UpdatePasswordParams, principal *app.Session) operations.UpdatePasswordResponder {
 			return operations.UpdatePasswordNotImplemented()

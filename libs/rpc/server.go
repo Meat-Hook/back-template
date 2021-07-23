@@ -14,11 +14,8 @@ import (
 
 // Server returns gRPC server configured to listen on the TCP network.
 func Server(
-	service string,
 	logger zerolog.Logger,
 	serverMetrics *grpc_prometheus.ServerMetrics,
-	extraUnary []grpc.UnaryServerInterceptor,
-	extraStream []grpc.StreamServerInterceptor,
 ) *grpc.Server {
 	srv := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -29,12 +26,12 @@ func Server(
 			MinTime:             keepaliveMinTime,
 			PermitWithoutStream: true,
 		}),
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(append([]grpc.UnaryServerInterceptor{
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			serverMetrics.UnaryServerInterceptor(),
 			MakeUnaryServerLogger(logger),
 			grpc_recovery.UnaryServerInterceptor(grpc_recovery.WithRecoveryHandlerContext(recoveryFunc)),
 			UnaryServerAccessLog,
-		}, extraUnary...)...)),
+		)),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			prometheus.StreamServerInterceptor,
 			MakeStreamServerLogger(logger),

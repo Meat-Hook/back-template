@@ -6,7 +6,9 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -90,6 +92,31 @@ type GetUsersOKBody struct {
 	// Max Items: 100
 	// Unique: true
 	Users []*models.User `json:"users"`
+}
+
+// UnmarshalJSON unmarshals this object while disallowing additional properties from JSON
+func (o *GetUsersOKBody) UnmarshalJSON(data []byte) error {
+	var props struct {
+
+		// total
+		// Minimum: 0
+		Total *int32 `json:"total,omitempty"`
+
+		// users
+		// Max Items: 100
+		// Unique: true
+		Users []*models.User `json:"users"`
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&props); err != nil {
+		return err
+	}
+
+	o.Total = props.Total
+	o.Users = props.Users
+	return nil
 }
 
 // Validate validates this get users o k body

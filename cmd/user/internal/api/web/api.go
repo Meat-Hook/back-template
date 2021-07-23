@@ -4,23 +4,24 @@ package web
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"path"
+	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi/operations"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	"github.com/Meat-Hook/back-template/libs/log"
-	"github.com/Meat-Hook/back-template/libs/metrics"
-	"github.com/Meat-Hook/back-template/libs/middleware"
 	"github.com/go-openapi/loads"
 	swag_middleware "github.com/go-openapi/runtime/middleware"
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog"
 	"github.com/sebest/xff"
-)
 
-//go:generate mockgen -source=api.go -destination mock.app.contracts_test.go -package web_test
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi/operations"
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
+	http2 "github.com/Meat-Hook/back-template/libs/http"
+	"github.com/Meat-Hook/back-template/libs/log"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+)
 
 type (
 	// For easy testing.
@@ -34,7 +35,9 @@ type (
 		ListUserByUsername(ctx context.Context, session app.Session, username string, page app.SearchParams) ([]app.User, int, error)
 		UpdateUsername(ctx context.Context, session app.Session, username string) error
 		UpdatePassword(ctx context.Context, session app.Session, oldPass string, newPass string) error
-		Auth(ctx context.Context, raw string) (*app.Session, error)
+		Login(ctx context.Context, email, password string, origin app.Origin) (*app.User, *app.Token, error)
+		Logout(ctx context.Context, session app.Session) error
+		Auth(ctx context.Context, token string) (*app.Session, error)
 	}
 
 	service struct {
@@ -48,10 +51,12 @@ type (
 )
 
 // New returns Swagger server configured to listen on the TCP network.
-func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) (*restapi.Server, error) {
+func New(ctx context.Context, module application, m *metrics.API, cfg Config) (*restapi.Server, error) {
 	svc := &service{
 		app: module,
 	}
+
+	logger := zerolog.Ctx(ctx)
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
@@ -59,7 +64,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	}
 
 	api := operations.NewUserServiceAPI(swaggerSpec)
-	swaggerLogger := logger.With().Str(log.Name, "swagger").Logger()
+	swaggerLogger := logger.With().Str(log.Subsystem, "swagger").Logger()
 	api.Logger = swaggerLogger.Printf
 	api.CookieKeyAuth = svc.cookieKeyAuth
 
@@ -71,6 +76,8 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	api.UpdatePasswordHandler = operations.UpdatePasswordHandlerFunc(svc.updatePassword)
 	api.UpdateUsernameHandler = operations.UpdateUsernameHandlerFunc(svc.updateUsername)
 	api.GetUsersHandler = operations.GetUsersHandlerFunc(svc.getUsers)
+	api.LoginHandler = operations.LoginHandlerFunc(svc.login)
+	api.LogoutHandler = operations.LogoutHandlerFunc(svc.logout)
 
 	server := restapi.NewServer(api)
 	server.Host = cfg.Host
@@ -79,14 +86,14 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	// The middlewareFunc executes before anything.
 	globalMiddlewares := func(handler http.Handler) http.Handler {
 		xffmw, _ := xff.Default()
-		createLog := middleware.CreateLogger(logger.With())
-		accesslog := middleware.AccessLog(m)
+		createLog := http2.CreateLogger(logger.With())
+		accesslog := http2.AccessLog(m)
 		redocOpts := swag_middleware.RedocOpts{
 			BasePath: swaggerSpec.BasePath(),
 			SpecURL:  path.Join(swaggerSpec.BasePath(), "/swagger.json"),
 		}
 
-		return xffmw.Handler(createLog(middleware.Recovery(accesslog(middleware.Health(
+		return xffmw.Handler(createLog(http2.Recovery(accesslog(http2.Health(
 			swag_middleware.Spec(swaggerSpec.BasePath(), restapi.FlatSwaggerJSON,
 				swag_middleware.Redoc(redocOpts, handler)))))))
 	}
@@ -96,7 +103,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	return server, nil
 }
 
-func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger) {
+func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolog.Logger, net.IP) {
 	ctx := r.Context()
 	userID := uuid.Nil
 	if session != nil {
@@ -104,6 +111,26 @@ func fromRequest(r *http.Request, session *app.Session) (context.Context, zerolo
 	}
 
 	logger := zerolog.Ctx(r.Context()).With().Stringer(log.User, userID).Logger()
+	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
 
-	return ctx, logger
+	return ctx, logger, net.ParseIP(remoteIP)
+}
+
+func generateCookie(token string) *http.Cookie {
+	cookie := &http.Cookie{
+		Name:       cookieTokenName,
+		Value:      token,
+		Path:       "/",
+		Domain:     "",
+		Expires:    time.Time{},
+		RawExpires: "",
+		MaxAge:     0,
+		Secure:     true,
+		HttpOnly:   true,
+		SameSite:   http.SameSiteLaxMode,
+		Raw:        "",
+		Unparsed:   nil,
+	}
+
+	return cookie
 }

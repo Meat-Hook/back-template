@@ -20,13 +20,6 @@ type (
 		Delete(context.Context, uuid.UUID) error
 	}
 
-	// Users microservice for get user information.
-	Users interface {
-		// Access get user by email and check password.
-		// Errors: ErrNotFound, ErrNotValidPassword, unknown.
-		Access(ctx context.Context, email, password string) (*User, error)
-	}
-
 	// Auth interface for generate access and refresh token by subject.
 	Auth interface {
 		// Token generate tokens by subject with expire time.

@@ -13,16 +13,16 @@ type Database struct {
 	callDuration *prometheus.HistogramVec
 }
 
-// DB registers and returns common repo metrics used by all services (namespace).
+// DB registers and returns common db metrics used by all services (namespace).
 func DB(service string, registerMethods ...string) (metric Database) {
-	const subsystem = "repo"
+	const subsystem = "db"
 
 	metric.callTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: service,
 			Subsystem: subsystem,
 			Name:      "call_total",
-			Help:      "Amount of repo calls.",
+			Help:      "Amount of db calls.",
 		},
 		[]string{MethodLabel},
 	)
@@ -32,7 +32,7 @@ func DB(service string, registerMethods ...string) (metric Database) {
 			Namespace: service,
 			Subsystem: subsystem,
 			Name:      "errors_total",
-			Help:      "Amount of repo errors.",
+			Help:      "Amount of db errors.",
 		},
 		[]string{MethodLabel},
 	)

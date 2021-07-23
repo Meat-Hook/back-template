@@ -5,9 +5,10 @@ package auth
 import (
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	"github.com/gofrs/uuid"
 	"github.com/o1egl/paseto/v2"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 )
 
 var _ app.Auth = &Auth{}
@@ -37,7 +38,7 @@ func (a *Auth) Token(subject app.Subject) (*app.Token, error) {
 
 	value, err := paseto.Encrypt(a.key, t, "")
 	if err != nil {
-		return nil, fmt.Errorf("paseto encrypt: %w", err)
+		return nil, fmt.Errorf("paseto.Encrypt: %w", err)
 	}
 
 	res := &app.Token{

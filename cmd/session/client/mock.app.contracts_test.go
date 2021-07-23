@@ -12,31 +12,31 @@ import (
 	reflect "reflect"
 )
 
-// MockSessionServiceClient is a mock of SessionServiceClient interface
-type MockSessionServiceClient struct {
+// MockServiceClient is a mock of ServiceClient interface
+type MockServiceClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockSessionServiceClientMockRecorder
+	recorder *MockServiceClientMockRecorder
 }
 
-// MockSessionServiceClientMockRecorder is the mock recorder for MockSessionServiceClient
-type MockSessionServiceClientMockRecorder struct {
-	mock *MockSessionServiceClient
+// MockServiceClientMockRecorder is the mock recorder for MockServiceClient
+type MockServiceClientMockRecorder struct {
+	mock *MockServiceClient
 }
 
-// NewMockSessionServiceClient creates a new mock instance
-func NewMockSessionServiceClient(ctrl *gomock.Controller) *MockSessionServiceClient {
-	mock := &MockSessionServiceClient{ctrl: ctrl}
-	mock.recorder = &MockSessionServiceClientMockRecorder{mock}
+// NewMockServiceClient creates a new mock instance
+func NewMockServiceClient(ctrl *gomock.Controller) *MockServiceClient {
+	mock := &MockServiceClient{ctrl: ctrl}
+	mock.recorder = &MockServiceClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockSessionServiceClient) EXPECT() *MockSessionServiceClientMockRecorder {
+func (m *MockServiceClient) EXPECT() *MockServiceClientMockRecorder {
 	return m.recorder
 }
 
 // Session mocks base method
-func (m *MockSessionServiceClient) Session(ctx context.Context, in *pb.SessionRequest, opts ...grpc.CallOption) (*pb.SessionResponse, error) {
+func (m *MockServiceClient) Session(ctx context.Context, in *pb.SessionRequest, opts ...grpc.CallOption) (*pb.SessionResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -49,37 +49,77 @@ func (m *MockSessionServiceClient) Session(ctx context.Context, in *pb.SessionRe
 }
 
 // Session indicates an expected call of Session
-func (mr *MockSessionServiceClientMockRecorder) Session(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockServiceClientMockRecorder) Session(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockSessionServiceClient)(nil).Session), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockServiceClient)(nil).Session), varargs...)
 }
 
-// MockSessionServiceServer is a mock of SessionServiceServer interface
-type MockSessionServiceServer struct {
+// RemoveSession mocks base method
+func (m *MockServiceClient) RemoveSession(ctx context.Context, in *pb.RemoveSessionRequest, opts ...grpc.CallOption) (*pb.RemoveSessionResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveSession", varargs...)
+	ret0, _ := ret[0].(*pb.RemoveSessionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveSession indicates an expected call of RemoveSession
+func (mr *MockServiceClientMockRecorder) RemoveSession(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSession", reflect.TypeOf((*MockServiceClient)(nil).RemoveSession), varargs...)
+}
+
+// NewSession mocks base method
+func (m *MockServiceClient) NewSession(ctx context.Context, in *pb.NewSessionRequest, opts ...grpc.CallOption) (*pb.NewSessionResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "NewSession", varargs...)
+	ret0, _ := ret[0].(*pb.NewSessionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewSession indicates an expected call of NewSession
+func (mr *MockServiceClientMockRecorder) NewSession(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSession", reflect.TypeOf((*MockServiceClient)(nil).NewSession), varargs...)
+}
+
+// MockServiceServer is a mock of ServiceServer interface
+type MockServiceServer struct {
 	ctrl     *gomock.Controller
-	recorder *MockSessionServiceServerMockRecorder
+	recorder *MockServiceServerMockRecorder
 }
 
-// MockSessionServiceServerMockRecorder is the mock recorder for MockSessionServiceServer
-type MockSessionServiceServerMockRecorder struct {
-	mock *MockSessionServiceServer
+// MockServiceServerMockRecorder is the mock recorder for MockServiceServer
+type MockServiceServerMockRecorder struct {
+	mock *MockServiceServer
 }
 
-// NewMockSessionServiceServer creates a new mock instance
-func NewMockSessionServiceServer(ctrl *gomock.Controller) *MockSessionServiceServer {
-	mock := &MockSessionServiceServer{ctrl: ctrl}
-	mock.recorder = &MockSessionServiceServerMockRecorder{mock}
+// NewMockServiceServer creates a new mock instance
+func NewMockServiceServer(ctrl *gomock.Controller) *MockServiceServer {
+	mock := &MockServiceServer{ctrl: ctrl}
+	mock.recorder = &MockServiceServerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockSessionServiceServer) EXPECT() *MockSessionServiceServerMockRecorder {
+func (m *MockServiceServer) EXPECT() *MockServiceServerMockRecorder {
 	return m.recorder
 }
 
 // Session mocks base method
-func (m *MockSessionServiceServer) Session(arg0 context.Context, arg1 *pb.SessionRequest) (*pb.SessionResponse, error) {
+func (m *MockServiceServer) Session(arg0 context.Context, arg1 *pb.SessionRequest) (*pb.SessionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", arg0, arg1)
 	ret0, _ := ret[0].(*pb.SessionResponse)
@@ -88,42 +128,72 @@ func (m *MockSessionServiceServer) Session(arg0 context.Context, arg1 *pb.Sessio
 }
 
 // Session indicates an expected call of Session
-func (mr *MockSessionServiceServerMockRecorder) Session(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockServiceServerMockRecorder) Session(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockSessionServiceServer)(nil).Session), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockServiceServer)(nil).Session), arg0, arg1)
 }
 
-// MockUnsafeSessionServiceServer is a mock of UnsafeSessionServiceServer interface
-type MockUnsafeSessionServiceServer struct {
+// RemoveSession mocks base method
+func (m *MockServiceServer) RemoveSession(arg0 context.Context, arg1 *pb.RemoveSessionRequest) (*pb.RemoveSessionResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSession", arg0, arg1)
+	ret0, _ := ret[0].(*pb.RemoveSessionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveSession indicates an expected call of RemoveSession
+func (mr *MockServiceServerMockRecorder) RemoveSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSession", reflect.TypeOf((*MockServiceServer)(nil).RemoveSession), arg0, arg1)
+}
+
+// NewSession mocks base method
+func (m *MockServiceServer) NewSession(arg0 context.Context, arg1 *pb.NewSessionRequest) (*pb.NewSessionResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewSession", arg0, arg1)
+	ret0, _ := ret[0].(*pb.NewSessionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewSession indicates an expected call of NewSession
+func (mr *MockServiceServerMockRecorder) NewSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSession", reflect.TypeOf((*MockServiceServer)(nil).NewSession), arg0, arg1)
+}
+
+// MockUnsafeServiceServer is a mock of UnsafeServiceServer interface
+type MockUnsafeServiceServer struct {
 	ctrl     *gomock.Controller
-	recorder *MockUnsafeSessionServiceServerMockRecorder
+	recorder *MockUnsafeServiceServerMockRecorder
 }
 
-// MockUnsafeSessionServiceServerMockRecorder is the mock recorder for MockUnsafeSessionServiceServer
-type MockUnsafeSessionServiceServerMockRecorder struct {
-	mock *MockUnsafeSessionServiceServer
+// MockUnsafeServiceServerMockRecorder is the mock recorder for MockUnsafeServiceServer
+type MockUnsafeServiceServerMockRecorder struct {
+	mock *MockUnsafeServiceServer
 }
 
-// NewMockUnsafeSessionServiceServer creates a new mock instance
-func NewMockUnsafeSessionServiceServer(ctrl *gomock.Controller) *MockUnsafeSessionServiceServer {
-	mock := &MockUnsafeSessionServiceServer{ctrl: ctrl}
-	mock.recorder = &MockUnsafeSessionServiceServerMockRecorder{mock}
+// NewMockUnsafeServiceServer creates a new mock instance
+func NewMockUnsafeServiceServer(ctrl *gomock.Controller) *MockUnsafeServiceServer {
+	mock := &MockUnsafeServiceServer{ctrl: ctrl}
+	mock.recorder = &MockUnsafeServiceServerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockUnsafeSessionServiceServer) EXPECT() *MockUnsafeSessionServiceServerMockRecorder {
+func (m *MockUnsafeServiceServer) EXPECT() *MockUnsafeServiceServerMockRecorder {
 	return m.recorder
 }
 
-// mustEmbedUnimplementedSessionServiceServer mocks base method
-func (m *MockUnsafeSessionServiceServer) mustEmbedUnimplementedSessionServiceServer() {
+// mustEmbedUnimplementedServiceServer mocks base method
+func (m *MockUnsafeServiceServer) mustEmbedUnimplementedServiceServer() {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "mustEmbedUnimplementedSessionServiceServer")
+	m.ctrl.Call(m, "mustEmbedUnimplementedServiceServer")
 }
 
-// mustEmbedUnimplementedSessionServiceServer indicates an expected call of mustEmbedUnimplementedSessionServiceServer
-func (mr *MockUnsafeSessionServiceServerMockRecorder) mustEmbedUnimplementedSessionServiceServer() *gomock.Call {
+// mustEmbedUnimplementedServiceServer indicates an expected call of mustEmbedUnimplementedServiceServer
+func (mr *MockUnsafeServiceServerMockRecorder) mustEmbedUnimplementedServiceServer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "mustEmbedUnimplementedSessionServiceServer", reflect.TypeOf((*MockUnsafeSessionServiceServer)(nil).mustEmbedUnimplementedSessionServiceServer))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "mustEmbedUnimplementedServiceServer", reflect.TypeOf((*MockUnsafeServiceServer)(nil).mustEmbedUnimplementedServiceServer))
 }

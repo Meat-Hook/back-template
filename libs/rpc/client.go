@@ -3,7 +3,6 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -16,8 +15,8 @@ import (
 func Dial(ctx context.Context, logger zerolog.Logger, addr string, metrics *grpc_prometheus.ClientMetrics) (*grpc.ClientConn, error) {
 	conn, err := grpc.DialContext(ctx, addr,
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                50 * time.Second,
-			Timeout:             10 * time.Second,
+			Time:                keepaliveTime,
+			Timeout:             keepaliveTimeout,
 			PermitWithoutStream: true,
 		}),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(

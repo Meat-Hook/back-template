@@ -78,44 +78,6 @@ func (mr *MockRepoMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepo)(nil).Delete), arg0, arg1)
 }
 
-// MockUsers is a mock of Users interface
-type MockUsers struct {
-	ctrl     *gomock.Controller
-	recorder *MockUsersMockRecorder
-}
-
-// MockUsersMockRecorder is the mock recorder for MockUsers
-type MockUsersMockRecorder struct {
-	mock *MockUsers
-}
-
-// NewMockUsers creates a new mock instance
-func NewMockUsers(ctrl *gomock.Controller) *MockUsers {
-	mock := &MockUsers{ctrl: ctrl}
-	mock.recorder = &MockUsersMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockUsers) EXPECT() *MockUsersMockRecorder {
-	return m.recorder
-}
-
-// Access mocks base method
-func (m *MockUsers) Access(ctx context.Context, email, password string) (*app.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Access", ctx, email, password)
-	ret0, _ := ret[0].(*app.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Access indicates an expected call of Access
-func (mr *MockUsersMockRecorder) Access(ctx, email, password interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Access", reflect.TypeOf((*MockUsers)(nil).Access), ctx, email, password)
-}
-
 // MockAuth is a mock of Auth interface
 type MockAuth struct {
 	ctrl     *gomock.Controller

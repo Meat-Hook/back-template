@@ -11,53 +11,52 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// FileServiceClient is the client API for FileService service.
+// ServiceClient is the client API for Service service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type FileServiceClient interface {
+type ServiceClient interface {
 	// Upload file to database.
-	Upload(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadClient, error)
+	Upload(ctx context.Context, opts ...grpc.CallOption) (Service_UploadClient, error)
 	// Set file metadata.
 	SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error)
 	// Delete file.
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
 
-type fileServiceClient struct {
+type serviceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewFileServiceClient(cc grpc.ClientConnInterface) FileServiceClient {
-	return &fileServiceClient{cc}
+func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
+	return &serviceClient{cc}
 }
 
-func (c *fileServiceClient) Upload(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &FileService_ServiceDesc.Streams[0], "/file.v1.FileService/Upload", opts...)
+func (c *serviceClient) Upload(ctx context.Context, opts ...grpc.CallOption) (Service_UploadClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Service_serviceDesc.Streams[0], "/file.v1.Service/Upload", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &fileServiceUploadClient{stream}
+	x := &serviceUploadClient{stream}
 	return x, nil
 }
 
-type FileService_UploadClient interface {
+type Service_UploadClient interface {
 	Send(*UploadRequest) error
 	CloseAndRecv() (*UploadResponse, error)
 	grpc.ClientStream
 }
 
-type fileServiceUploadClient struct {
+type serviceUploadClient struct {
 	grpc.ClientStream
 }
 
-func (x *fileServiceUploadClient) Send(m *UploadRequest) error {
+func (x *serviceUploadClient) Send(m *UploadRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *fileServiceUploadClient) CloseAndRecv() (*UploadResponse, error) {
+func (x *serviceUploadClient) CloseAndRecv() (*UploadResponse, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
@@ -68,80 +67,80 @@ func (x *fileServiceUploadClient) CloseAndRecv() (*UploadResponse, error) {
 	return m, nil
 }
 
-func (c *fileServiceClient) SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error) {
+func (c *serviceClient) SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error) {
 	out := new(SetMetadataResponse)
-	err := c.cc.Invoke(ctx, "/file.v1.FileService/SetMetadata", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/file.v1.Service/SetMetadata", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *fileServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+func (c *serviceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, "/file.v1.FileService/Delete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/file.v1.Service/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// FileServiceServer is the server API for FileService service.
-// All implementations should embed UnimplementedFileServiceServer
+// ServiceServer is the server API for Service service.
+// All implementations should embed UnimplementedServiceServer
 // for forward compatibility
-type FileServiceServer interface {
+type ServiceServer interface {
 	// Upload file to database.
-	Upload(FileService_UploadServer) error
+	Upload(Service_UploadServer) error
 	// Set file metadata.
 	SetMetadata(context.Context, *SetMetadataRequest) (*SetMetadataResponse, error)
 	// Delete file.
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 }
 
-// UnimplementedFileServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedFileServiceServer struct {
+// UnimplementedServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedServiceServer struct {
 }
 
-func (UnimplementedFileServiceServer) Upload(FileService_UploadServer) error {
+func (UnimplementedServiceServer) Upload(Service_UploadServer) error {
 	return status.Errorf(codes.Unimplemented, "method Upload not implemented")
 }
-func (UnimplementedFileServiceServer) SetMetadata(context.Context, *SetMetadataRequest) (*SetMetadataResponse, error) {
+func (UnimplementedServiceServer) SetMetadata(context.Context, *SetMetadataRequest) (*SetMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetMetadata not implemented")
 }
-func (UnimplementedFileServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+func (UnimplementedServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
-// UnsafeFileServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FileServiceServer will
+// UnsafeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServiceServer will
 // result in compilation errors.
-type UnsafeFileServiceServer interface {
-	mustEmbedUnimplementedFileServiceServer()
+type UnsafeServiceServer interface {
+	mustEmbedUnimplementedServiceServer()
 }
 
-func RegisterFileServiceServer(s grpc.ServiceRegistrar, srv FileServiceServer) {
-	s.RegisterService(&FileService_ServiceDesc, srv)
+func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
+	s.RegisterService(&_Service_serviceDesc, srv)
 }
 
-func _FileService_Upload_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(FileServiceServer).Upload(&fileServiceUploadServer{stream})
+func _Service_Upload_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ServiceServer).Upload(&serviceUploadServer{stream})
 }
 
-type FileService_UploadServer interface {
+type Service_UploadServer interface {
 	SendAndClose(*UploadResponse) error
 	Recv() (*UploadRequest, error)
 	grpc.ServerStream
 }
 
-type fileServiceUploadServer struct {
+type serviceUploadServer struct {
 	grpc.ServerStream
 }
 
-func (x *fileServiceUploadServer) SendAndClose(m *UploadResponse) error {
+func (x *serviceUploadServer) SendAndClose(m *UploadResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *fileServiceUploadServer) Recv() (*UploadRequest, error) {
+func (x *serviceUploadServer) Recv() (*UploadRequest, error) {
 	m := new(UploadRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -149,62 +148,59 @@ func (x *fileServiceUploadServer) Recv() (*UploadRequest, error) {
 	return m, nil
 }
 
-func _FileService_SetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_SetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FileServiceServer).SetMetadata(ctx, in)
+		return srv.(ServiceServer).SetMetadata(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/file.v1.FileService/SetMetadata",
+		FullMethod: "/file.v1.Service/SetMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).SetMetadata(ctx, req.(*SetMetadataRequest))
+		return srv.(ServiceServer).SetMetadata(ctx, req.(*SetMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FileService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FileServiceServer).Delete(ctx, in)
+		return srv.(ServiceServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/file.v1.FileService/Delete",
+		FullMethod: "/file.v1.Service/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).Delete(ctx, req.(*DeleteRequest))
+		return srv.(ServiceServer).Delete(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// FileService_ServiceDesc is the grpc.ServiceDesc for FileService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var FileService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "file.v1.FileService",
-	HandlerType: (*FileServiceServer)(nil),
+var _Service_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "file.v1.Service",
+	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "SetMetadata",
-			Handler:    _FileService_SetMetadata_Handler,
+			Handler:    _Service_SetMetadata_Handler,
 		},
 		{
 			MethodName: "Delete",
-			Handler:    _FileService_Delete_Handler,
+			Handler:    _Service_Delete_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Upload",
-			Handler:       _FileService_Upload_Handler,
+			Handler:       _Service_Upload_Handler,
 			ClientStreams: true,
 		},
 	},

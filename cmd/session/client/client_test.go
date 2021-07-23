@@ -70,7 +70,7 @@ func TestClient_Session(t *testing.T) {
 
 	var (
 		session = &client.Session{
-			ID:     "sessionID",
+			ID:     uuid.Must(uuid.NewV4()),
 			UserID: uuid.Must(uuid.NewV4()),
 		}
 		token         = `token`
@@ -85,13 +85,13 @@ func TestClient_Session(t *testing.T) {
 		"success": {token, session, nil},
 		"err_any": {notValidToken, nil, status.Error(codes.Unknown, errAny.Error())},
 	}
-
+	
 	// success
 	mock.EXPECT().Session(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.SessionRequest{
 		Token: token,
 	}}).Return(&pb.SessionResponse{
-		Id:     session.ID,
-		UserId: session.UserID.String(),
+		SessionId: &pb.UUID{Value: session.ID.String()},
+		UserId:    &pb.UUID{Value: session.UserID.String()},
 	}, nil)
 
 	// err any

@@ -19,8 +19,8 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	"github.com/Meat-Hook/back-template/cmd/user/internal/repo"
-	wrapper "github.com/Meat-Hook/back-template/cmd/user/internal/session"
+	repo2 "github.com/Meat-Hook/back-template/cmd/user/internal/services/repo"
+	session2 "github.com/Meat-Hook/back-template/cmd/user/internal/services/session"
 	"github.com/Meat-Hook/back-template/libs/hash"
 	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/Meat-Hook/back-template/libs/metrics"
@@ -206,7 +206,7 @@ func start(c *cli.Context) error {
 	}
 
 	// init database connection
-	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo.Repo{})...)
+	dbMetric := metrics.DB(name, metrics.MethodsOf(&repo2.Repo{})...)
 	db, err := sqlx.Connect(dbDriver, fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=%s", c.String(dbHost.Name), c.Int(dbPort.Name), c.String(dbUser.Name),
 		c.String(dbPass.Name), c.String(dbName.Name), c.String(dbSSLMode.Name)))
@@ -228,10 +228,10 @@ func start(c *cli.Context) error {
 	}
 	sessionSvcClient := session.New(grpcConn)
 
-	r := repo.New(db, &dbMetric)
+	r := repo2.New(db, &dbMetric)
 	hasher := hash.New()
 
-	module := app.New(r, hasher, wrapper.New(sessionSvcClient))
+	module := app.New(r, hasher, session2.New(sessionSvcClient))
 
 	apiMetric := metrics.HTTP(name, restapi.FlatSwaggerJSON)
 	// internalAPI := rpc.New(module, librpc.Server(logger))
@@ -246,8 +246,8 @@ func start(c *cli.Context) error {
 	return runner.Start(
 		c.Context,
 		// runner.GRPC(logger.With().Str(log.Name, "GRPC").Logger(), internalAPI, appHost, c.Int(grpcPort.Name)),
-		runner.Swagger(logger.With().Str(log.Name, "Swagger").Logger(), externalAPI, appHost, c.Int(httpPort.Name)),
-		runner.Metric(logger.With().Str(log.Name, "Metric").Logger(), appHost, c.Int(metricPort.Name)),
+		runner.Swagger(logger.With().Str(log.Module, "Swagger").Logger(), externalAPI, appHost, c.Int(httpPort.Name)),
+		runner.Metric(logger.With().Str(log.Module, "Metric").Logger(), appHost, c.Int(metricPort.Name)),
 	)
 }
 

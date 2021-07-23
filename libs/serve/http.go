@@ -36,7 +36,7 @@ func HTTP(ctx context.Context, host string, port int, handler http.Handler) erro
 		err = srv.Shutdown(context.Background())
 	}
 	if err != nil {
-		return fmt.Errorf("failed to serve: %w", err)
+		return fmt.Errorf("srv.ListenAndServe: %w", err)
 	}
 
 	return nil

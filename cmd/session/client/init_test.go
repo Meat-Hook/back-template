@@ -4,36 +4,47 @@ import (
 	"context"
 	"errors"
 	"net"
+	"os"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/xid"
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 
 	"github.com/Meat-Hook/back-template/cmd/session/client"
 	"github.com/Meat-Hook/back-template/libs/log"
-	librpc "github.com/Meat-Hook/back-template/libs/rpc"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/rpc"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
-	"github.com/golang/mock/gomock"
-	"github.com/rs/xid"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
 )
-
-//go:generate mockgen -source=../../../proto/gen/go/session/v1/session_grpc.pb.go -destination mock.app.contracts_test.go -package client_test
 
 var (
-	reqID = xid.New()
-	ctx   = log.ReqIDWithCtx(context.Background(), reqID.String())
+	logger = zerolog.New(os.Stdout)
+	reqID  = xid.New()
+	ctx    = log.ReqIDWithCtx(context.Background(), reqID.String())
 
 	errAny = errors.New("any err")
+	reg    = prometheus.NewPedanticRegistry()
 )
 
-func start(t *testing.T) (*client.Client, *MockSessionServiceServer, *require.Assertions) {
+func TestMain(m *testing.M) {
+	metrics.InitMetrics(reg)
+
+	os.Exit(m.Run())
+}
+
+func start(t *testing.T) (*client.Client, *MockServiceServer, *require.Assertions) {
 	t.Helper()
 	r := require.New(t)
 
 	ctrl := gomock.NewController(t)
-	mock := NewMockSessionServiceServer(ctrl)
+	mock := NewMockServiceServer(ctrl)
 
 	srv := grpc.NewServer()
-	pb.RegisterSessionServiceServer(srv, mock)
+	pb.RegisterServiceServer(srv, mock)
 	ln, err := net.Listen("tcp", "")
 	r.Nil(err)
 	go func() { r.Nil(srv.Serve(ln)) }()
@@ -42,7 +53,7 @@ func start(t *testing.T) (*client.Client, *MockSessionServiceServer, *require.As
 		srv.Stop()
 	})
 
-	conn, err := librpc.Client(ctx, ln.Addr().String())
+	conn, err := rpc.Dial(ctx, logger, ln.Addr().String(), rpc.NewClientMetrics(reg, "test", "grpc_client"))
 	r.Nil(err)
 
 	svc := client.New(conn)

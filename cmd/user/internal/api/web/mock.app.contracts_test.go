@@ -151,17 +151,47 @@ func (mr *MockapplicationMockRecorder) UpdatePassword(ctx, session, oldPass, new
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*Mockapplication)(nil).UpdatePassword), ctx, session, oldPass, newPass)
 }
 
-// Auth mocks base method
-func (m *Mockapplication) Auth(ctx context.Context, raw string) (*app.Session, error) {
+// Login mocks base method
+func (m *Mockapplication) Login(ctx context.Context, email, password string, origin app.Origin) (*app.User, *app.Token, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Auth", ctx, raw)
+	ret := m.ctrl.Call(m, "Login", ctx, email, password, origin)
+	ret0, _ := ret[0].(*app.User)
+	ret1, _ := ret[1].(*app.Token)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// Login indicates an expected call of Login
+func (mr *MockapplicationMockRecorder) Login(ctx, email, password, origin interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*Mockapplication)(nil).Login), ctx, email, password, origin)
+}
+
+// Logout mocks base method
+func (m *Mockapplication) Logout(ctx context.Context, session app.Session) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Logout", ctx, session)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Logout indicates an expected call of Logout
+func (mr *MockapplicationMockRecorder) Logout(ctx, session interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*Mockapplication)(nil).Logout), ctx, session)
+}
+
+// Auth mocks base method
+func (m *Mockapplication) Auth(ctx context.Context, token string) (*app.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Auth", ctx, token)
 	ret0, _ := ret[0].(*app.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Auth indicates an expected call of Auth
-func (mr *MockapplicationMockRecorder) Auth(ctx, raw interface{}) *gomock.Call {
+func (mr *MockapplicationMockRecorder) Auth(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*Mockapplication)(nil).Auth), ctx, raw)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*Mockapplication)(nil).Auth), ctx, token)
 }

@@ -8,17 +8,18 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi"
-	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi/operations"
-	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
-	"github.com/Meat-Hook/back-template/libs/log"
-	"github.com/Meat-Hook/back-template/libs/metrics"
-	"github.com/Meat-Hook/back-template/libs/middleware"
 	"github.com/go-openapi/loads"
 	swag_middleware "github.com/go-openapi/runtime/middleware"
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog"
 	"github.com/sebest/xff"
+
+	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi"
+	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi/operations"
+	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
+	http2 "github.com/Meat-Hook/back-template/libs/http"
+	"github.com/Meat-Hook/back-template/libs/log"
+	"github.com/Meat-Hook/back-template/libs/metrics"
 )
 
 //go:generate mockgen -source=api.go -destination mock.app.contracts_test.go -package web_test
@@ -64,8 +65,8 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	// The middlewareFunc executes before anything.
 	globalMiddlewares := func(handler http.Handler) http.Handler {
 		xffmw, _ := xff.Default()
-		createLog := middleware.CreateLogger(logger.With())
-		accesslog := middleware.AccessLog(m)
+		createLog := http2.CreateLogger(logger.With())
+		accesslog := http2.AccessLog(m)
 		redocOpts := swag_middleware.RedocOpts{
 			BasePath: swaggerSpec.BasePath(),
 			Path:     "",
@@ -74,7 +75,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 			Title:    "",
 		}
 
-		return xffmw.Handler(createLog(middleware.Recovery(accesslog(middleware.Health(
+		return xffmw.Handler(createLog(http2.Recovery(accesslog(http2.Health(
 			swag_middleware.Spec(swaggerSpec.BasePath(), restapi.FlatSwaggerJSON,
 				swag_middleware.Redoc(redocOpts, handler)))))))
 	}

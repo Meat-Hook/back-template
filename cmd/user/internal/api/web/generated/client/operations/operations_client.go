@@ -36,6 +36,10 @@ type ClientService interface {
 
 	GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUsersOK, error)
 
+	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
+
+	Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*LogoutNoContent, error)
+
 	UpdatePassword(params *UpdatePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdatePasswordNoContent, error)
 
 	UpdateUsername(params *UpdateUsernameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateUsernameNoContent, error)
@@ -195,6 +199,81 @@ func (a *Client) GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInf
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*GetUsersDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  Login Login for user.
+*/
+func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewLoginParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "login",
+		Method:             "POST",
+		PathPattern:        "/login",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &LoginReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*LoginOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*LoginDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  Logout Logout for user.
+*/
+func (a *Client) Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*LogoutNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewLogoutParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "logout",
+		Method:             "POST",
+		PathPattern:        "/logout",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &LogoutReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*LogoutNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*LogoutDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

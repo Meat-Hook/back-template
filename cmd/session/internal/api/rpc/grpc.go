@@ -4,29 +4,43 @@ package rpc
 import (
 	"context"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
-	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
-	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/gofrs/uuid"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	"github.com/Meat-Hook/back-template/libs/rpc"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
 )
 
-//go:generate mockgen -source=grpc.go -destination mock.app.contracts_test.go -package rpc_test
+// Metric contains general metrics for gRPC methods.
+var metric struct { //nolint:gochecknoglobals // Metrics are global anyway.
+	server *grpc_prometheus.ServerMetrics
+}
 
 // For convenient testing.
+// Wrapper for app.Module.
 type sessions interface {
-	// Session get user session by his token.
 	Session(ctx context.Context, token string) (*app.Session, error)
+	NewSession(ctx context.Context, userID uuid.UUID, origin app.Origin) (*app.Token, error)
+	RemoveSession(ctx context.Context, sessionID uuid.UUID) error
 }
 
 type api struct {
 	app sessions
 }
 
-// New register service by grpc.Server and register metrics.
-func New(applications sessions, srv *grpc.Server) *grpc.Server {
-	pb.RegisterSessionServiceServer(srv, &api{app: applications})
+// New creates and returns gRPC server.
+func New(ctx context.Context, req *prometheus.Registry,namespace string, applications sessions) *grpc.Server {
+	logger := zerolog.Ctx(ctx)
 
-	prometheus.Register(srv)
+	const subsystem = `grpc`
+	metric.server = rpc.NewServerMetrics(req, namespace, subsystem)
+
+	srv := rpc.Server(*logger, metric.server)
+	pb.RegisterServiceServer(srv, &api{app: applications})
 
 	return srv
 }

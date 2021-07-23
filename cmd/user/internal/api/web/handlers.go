@@ -4,15 +4,16 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/go-openapi/swag"
+	"github.com/gofrs/uuid"
+
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi/operations"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	"github.com/go-openapi/swag"
-	"github.com/gofrs/uuid"
 )
 
 func (svc *service) verificationEmail(params operations.VerificationEmailParams) operations.VerificationEmailResponder {
-	ctx, log := fromRequest(params.HTTPRequest, nil)
+	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
 
 	err := svc.app.VerificationEmail(ctx, string(*params.Args.Email))
 	defer logs(log, err)
@@ -28,7 +29,7 @@ func (svc *service) verificationEmail(params operations.VerificationEmailParams)
 }
 
 func (svc *service) verificationUsername(params operations.VerificationUsernameParams) operations.VerificationUsernameResponder {
-	ctx, log := fromRequest(params.HTTPRequest, nil)
+	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
 
 	err := svc.app.VerificationUsername(ctx, string(*params.Args.Username))
 	defer logs(log, err)
@@ -44,7 +45,7 @@ func (svc *service) verificationUsername(params operations.VerificationUsernameP
 }
 
 func (svc *service) createUser(params operations.CreateUserParams) operations.CreateUserResponder {
-	ctx, log := fromRequest(params.HTTPRequest, nil)
+	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
 
 	id, err := svc.app.CreateUser(
 		ctx,
@@ -67,7 +68,7 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 }
 
 func (svc *service) getUser(params operations.GetUserParams, session *app.Session) operations.GetUserResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	getUserID := session.UserID
 	if params.ID != nil {
@@ -88,7 +89,7 @@ func (svc *service) getUser(params operations.GetUserParams, session *app.Sessio
 }
 
 func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.Session) operations.DeleteUserResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.DeleteUser(ctx, *session)
 	defer logs(log, err)
@@ -102,7 +103,7 @@ func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.
 }
 
 func (svc *service) updatePassword(params operations.UpdatePasswordParams, session *app.Session) operations.UpdatePasswordResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.UpdatePassword(ctx, *session, string(*params.Args.Old), string(*params.Args.New))
 	defer logs(log, err)
@@ -119,7 +120,7 @@ func (svc *service) updatePassword(params operations.UpdatePasswordParams, sessi
 }
 
 func (svc *service) updateUsername(params operations.UpdateUsernameParams, session *app.Session) operations.UpdateUsernameResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	err := svc.app.UpdateUsername(ctx, *session, string(*params.Args.Username))
 	defer logs(log, err)
@@ -139,7 +140,7 @@ func (svc *service) updateUsername(params operations.UpdateUsernameParams, sessi
 }
 
 func (svc *service) getUsers(params operations.GetUsersParams, session *app.Session) operations.GetUsersResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	page := app.SearchParams{
 		Limit:  uint(params.Limit),
@@ -156,6 +157,44 @@ func (svc *service) getUsers(params operations.GetUsersParams, session *app.Sess
 		})
 	default:
 		return operations.NewGetUsersDefault(http.StatusInternalServerError).
+			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func (svc *service) login(params operations.LoginParams) operations.LoginResponder {
+	ctx, log, remoteIP := fromRequest(params.HTTPRequest, nil)
+
+	origin := app.Origin{
+		IP:        remoteIP,
+		UserAgent: params.HTTPRequest.Header.Get("User-Agent"),
+	}
+
+	u, token, err := svc.app.Login(ctx, string(*params.Args.Email), string(*params.Args.Password), origin)
+	defer logs(log, err)
+	switch {
+	case err == nil:
+		return operations.NewLoginOK().WithPayload(User(u)).
+			WithSetCookie(generateCookie(token.Value).String())
+	case errors.Is(err, app.ErrNotFound):
+		return operations.NewLoginDefault(http.StatusNotFound).WithPayload(apiError(app.ErrNotFound.Error()))
+	case errors.Is(err, app.ErrNotValidPassword):
+		return operations.NewLoginDefault(http.StatusBadRequest).WithPayload(apiError(app.ErrNotValidPassword.Error()))
+	default:
+		return operations.NewLoginDefault(http.StatusInternalServerError).
+			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func (svc *service) logout(params operations.LogoutParams, session *app.Session) operations.LogoutResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+
+	err := svc.app.Logout(ctx, *session)
+	defer logs(log, err)
+	switch {
+	case err == nil:
+		return operations.NewLogoutNoContent()
+	default:
+		return operations.NewLogoutDefault(http.StatusInternalServerError).
 			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
 	}
 }

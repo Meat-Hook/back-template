@@ -46,5 +46,11 @@ type (
 		// Session returns user session by his token.
 		// Errors: ErrNotFound, unknown.
 		Session(ctx context.Context, token string) (*Session, error)
+		// NewSession generate new session for specific user.
+		// Errors: unknown.
+		NewSession(ctx context.Context, userID uuid.UUID, origin Origin) (*Token, error)
+		// RemoveSession removes session by id.
+		// Errors: ErrNotFound, unknown.
+		RemoveSession(ctx context.Context, sessionID uuid.UUID) error
 	}
 )

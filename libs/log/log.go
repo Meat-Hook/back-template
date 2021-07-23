@@ -11,6 +11,8 @@ import (
 const (
 	Func          = `func`
 	HTTPMethod    = `http-method`
+	Version       = `version`
+	Service       = `service`
 	Code          = `code`
 	IP            = `ip`
 	ReqID         = `req-id`
@@ -20,7 +22,7 @@ const (
 	Duration      = `duration`
 	Host          = `host`
 	Port          = `port`
-	Name          = `name`
+	Subsystem     = `subsystem`
 	DBMethod      = `db-method`
 )
 

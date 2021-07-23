@@ -1,11 +1,21 @@
 package web_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
+
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/swag"
+	"github.com/gofrs/uuid"
+	"github.com/golang/mock/gomock"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/client"
@@ -14,13 +24,6 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 	"github.com/Meat-Hook/back-template/libs/metrics"
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
-	"github.com/gofrs/uuid"
-	"github.com/golang/mock/gomock"
-	"github.com/rs/zerolog"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -33,16 +36,18 @@ var (
 	}
 
 	session = app.Session{
-		ID:     "id",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: user.ID,
 	}
 
 	token      = "token"
 	apiKeyAuth = httptransport.APIKeyAuth("Cookie", "header", "authKey="+token)
+
+	reg = prometheus.NewPedanticRegistry()
 )
 
 func TestMain(m *testing.M) {
-	metrics.InitMetrics()
+	metrics.InitMetrics(reg)
 
 	os.Exit(m.Run())
 }
@@ -53,9 +58,9 @@ func start(t *testing.T) (string, *Mockapplication, *client.UserService, *requir
 	ctrl := gomock.NewController(t)
 	mockApp := NewMockapplication(ctrl)
 
-	log := zerolog.New(os.Stdout)
+	logger := zerolog.New(os.Stdout)
 	m := metrics.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi.FlatSwaggerJSON)
-	server, err := web.New(mockApp, log, &m, web.Config{})
+	server, err := web.New(logger.WithContext(context.Background()), mockApp, &m, web.Config{})
 	assert.NoError(t, err, "web.New")
 	assert.NoError(t, server.Listen(), "server.Listen")
 
@@ -104,6 +109,10 @@ func errPayload(err interface{}) *models.Error {
 	case *operations.UpdateUsernameDefault:
 		return err.Payload
 	case *operations.GetUsersDefault:
+		return err.Payload
+	case *operations.LoginDefault:
+		return err.Payload
+	case *operations.LogoutDefault:
 		return err.Payload
 	default:
 		return nil

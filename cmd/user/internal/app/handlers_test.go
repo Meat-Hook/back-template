@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 	"github.com/gofrs/uuid"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
 func TestModule_VerificationEmail(t *testing.T) {
@@ -166,7 +167,7 @@ func TestModule_DeleteUser(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	session := &app.Session{
-		ID:     "id",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 
@@ -194,11 +195,11 @@ func TestModule_UpdateUsername(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	session := &app.Session{
-		ID:     "id",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 	notValidSession := &app.Session{
-		ID:     "id2",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 	user := &app.User{
@@ -244,11 +245,11 @@ func TestModule_UpdatePassword(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	session := &app.Session{
-		ID:     "id",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 	notValidSession := &app.Session{
-		ID:     "id2",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 	user := &app.User{
@@ -350,7 +351,7 @@ func TestModule_Auth(t *testing.T) {
 	module, mocks, assert := start(t)
 
 	session := &app.Session{
-		ID:     "id",
+		ID:     uuid.Must(uuid.NewV4()),
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 
@@ -376,7 +377,7 @@ func TestModule_Auth(t *testing.T) {
 	}
 }
 
-func TestModule_Access(t *testing.T) {
+func TestModule_Login(t *testing.T) {
 	t.Parallel()
 
 	module, mocks, assert := start(t)
@@ -390,11 +391,16 @@ func TestModule_Access(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
+	token := &app.Token{
+		Value: "auth-token",
+	}
+
 	const (
 		notValidPass = `notValidPass`
 		unknownEmail = `email`
 	)
 
+	mocks.auth.EXPECT().NewSession(ctx, user.ID, origin).Return(token, nil)
 	mocks.repo.EXPECT().ByEmail(ctx, user.Email).Return(user, nil).Times(2)
 	mocks.repo.EXPECT().ByEmail(ctx, unknownEmail).Return(nil, app.ErrNotFound)
 	mocks.hasher.EXPECT().Compare(user.PassHash, user.PassHash).Return(true)
@@ -403,10 +409,10 @@ func TestModule_Access(t *testing.T) {
 	testCases := map[string]struct {
 		email   string
 		pass    string
-		want    *app.User
+		want    *app.Token
 		wantErr error
 	}{
-		"success":       {user.Email, string(user.PassHash), user, nil},
+		"success":       {user.Email, string(user.PassHash), token, nil},
 		"err_not_valid": {user.Email, notValidPass, nil, app.ErrNotValidPassword},
 		"err_not_found": {unknownEmail, "", nil, app.ErrNotFound},
 	}
@@ -414,9 +420,37 @@ func TestModule_Access(t *testing.T) {
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
-			res, err := module.Access(ctx, tc.email, tc.pass)
+			res, err := module.Login(ctx, tc.email, tc.pass, origin)
 			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
+		})
+	}
+}
+
+func TestModule_Logout(t *testing.T) {
+	t.Parallel()
+
+	module, mocks, assert := start(t)
+
+	session := &app.Session{
+		ID:     uuid.Must(uuid.NewV4()),
+		UserID: uuid.Must(uuid.NewV4()),
+	}
+
+	mocks.auth.EXPECT().RemoveSession(ctx, session.ID).Return(nil)
+
+	testCases := map[string]struct {
+		session *app.Session
+		wantErr error
+	}{
+		"success": {session, nil},
+	}
+
+	for name, tc := range testCases {
+		name, tc := name, tc
+		t.Run(name, func(t *testing.T) {
+			err := module.Logout(ctx, *tc.session)
+			assert.ErrorIs(err, tc.wantErr)
 		})
 	}
 }

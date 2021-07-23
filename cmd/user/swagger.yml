@@ -93,6 +93,17 @@ definitions:
       email:
         $ref: '#/definitions/Email'
 
+  LoginParam:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        $ref: '#/definitions/Email'
+      password:
+        $ref: '#/definitions/Password'
+
 responses:
 
   GenericError:
@@ -257,4 +268,34 @@ paths:
                 type: integer
                 format: int32
                 minimum: 0
+        default: { $ref: '#/responses/GenericError' }
+
+  /login:
+    post:
+      operationId: login
+      description: Login for user.
+      security: [ ]
+      parameters:
+        - name: args
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/LoginParam'
+      responses:
+        200:
+          description: OK
+          headers:
+            Set-Cookie:
+              description: Session auth.
+              type: string
+          schema:
+            $ref: '#/definitions/User'
+        default: { $ref: '#/responses/GenericError' }
+
+  /logout:
+    post:
+      operationId: logout
+      description: Logout for user.
+      responses:
+        204: { $ref: '#/responses/NoContent' }
         default: { $ref: '#/responses/GenericError' }

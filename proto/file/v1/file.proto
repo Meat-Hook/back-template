@@ -8,7 +8,7 @@ import "google/protobuf/empty.proto";
 option go_package = "github.com/Meat-Hook/back-template/proto/go/file/v1;pb";
 
 // Internal service API fot upload and download files.
-service FileService {
+service Service {
   // Upload file to database.
   rpc Upload (stream UploadRequest) returns (UploadResponse);
   // Set file metadata.

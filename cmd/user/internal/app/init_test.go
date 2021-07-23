@@ -3,16 +3,22 @@ package app_test
 import (
 	"context"
 	"errors"
+	"net"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 )
 
 var (
 	ctx    = context.Background()
 	errAny = errors.New("any error")
+	origin = app.Origin{
+		IP:        net.ParseIP("192.100.10.4"),
+		UserAgent: "UserAgent",
+	}
 )
 
 type mocks struct {

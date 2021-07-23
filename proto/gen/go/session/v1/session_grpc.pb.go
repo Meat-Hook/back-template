@@ -11,89 +11,161 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// SessionServiceClient is the client API for SessionService service.
+// ServiceClient is the client API for Service service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type SessionServiceClient interface {
+type ServiceClient interface {
 	// Session get session info by token.
 	Session(ctx context.Context, in *SessionRequest, opts ...grpc.CallOption) (*SessionResponse, error)
+	// Delete user's session
+	RemoveSession(ctx context.Context, in *RemoveSessionRequest, opts ...grpc.CallOption) (*RemoveSessionResponse, error)
+	// Make new session specific user.
+	NewSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error)
 }
 
-type sessionServiceClient struct {
+type serviceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewSessionServiceClient(cc grpc.ClientConnInterface) SessionServiceClient {
-	return &sessionServiceClient{cc}
+func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
+	return &serviceClient{cc}
 }
 
-func (c *sessionServiceClient) Session(ctx context.Context, in *SessionRequest, opts ...grpc.CallOption) (*SessionResponse, error) {
+func (c *serviceClient) Session(ctx context.Context, in *SessionRequest, opts ...grpc.CallOption) (*SessionResponse, error) {
 	out := new(SessionResponse)
-	err := c.cc.Invoke(ctx, "/session.v1.SessionService/Session", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/session.v1.Service/Session", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// SessionServiceServer is the server API for SessionService service.
-// All implementations should embed UnimplementedSessionServiceServer
+func (c *serviceClient) RemoveSession(ctx context.Context, in *RemoveSessionRequest, opts ...grpc.CallOption) (*RemoveSessionResponse, error) {
+	out := new(RemoveSessionResponse)
+	err := c.cc.Invoke(ctx, "/session.v1.Service/RemoveSession", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) NewSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error) {
+	out := new(NewSessionResponse)
+	err := c.cc.Invoke(ctx, "/session.v1.Service/NewSession", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ServiceServer is the server API for Service service.
+// All implementations should embed UnimplementedServiceServer
 // for forward compatibility
-type SessionServiceServer interface {
+type ServiceServer interface {
 	// Session get session info by token.
 	Session(context.Context, *SessionRequest) (*SessionResponse, error)
+	// Delete user's session
+	RemoveSession(context.Context, *RemoveSessionRequest) (*RemoveSessionResponse, error)
+	// Make new session specific user.
+	NewSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error)
 }
 
-// UnimplementedSessionServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedSessionServiceServer struct {
+// UnimplementedServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedServiceServer struct {
 }
 
-func (UnimplementedSessionServiceServer) Session(context.Context, *SessionRequest) (*SessionResponse, error) {
+func (UnimplementedServiceServer) Session(context.Context, *SessionRequest) (*SessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Session not implemented")
 }
+func (UnimplementedServiceServer) RemoveSession(context.Context, *RemoveSessionRequest) (*RemoveSessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveSession not implemented")
+}
+func (UnimplementedServiceServer) NewSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewSession not implemented")
+}
 
-// UnsafeSessionServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SessionServiceServer will
+// UnsafeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServiceServer will
 // result in compilation errors.
-type UnsafeSessionServiceServer interface {
-	mustEmbedUnimplementedSessionServiceServer()
+type UnsafeServiceServer interface {
+	mustEmbedUnimplementedServiceServer()
 }
 
-func RegisterSessionServiceServer(s grpc.ServiceRegistrar, srv SessionServiceServer) {
-	s.RegisterService(&SessionService_ServiceDesc, srv)
+func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
+	s.RegisterService(&_Service_serviceDesc, srv)
 }
 
-func _SessionService_Session_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_Session_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SessionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SessionServiceServer).Session(ctx, in)
+		return srv.(ServiceServer).Session(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/session.v1.SessionService/Session",
+		FullMethod: "/session.v1.Service/Session",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).Session(ctx, req.(*SessionRequest))
+		return srv.(ServiceServer).Session(ctx, req.(*SessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// SessionService_ServiceDesc is the grpc.ServiceDesc for SessionService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var SessionService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "session.v1.SessionService",
-	HandlerType: (*SessionServiceServer)(nil),
+func _Service_RemoveSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).RemoveSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.v1.Service/RemoveSession",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).RemoveSession(ctx, req.(*RemoveSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_NewSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).NewSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.v1.Service/NewSession",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).NewSession(ctx, req.(*NewSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Service_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "session.v1.Service",
+	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Session",
-			Handler:    _SessionService_Session_Handler,
+			Handler:    _Service_Session_Handler,
+		},
+		{
+			MethodName: "RemoveSession",
+			Handler:    _Service_RemoveSession_Handler,
+		},
+		{
+			MethodName: "NewSession",
+			Handler:    _Service_NewSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

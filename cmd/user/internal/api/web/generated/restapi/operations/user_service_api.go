@@ -56,6 +56,12 @@ func NewUserServiceAPI(spec *loads.Document) *UserServiceAPI {
 		GetUsersHandler: GetUsersHandlerFunc(func(params GetUsersParams, principal *app.Session) GetUsersResponder {
 			return GetUsersNotImplemented()
 		}),
+		LoginHandler: LoginHandlerFunc(func(params LoginParams) LoginResponder {
+			return LoginNotImplemented()
+		}),
+		LogoutHandler: LogoutHandlerFunc(func(params LogoutParams, principal *app.Session) LogoutResponder {
+			return LogoutNotImplemented()
+		}),
 		UpdatePasswordHandler: UpdatePasswordHandlerFunc(func(params UpdatePasswordParams, principal *app.Session) UpdatePasswordResponder {
 			return UpdatePasswordNotImplemented()
 		}),
@@ -126,6 +132,10 @@ type UserServiceAPI struct {
 	GetUserHandler GetUserHandler
 	// GetUsersHandler sets the operation handler for the get users operation
 	GetUsersHandler GetUsersHandler
+	// LoginHandler sets the operation handler for the login operation
+	LoginHandler LoginHandler
+	// LogoutHandler sets the operation handler for the logout operation
+	LogoutHandler LogoutHandler
 	// UpdatePasswordHandler sets the operation handler for the update password operation
 	UpdatePasswordHandler UpdatePasswordHandler
 	// UpdateUsernameHandler sets the operation handler for the update username operation
@@ -226,6 +236,12 @@ func (o *UserServiceAPI) Validate() error {
 	}
 	if o.GetUsersHandler == nil {
 		unregistered = append(unregistered, "GetUsersHandler")
+	}
+	if o.LoginHandler == nil {
+		unregistered = append(unregistered, "LoginHandler")
+	}
+	if o.LogoutHandler == nil {
+		unregistered = append(unregistered, "LogoutHandler")
 	}
 	if o.UpdatePasswordHandler == nil {
 		unregistered = append(unregistered, "UpdatePasswordHandler")
@@ -354,6 +370,14 @@ func (o *UserServiceAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/users"] = NewGetUsers(o.context, o.GetUsersHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/login"] = NewLogin(o.context, o.LoginHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/logout"] = NewLogout(o.context, o.LogoutHandler)
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}

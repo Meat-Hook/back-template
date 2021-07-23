@@ -64,6 +64,54 @@ func init() {
         }
       }
     },
+    "/login": {
+      "post": {
+        "security": [],
+        "description": "Login for user.",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "args",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginParam"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/User"
+            },
+            "headers": {
+              "Set-Cookie": {
+                "type": "string",
+                "description": "Session auth."
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/responses/GenericError"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "description": "Logout for user.",
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "$ref": "#/responses/NoContent"
+          },
+          "default": {
+            "$ref": "#/responses/GenericError"
+          }
+        }
+      }
+    },
     "/user": {
       "get": {
         "description": "Open user profile by id. If id not set returns self info.",
@@ -312,6 +360,21 @@ func init() {
         }
       }
     },
+    "LoginParam": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "$ref": "#/definitions/Email"
+        },
+        "password": {
+          "$ref": "#/definitions/Password"
+        }
+      }
+    },
     "Password": {
       "type": "string",
       "format": "password",
@@ -424,6 +487,60 @@ func init() {
             }
           }
         ],
+        "responses": {
+          "204": {
+            "description": "The server successfully processed the request and is not returning any content."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "security": [],
+        "description": "Login for user.",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "args",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginParam"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/User"
+            },
+            "headers": {
+              "Set-Cookie": {
+                "type": "string",
+                "description": "Session auth."
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "description": "Logout for user.",
+        "operationId": "logout",
         "responses": {
           "204": {
             "description": "The server successfully processed the request and is not returning any content."
@@ -704,6 +821,21 @@ func init() {
       "properties": {
         "message": {
           "type": "string"
+        }
+      }
+    },
+    "LoginParam": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "$ref": "#/definitions/Email"
+        },
+        "password": {
+          "$ref": "#/definitions/Password"
         }
       }
     },

@@ -1,4 +1,4 @@
-// Package repo contains implements for app.Repo.
+// Package db contains implements for app.Repo.
 // Provide file chunk to and from repository.
 package repo
 
@@ -52,7 +52,7 @@ func (f *fileInfo) convert(r *file) *app.File {
 	}
 }
 
-// New build and returns user repo.
+// New build and returns user db.
 func New(db *sqlx.DB, m *metrics.Database) *Repo {
 	return &Repo{
 		db:     db,

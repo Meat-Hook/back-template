@@ -2,22 +2,11 @@
 
 # For MacOS.
 if test "$(uname)" = "Darwin"; then
-	shopt -s expand_aliases
-	alias sed=gsed
-	alias grep=ggrep
-	alias xargs=gxargs
+  shopt -s expand_aliases
+  alias sed=gsed
+  alias grep=ggrep
+  alias xargs=gxargs
 fi
-
-# Install depends.
-set -e -o pipefail
-mkdir -p .gobincache # Darwin does not support `install -D`.
-export PATH="$PWD/.gobincache:$PATH"
-go generate
-HADOLINT_VER="2.5.0"
-hadolint --version | grep -wq $HADOLINT_VER || curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-"$(uname)"-x86_64 | install /dev/stdin .gobincache/hadolint
-SHELLCHECK_VER="0.7.2"
-shellcheck --version | grep -wq $SHELLCHECK_VER || curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}."$(uname)".x86_64.tar.xz | tar xJf - -C .gobincache --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
-set -x
 
 # Start Dockerfile linter.
 hadolint Dockerfile

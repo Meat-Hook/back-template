@@ -18,7 +18,7 @@ func (m *Module) VerificationEmail(ctx context.Context, email string) error {
 	case err == nil:
 		return ErrEmailExist
 	default:
-		return fmt.Errorf("user by email: %w", err)
+		return fmt.Errorf("m.user.ByEmail: %w", err)
 	}
 }
 
@@ -31,7 +31,7 @@ func (m *Module) VerificationUsername(ctx context.Context, username string) erro
 	case err == nil:
 		return ErrUsernameExist
 	default:
-		return fmt.Errorf("user by username: %w", err)
+		return fmt.Errorf("m.user.ByUsername: %w", err)
 	}
 }
 
@@ -39,7 +39,7 @@ func (m *Module) VerificationUsername(ctx context.Context, username string) erro
 func (m *Module) CreateUser(ctx context.Context, email, username, password string) (uuid.UUID, error) {
 	passHash, err := m.hash.Hashing(password)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("hash hashing: %w", err)
+		return uuid.Nil, fmt.Errorf("m.hash.Hashing: %w", err)
 	}
 	email = strings.ToLower(email)
 
@@ -51,7 +51,7 @@ func (m *Module) CreateUser(ctx context.Context, email, username, password strin
 
 	userID, err := m.user.Save(ctx, newUser)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("user save: %w", err)
+		return uuid.Nil, fmt.Errorf("m.user.Save: %w", err)
 	}
 
 	return userID, nil
@@ -62,7 +62,7 @@ func (m *Module) UserByID(ctx context.Context, _ Session, userID uuid.UUID) (*Us
 	return m.user.ByID(ctx, userID)
 }
 
-// DeleteUser remove user from repo.
+// DeleteUser remove user from db.
 func (m *Module) DeleteUser(ctx context.Context, session Session) error {
 	return m.user.Delete(ctx, session.UserID)
 }
@@ -71,7 +71,7 @@ func (m *Module) DeleteUser(ctx context.Context, session Session) error {
 func (m *Module) UpdateUsername(ctx context.Context, session Session, username string) error {
 	user, err := m.user.ByID(ctx, session.UserID)
 	if err != nil {
-		return fmt.Errorf("user by id: %w", err)
+		return fmt.Errorf("m.user.ByID: %w", err)
 	}
 
 	if user.Name == username {
@@ -86,7 +86,7 @@ func (m *Module) UpdateUsername(ctx context.Context, session Session, username s
 func (m *Module) UpdatePassword(ctx context.Context, session Session, oldPass, newPass string) error {
 	user, err := m.user.ByID(ctx, session.UserID)
 	if err != nil {
-		return fmt.Errorf("user by id: %w", err)
+		return fmt.Errorf("m.user.ByID: %w", err)
 	}
 
 	if !m.hash.Compare(user.PassHash, []byte(oldPass)) {
@@ -99,7 +99,7 @@ func (m *Module) UpdatePassword(ctx context.Context, session Session, oldPass, n
 
 	passHash, err := m.hash.Hashing(newPass)
 	if err != nil {
-		return fmt.Errorf("hash hashing: %w", err)
+		return fmt.Errorf("m.hash.Hashing: %w", err)
 	}
 	user.PassHash = passHash
 
@@ -116,17 +116,22 @@ func (m *Module) Auth(ctx context.Context, token string) (*Session, error) {
 	return m.auth.Session(ctx, token)
 }
 
-// Access finds a user by email and compares his password to allow access.
-func (m *Module) Access(ctx context.Context, email, password string) (*User, error) {
+// Login make new session and returns auth token.
+func (m *Module) Login(ctx context.Context, email, password string, origin Origin) (*Token, error) {
 	email = strings.ToLower(email)
 	user, err := m.user.ByEmail(ctx, email)
 	if err != nil {
-		return nil, fmt.Errorf("user by email: %w", err)
+		return nil, fmt.Errorf("m.user.ByEmail: %w", err)
 	}
 
 	if !m.hash.Compare(user.PassHash, []byte(password)) {
 		return nil, ErrNotValidPassword
 	}
 
-	return user, nil
+	return m.auth.NewSession(ctx, user.ID, origin)
+}
+
+// Logout remove user session.
+func (m *Module) Logout(ctx context.Context, session Session) error {
+	return m.auth.RemoveSession(ctx, session.ID)
 }

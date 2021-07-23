@@ -228,3 +228,32 @@ func (mr *MockAuthMockRecorder) Session(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockAuth)(nil).Session), ctx, token)
 }
+
+// NewSession mocks base method
+func (m *MockAuth) NewSession(ctx context.Context, userID uuid.UUID, origin app.Origin) (*app.Token, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewSession", ctx, userID, origin)
+	ret0, _ := ret[0].(*app.Token)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewSession indicates an expected call of NewSession
+func (mr *MockAuthMockRecorder) NewSession(ctx, userID, origin interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSession", reflect.TypeOf((*MockAuth)(nil).NewSession), ctx, userID, origin)
+}
+
+// RemoveSession mocks base method
+func (m *MockAuth) RemoveSession(ctx context.Context, sessionID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSession", ctx, sessionID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveSession indicates an expected call of RemoveSession
+func (mr *MockAuthMockRecorder) RemoveSession(ctx, sessionID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSession", reflect.TypeOf((*MockAuth)(nil).RemoveSession), ctx, sessionID)
+}

@@ -4,21 +4,15 @@ import (
 	"net"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	"github.com/gofrs/uuid"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 )
 
-func TestModule_Login(t *testing.T) {
+func TestModule_NewSession(t *testing.T) {
 	t.Parallel()
 
 	module, mocks, assert := start(t)
-
-	const (
-		email               = `email@mail.com`
-		pass                = `pass`
-		notValidEmail       = `notExist@email.com`
-		errSaveSessionEmail = `errSaveSession@email.com`
-	)
 
 	var (
 		id  = uuid.Must(uuid.NewV4())
@@ -28,17 +22,9 @@ func TestModule_Login(t *testing.T) {
 			IP:        net.ParseIP("192.100.10.4"),
 			UserAgent: "UserAgent",
 		}
-		user = app.User{
-			ID:    uuid.Must(uuid.NewV4()),
-			Email: email,
-			Name:  "username",
-		}
-		user2 = app.User{
-			ID:    uuid.Must(uuid.NewV4()),
-			Email: errSaveSessionEmail,
-			Name:  "username",
-		}
-		token = app.Token{
+		userID1 = uuid.Must(uuid.NewV4())
+		userID2 = uuid.Must(uuid.NewV4())
+		token   = app.Token{
 			Value: "token",
 		}
 		token2 = app.Token{
@@ -48,19 +34,16 @@ func TestModule_Login(t *testing.T) {
 			ID:     id,
 			Origin: origin,
 			Token:  token,
-			UserID: user.ID,
+			UserID: userID1,
 		}
 		errSaveSession = app.Session{
 			ID:     id2,
 			Origin: origin,
 			Token:  token2,
-			UserID: user2.ID,
+			UserID: userID2,
 		}
 	)
 
-	mocks.users.EXPECT().Access(ctx, email, pass).Return(&user, nil)
-	mocks.users.EXPECT().Access(ctx, errSaveSessionEmail, pass).Return(&user2, nil)
-	mocks.users.EXPECT().Access(ctx, notValidEmail, pass).Return(nil, app.ErrNotFound)
 	mocks.id.EXPECT().New().Return(id)
 	mocks.id.EXPECT().New().Return(id2)
 	mocks.auth.EXPECT().Token(app.Subject{SessionID: id}).Return(&token, nil)
@@ -69,57 +52,43 @@ func TestModule_Login(t *testing.T) {
 	mocks.repo.EXPECT().Save(ctx, errSaveSession).Return(errAny)
 
 	testCases := map[string]struct {
-		email, password string
-		want            *app.User
-		wantToken       *app.Token
-		wantErr         error
+		userID  uuid.UUID
+		want    *app.Token
+		wantErr error
 	}{
-		"success":       {email, pass, &user, &token, nil},
-		"err_any":       {errSaveSessionEmail, pass, nil, nil, errAny},
-		"err_not_found": {notValidEmail, pass, nil, nil, app.ErrNotFound},
+		"success":       {userID1, &token, nil},
+		"err_any":       {userID2, nil, errAny},
 	}
 
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
-			resUser, resToken, err := module.Login(ctx, tc.email, tc.password, origin)
-			assert.Equal(tc.want, resUser)
-			assert.Equal(tc.wantToken, resToken)
+			resToken, err := module.NewSession(ctx, tc.userID, origin)
+			assert.Equal(tc.want, resToken)
 			assert.ErrorIs(err, tc.wantErr)
 		})
 	}
 }
 
-func TestModule_Logout(t *testing.T) {
+func TestModule_RemoveSession(t *testing.T) {
 	t.Parallel()
 
 	module, mocks, assert := start(t)
 
-	session := app.Session{
-		ID: uuid.Must(uuid.NewV4()),
-		Origin: app.Origin{
-			IP:        net.ParseIP("192.100.10.4"),
-			UserAgent: "UserAgent",
-		},
-		Token: app.Token{
-			Value: "token",
-		},
-		UserID: uuid.Must(uuid.NewV4()),
-	}
-
-	mocks.repo.EXPECT().Delete(ctx, session.ID).Return(nil)
+	id := uuid.Must(uuid.NewV4())
+	mocks.repo.EXPECT().Delete(ctx, id).Return(nil)
 
 	testCases := map[string]struct {
-		session *app.Session
+		session uuid.UUID
 		want    error
 	}{
-		"success": {&session, nil},
+		"success": {id, nil},
 	}
 
 	for name, tc := range testCases {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
-			err := module.Logout(ctx, *tc.session)
+			err := module.RemoveSession(ctx, id)
 			assert.Equal(tc.want, err)
 		})
 	}
