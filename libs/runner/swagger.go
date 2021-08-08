@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/libs/log"
 	"github.com/rs/zerolog"
+
+	"github.com/Meat-Hook/back-template/libs/log"
 )
 
 type swaggerServer interface {
@@ -13,7 +14,7 @@ type swaggerServer interface {
 	Shutdown() error
 }
 
-// Swagger run swagger http server.
+// Swagger run swagger web server.
 func Swagger(logger zerolog.Logger, srv swaggerServer, host string, port int) func(context.Context) error {
 	return func(ctx context.Context) error {
 		errc := make(chan error, 1)
@@ -24,12 +25,12 @@ func Swagger(logger zerolog.Logger, srv swaggerServer, host string, port int) fu
 		select {
 		case err := <-errc:
 			if err != nil {
-				return fmt.Errorf("failed to listen http server: %w", err)
+				return fmt.Errorf("failed to listen web server: %w", err)
 			}
 		case <-ctx.Done():
 			err := srv.Shutdown()
 			if err != nil {
-				return fmt.Errorf("failed to shutdown http server: %w", err)
+				return fmt.Errorf("failed to shutdown web server: %w", err)
 			}
 		}
 

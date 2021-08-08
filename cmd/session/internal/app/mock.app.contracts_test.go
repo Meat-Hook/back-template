@@ -6,50 +6,37 @@ package app_test
 
 import (
 	context "context"
+	reflect "reflect"
+
 	app "github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
-// MockRepo is a mock of Repo interface
+// MockRepo is a mock of Repo interface.
 type MockRepo struct {
 	ctrl     *gomock.Controller
 	recorder *MockRepoMockRecorder
 }
 
-// MockRepoMockRecorder is the mock recorder for MockRepo
+// MockRepoMockRecorder is the mock recorder for MockRepo.
 type MockRepoMockRecorder struct {
 	mock *MockRepo
 }
 
-// NewMockRepo creates a new mock instance
+// NewMockRepo creates a new mock instance.
 func NewMockRepo(ctrl *gomock.Controller) *MockRepo {
 	mock := &MockRepo{ctrl: ctrl}
 	mock.recorder = &MockRepoMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 	return m.recorder
 }
 
-// Save mocks base method
-func (m *MockRepo) Save(arg0 context.Context, arg1 app.Session) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Save indicates an expected call of Save
-func (mr *MockRepoMockRecorder) Save(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepo)(nil).Save), arg0, arg1)
-}
-
-// ByID mocks base method
+// ByID mocks base method.
 func (m *MockRepo) ByID(arg0 context.Context, arg1 uuid.UUID) (*app.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByID", arg0, arg1)
@@ -58,13 +45,13 @@ func (m *MockRepo) ByID(arg0 context.Context, arg1 uuid.UUID) (*app.Session, err
 	return ret0, ret1
 }
 
-// ByID indicates an expected call of ByID
+// ByID indicates an expected call of ByID.
 func (mr *MockRepoMockRecorder) ByID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByID", reflect.TypeOf((*MockRepo)(nil).ByID), arg0, arg1)
 }
 
-// Delete mocks base method
+// Delete mocks base method.
 func (m *MockRepo) Delete(arg0 context.Context, arg1 uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
@@ -72,51 +59,50 @@ func (m *MockRepo) Delete(arg0 context.Context, arg1 uuid.UUID) error {
 	return ret0
 }
 
-// Delete indicates an expected call of Delete
+// Delete indicates an expected call of Delete.
 func (mr *MockRepoMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepo)(nil).Delete), arg0, arg1)
 }
 
-// MockAuth is a mock of Auth interface
+// Save mocks base method.
+func (m *MockRepo) Save(arg0 context.Context, arg1 app.Session) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Save", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Save indicates an expected call of Save.
+func (mr *MockRepoMockRecorder) Save(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepo)(nil).Save), arg0, arg1)
+}
+
+// MockAuth is a mock of Auth interface.
 type MockAuth struct {
 	ctrl     *gomock.Controller
 	recorder *MockAuthMockRecorder
 }
 
-// MockAuthMockRecorder is the mock recorder for MockAuth
+// MockAuthMockRecorder is the mock recorder for MockAuth.
 type MockAuthMockRecorder struct {
 	mock *MockAuth
 }
 
-// NewMockAuth creates a new mock instance
+// NewMockAuth creates a new mock instance.
 func NewMockAuth(ctrl *gomock.Controller) *MockAuth {
 	mock := &MockAuth{ctrl: ctrl}
 	mock.recorder = &MockAuthMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockAuth) EXPECT() *MockAuthMockRecorder {
 	return m.recorder
 }
 
-// Token mocks base method
-func (m *MockAuth) Token(arg0 app.Subject) (*app.Token, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Token", arg0)
-	ret0, _ := ret[0].(*app.Token)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Token indicates an expected call of Token
-func (mr *MockAuthMockRecorder) Token(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Token", reflect.TypeOf((*MockAuth)(nil).Token), arg0)
-}
-
-// Subject mocks base method
+// Subject mocks base method.
 func (m *MockAuth) Subject(token string) (*app.Subject, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Subject", token)
@@ -125,36 +111,51 @@ func (m *MockAuth) Subject(token string) (*app.Subject, error) {
 	return ret0, ret1
 }
 
-// Subject indicates an expected call of Subject
+// Subject indicates an expected call of Subject.
 func (mr *MockAuthMockRecorder) Subject(token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subject", reflect.TypeOf((*MockAuth)(nil).Subject), token)
 }
 
-// MockID is a mock of ID interface
+// Token mocks base method.
+func (m *MockAuth) Token(arg0 app.Subject) (*app.Token, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Token", arg0)
+	ret0, _ := ret[0].(*app.Token)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Token indicates an expected call of Token.
+func (mr *MockAuthMockRecorder) Token(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Token", reflect.TypeOf((*MockAuth)(nil).Token), arg0)
+}
+
+// MockID is a mock of ID interface.
 type MockID struct {
 	ctrl     *gomock.Controller
 	recorder *MockIDMockRecorder
 }
 
-// MockIDMockRecorder is the mock recorder for MockID
+// MockIDMockRecorder is the mock recorder for MockID.
 type MockIDMockRecorder struct {
 	mock *MockID
 }
 
-// NewMockID creates a new mock instance
+// NewMockID creates a new mock instance.
 func NewMockID(ctrl *gomock.Controller) *MockID {
 	mock := &MockID{ctrl: ctrl}
 	mock.recorder = &MockIDMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockID) EXPECT() *MockIDMockRecorder {
 	return m.recorder
 }
 
-// New mocks base method
+// New mocks base method.
 func (m *MockID) New() uuid.UUID {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "New")
@@ -162,7 +163,7 @@ func (m *MockID) New() uuid.UUID {
 	return ret0
 }
 
-// New indicates an expected call of New
+// New indicates an expected call of New.
 func (mr *MockIDMockRecorder) New() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockID)(nil).New))

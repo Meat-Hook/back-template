@@ -34,6 +34,7 @@ func configureAPI(api *operations.UserServiceAPI) http.Handler {
 	// api.UseRedoc()
 
 	api.JSONConsumer = runtime.JSONConsumer()
+	api.MultipartformConsumer = runtime.DiscardConsumer
 
 	api.JSONProducer = runtime.JSONProducer()
 
@@ -49,10 +50,17 @@ func configureAPI(api *operations.UserServiceAPI) http.Handler {
 	//
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
+	// You may change here the memory limit for this multipart form parser. Below is the default (32 MB).
+	// operations.NewAvatarMaxParseMemory = 32 << 20
 
 	if api.CreateUserHandler == nil {
 		api.CreateUserHandler = operations.CreateUserHandlerFunc(func(params operations.CreateUserParams) operations.CreateUserResponder {
 			return operations.CreateUserNotImplemented()
+		})
+	}
+	if api.DeleteAvatarHandler == nil {
+		api.DeleteAvatarHandler = operations.DeleteAvatarHandlerFunc(func(params operations.DeleteAvatarParams, principal *app.Session) operations.DeleteAvatarResponder {
+			return operations.DeleteAvatarNotImplemented()
 		})
 	}
 	if api.DeleteUserHandler == nil {
@@ -78,6 +86,11 @@ func configureAPI(api *operations.UserServiceAPI) http.Handler {
 	if api.LogoutHandler == nil {
 		api.LogoutHandler = operations.LogoutHandlerFunc(func(params operations.LogoutParams, principal *app.Session) operations.LogoutResponder {
 			return operations.LogoutNotImplemented()
+		})
+	}
+	if api.NewAvatarHandler == nil {
+		api.NewAvatarHandler = operations.NewAvatarHandlerFunc(func(params operations.NewAvatarParams, principal *app.Session) operations.NewAvatarResponder {
+			return operations.NewAvatarNotImplemented()
 		})
 	}
 	if api.UpdatePasswordHandler == nil {

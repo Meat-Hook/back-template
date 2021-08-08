@@ -6,13 +6,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/client/operations"
-	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/models"
-	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
 	"github.com/go-openapi/strfmt"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/client/operations"
+	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/models"
+	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
 )
 
 func TestService_GetFile(t *testing.T) {
@@ -20,14 +21,14 @@ func TestService_GetFile(t *testing.T) {
 	assert := require.New(t)
 
 	file, err := os.Open(testFile)
-	assert.Nil(err)
+	assert.NoError(err)
 	stat, err := file.Stat()
-	assert.Nil(err)
+	assert.NoError(err)
 
 	fileBuf, err := io.ReadAll(file)
-	assert.Nil(err)
+	assert.NoError(err)
 	_, err = file.Seek(0, io.SeekStart)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	appFile := app.File{
 		ReadSeekCloser: file,
@@ -61,10 +62,10 @@ func TestService_GetFile(t *testing.T) {
 
 			res, err := client.Operations.GetFile(params, b)
 			if tc.wantErr == nil {
-				assert.Nil(err)
+				assert.NoError(err)
 				assert.Equal(tc.want, b.Bytes())
 			} else {
-				assert.Nil(res)
+				assert.NoError(res)
 				assert.Equal(tc.wantErr, errPayload(err))
 			}
 		})

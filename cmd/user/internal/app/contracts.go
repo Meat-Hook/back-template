@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"io"
 
 	"github.com/gofrs/uuid"
 )
@@ -41,8 +42,8 @@ type (
 		Compare(hashedPassword []byte, password []byte) bool
 	}
 
-	// Auth module for get user session by token.
-	Auth interface {
+	// AuthSvc module for manager user session.
+	AuthSvc interface {
 		// Session returns user session by his token.
 		// Errors: ErrNotFound, unknown.
 		Session(ctx context.Context, token string) (*Session, error)
@@ -52,5 +53,15 @@ type (
 		// RemoveSession removes session by id.
 		// Errors: ErrNotFound, unknown.
 		RemoveSession(ctx context.Context, sessionID uuid.UUID) error
+	}
+
+	// FileSvc module for manage files.
+	FileSvc interface {
+		// Upload file to database.
+		// Errors: unknown.
+		Upload(ctx context.Context, file io.Reader) (uuid.UUID, error)
+		// Delete remove file from database.
+		// Errors: ErrNotFound, unknown.
+		Delete(ctx context.Context, uuid uuid.UUID) error
 	}
 )

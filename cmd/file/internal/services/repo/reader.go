@@ -5,9 +5,10 @@ import (
 	"io"
 	"os"
 
-	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"
+
+	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
 )
 
 var _ io.ReadSeekCloser = &file{}
@@ -44,7 +45,7 @@ func (f *file) Read(dst []byte) (n int, err error) {
 		const query = `select * from chunks where id = $1;`
 		err = f.db.Get(chunk, query, f.chunks.Elements[stoppedAtChunk])
 		if err != nil {
-			return 0, f.lastErr(fmt.Errorf("get chunk: %w", convertErr(err)))
+			return 0, f.lastErr(fmt.Errorf("f.db.Get: %w", convertErr(err)))
 		}
 
 		f.chunkCached = int64(stoppedAtChunk)

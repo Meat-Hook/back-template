@@ -1,0 +1,50 @@
+{
+  "user": {
+    "db": {
+      "dsn": "postgresql://root:root@user-db:26257/defaultdb?sslmode=disable",
+      "driver": "postgres",
+      "migrate_dir": "user/migrate"
+    },
+    "server": {
+      "host": "0.0.0.0",
+      "port": {
+        "web": 15000,
+        "metric": 20000
+      }
+    },
+    "services": {
+      "session_addr": "localhost:10001",
+      "file_addr": "localhost:10002"
+    }
+  },
+  "session": {
+    "db": {
+      "dsn": "postgresql://root:root@session-db:26257/defaultdb?sslmode=disable",
+      "driver": "postgres",
+      "migrate_dir": "session/migrate"
+    },
+    "server": {
+      "host": "0.0.0.0",
+      "port": {
+        "grpc": 10001,
+        "metric": 20001
+      }
+    },
+    "auth_key": "super-duper-secret-key-qwertyuio"
+  },
+  "file": {
+    "db": {
+      "dsn": "postgresql://root:root@file-db:26257/defaultdb?sslmode=disable",
+      "driver": "postgres",
+      "migrate_dir": "file/migrate"
+    },
+    "server": {
+      "host": "0.0.0.0",
+      "port": {
+        "grpc": 10002,
+        "web": 15002,
+        "metric": 20002
+      }
+    }
+  }
+}

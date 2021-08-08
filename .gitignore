@@ -2,3 +2,4 @@
 volume
 bin/
 vendor
+cfg.json

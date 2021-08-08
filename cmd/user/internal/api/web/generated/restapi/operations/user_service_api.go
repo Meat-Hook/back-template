@@ -40,12 +40,16 @@ func NewUserServiceAPI(spec *loads.Document) *UserServiceAPI {
 		APIKeyAuthenticator: security.APIKeyAuth,
 		BearerAuthenticator: security.BearerAuth,
 
-		JSONConsumer: runtime.JSONConsumer(),
+		JSONConsumer:          runtime.JSONConsumer(),
+		MultipartformConsumer: runtime.DiscardConsumer,
 
 		JSONProducer: runtime.JSONProducer(),
 
 		CreateUserHandler: CreateUserHandlerFunc(func(params CreateUserParams) CreateUserResponder {
 			return CreateUserNotImplemented()
+		}),
+		DeleteAvatarHandler: DeleteAvatarHandlerFunc(func(params DeleteAvatarParams, principal *app.Session) DeleteAvatarResponder {
+			return DeleteAvatarNotImplemented()
 		}),
 		DeleteUserHandler: DeleteUserHandlerFunc(func(params DeleteUserParams, principal *app.Session) DeleteUserResponder {
 			return DeleteUserNotImplemented()
@@ -61,6 +65,9 @@ func NewUserServiceAPI(spec *loads.Document) *UserServiceAPI {
 		}),
 		LogoutHandler: LogoutHandlerFunc(func(params LogoutParams, principal *app.Session) LogoutResponder {
 			return LogoutNotImplemented()
+		}),
+		NewAvatarHandler: NewAvatarHandlerFunc(func(params NewAvatarParams, principal *app.Session) NewAvatarResponder {
+			return NewAvatarNotImplemented()
 		}),
 		UpdatePasswordHandler: UpdatePasswordHandlerFunc(func(params UpdatePasswordParams, principal *app.Session) UpdatePasswordResponder {
 			return UpdatePasswordNotImplemented()
@@ -112,6 +119,9 @@ type UserServiceAPI struct {
 	// JSONConsumer registers a consumer for the following mime types:
 	//   - application/json
 	JSONConsumer runtime.Consumer
+	// MultipartformConsumer registers a consumer for the following mime types:
+	//   - multipart/form-data
+	MultipartformConsumer runtime.Consumer
 
 	// JSONProducer registers a producer for the following mime types:
 	//   - application/json
@@ -126,6 +136,8 @@ type UserServiceAPI struct {
 
 	// CreateUserHandler sets the operation handler for the create user operation
 	CreateUserHandler CreateUserHandler
+	// DeleteAvatarHandler sets the operation handler for the delete avatar operation
+	DeleteAvatarHandler DeleteAvatarHandler
 	// DeleteUserHandler sets the operation handler for the delete user operation
 	DeleteUserHandler DeleteUserHandler
 	// GetUserHandler sets the operation handler for the get user operation
@@ -136,6 +148,8 @@ type UserServiceAPI struct {
 	LoginHandler LoginHandler
 	// LogoutHandler sets the operation handler for the logout operation
 	LogoutHandler LogoutHandler
+	// NewAvatarHandler sets the operation handler for the new avatar operation
+	NewAvatarHandler NewAvatarHandler
 	// UpdatePasswordHandler sets the operation handler for the update password operation
 	UpdatePasswordHandler UpdatePasswordHandler
 	// UpdateUsernameHandler sets the operation handler for the update username operation
@@ -216,6 +230,9 @@ func (o *UserServiceAPI) Validate() error {
 	if o.JSONConsumer == nil {
 		unregistered = append(unregistered, "JSONConsumer")
 	}
+	if o.MultipartformConsumer == nil {
+		unregistered = append(unregistered, "MultipartformConsumer")
+	}
 
 	if o.JSONProducer == nil {
 		unregistered = append(unregistered, "JSONProducer")
@@ -227,6 +244,9 @@ func (o *UserServiceAPI) Validate() error {
 
 	if o.CreateUserHandler == nil {
 		unregistered = append(unregistered, "CreateUserHandler")
+	}
+	if o.DeleteAvatarHandler == nil {
+		unregistered = append(unregistered, "DeleteAvatarHandler")
 	}
 	if o.DeleteUserHandler == nil {
 		unregistered = append(unregistered, "DeleteUserHandler")
@@ -242,6 +262,9 @@ func (o *UserServiceAPI) Validate() error {
 	}
 	if o.LogoutHandler == nil {
 		unregistered = append(unregistered, "LogoutHandler")
+	}
+	if o.NewAvatarHandler == nil {
+		unregistered = append(unregistered, "NewAvatarHandler")
 	}
 	if o.UpdatePasswordHandler == nil {
 		unregistered = append(unregistered, "UpdatePasswordHandler")
@@ -297,6 +320,8 @@ func (o *UserServiceAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Co
 		switch mt {
 		case "application/json":
 			result["application/json"] = o.JSONConsumer
+		case "multipart/form-data":
+			result["multipart/form-data"] = o.MultipartformConsumer
 		}
 
 		if c, ok := o.customConsumers[mt]; ok {
@@ -361,6 +386,10 @@ func (o *UserServiceAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/avatar"] = NewDeleteAvatar(o.context, o.DeleteAvatarHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/user"] = NewDeleteUser(o.context, o.DeleteUserHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -378,6 +407,10 @@ func (o *UserServiceAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/logout"] = NewLogout(o.context, o.LogoutHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/avatar"] = NewNewAvatar(o.context, o.NewAvatarHandler)
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}

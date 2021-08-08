@@ -26,11 +26,6 @@ type LoginOK struct {
 
 	 */
 	SetCookie string `json:"Set-Cookie"`
-
-	/*
-	  In: Body
-	*/
-	Payload *models.User `json:"body,omitempty"`
 }
 
 // NewLoginOK creates LoginOK with default headers values
@@ -50,17 +45,6 @@ func (o *LoginOK) SetSetCookie(setCookie string) {
 	o.SetCookie = setCookie
 }
 
-// WithPayload adds the payload to the login o k response
-func (o *LoginOK) WithPayload(payload *models.User) *LoginOK {
-	o.Payload = payload
-	return o
-}
-
-// SetPayload sets the payload to the login o k response
-func (o *LoginOK) SetPayload(payload *models.User) {
-	o.Payload = payload
-}
-
 // WriteResponse to the client
 func (o *LoginOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
@@ -71,13 +55,9 @@ func (o *LoginOK) WriteResponse(rw http.ResponseWriter, producer runtime.Produce
 		rw.Header().Set("Set-Cookie", setCookie)
 	}
 
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
 	rw.WriteHeader(200)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
-	}
 }
 
 func (o *LoginOK) LoginResponder() {}

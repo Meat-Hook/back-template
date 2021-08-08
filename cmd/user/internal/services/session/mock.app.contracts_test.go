@@ -6,35 +6,67 @@ package session_test
 
 import (
 	context "context"
-	client "github.com/Meat-Hook/back-template/cmd/session/client"
-	gomock "github.com/golang/mock/gomock"
+	net "net"
 	reflect "reflect"
+
+	client "github.com/Meat-Hook/back-template/cmd/session/client"
+	uuid "github.com/gofrs/uuid"
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MocksessionSvc is a mock of sessionSvc interface
+// MocksessionSvc is a mock of sessionSvc interface.
 type MocksessionSvc struct {
 	ctrl     *gomock.Controller
 	recorder *MocksessionSvcMockRecorder
 }
 
-// MocksessionSvcMockRecorder is the mock recorder for MocksessionSvc
+// MocksessionSvcMockRecorder is the mock recorder for MocksessionSvc.
 type MocksessionSvcMockRecorder struct {
 	mock *MocksessionSvc
 }
 
-// NewMocksessionSvc creates a new mock instance
+// NewMocksessionSvc creates a new mock instance.
 func NewMocksessionSvc(ctrl *gomock.Controller) *MocksessionSvc {
 	mock := &MocksessionSvc{ctrl: ctrl}
 	mock.recorder = &MocksessionSvcMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MocksessionSvc) EXPECT() *MocksessionSvcMockRecorder {
 	return m.recorder
 }
 
-// Session mocks base method
+// NewSession mocks base method.
+func (m *MocksessionSvc) NewSession(ctx context.Context, userID uuid.UUID, ip net.IP, userAgent string) (*client.Token, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewSession", ctx, userID, ip, userAgent)
+	ret0, _ := ret[0].(*client.Token)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewSession indicates an expected call of NewSession.
+func (mr *MocksessionSvcMockRecorder) NewSession(ctx, userID, ip, userAgent interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSession", reflect.TypeOf((*MocksessionSvc)(nil).NewSession), ctx, userID, ip, userAgent)
+}
+
+// RemoveSession mocks base method.
+func (m *MocksessionSvc) RemoveSession(ctx context.Context, sessionID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSession", ctx, sessionID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveSession indicates an expected call of RemoveSession.
+func (mr *MocksessionSvcMockRecorder) RemoveSession(ctx, sessionID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSession", reflect.TypeOf((*MocksessionSvc)(nil).RemoveSession), ctx, sessionID)
+}
+
+// Session mocks base method.
 func (m *MocksessionSvc) Session(ctx context.Context, token string) (*client.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, token)
@@ -43,7 +75,7 @@ func (m *MocksessionSvc) Session(ctx context.Context, token string) (*client.Ses
 	return ret0, ret1
 }
 
-// Session indicates an expected call of Session
+// Session indicates an expected call of Session.
 func (mr *MocksessionSvcMockRecorder) Session(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MocksessionSvc)(nil).Session), ctx, token)

@@ -1,8 +1,9 @@
-// Package client provide to internal method of service session.
+// Package client provide to internal method of service file.
 package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -20,12 +21,12 @@ import (
 
 // Client to file microservice.
 type Client struct {
-	conn pb.FileServiceClient
+	conn pb.ServiceClient
 }
 
 // New build and returns new client to microservice session.
 func New(conn grpc.ClientConnInterface) *Client {
-	return &Client{conn: pb.NewFileServiceClient(conn)}
+	return &Client{conn: pb.NewServiceClient(conn)}
 }
 
 // Errors.
@@ -41,15 +42,15 @@ func (c *Client) Upload(ctx context.Context, r io.Reader) (uuid.UUID, error) {
 
 	stream, err := c.conn.Upload(ctx)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("conn upload: %w", err)
+		return uuid.Nil, fmt.Errorf("c.conn.Upload: %w", err)
 	}
 
 	buf := make([]byte, app.MaxChunkSize)
 
 	for {
 		n, err := r.Read(buf)
-		if err != nil {
-			return uuid.Nil, fmt.Errorf("file read: %w", err)
+		if err != nil && !errors.Is(err, io.EOF) {
+			return uuid.Nil, fmt.Errorf("r.Read: %w", err)
 		}
 
 		if n == 0 {
@@ -64,18 +65,18 @@ func (c *Client) Upload(ctx context.Context, r io.Reader) (uuid.UUID, error) {
 
 		err = stream.Send(in)
 		if err != nil {
-			return uuid.Nil, fmt.Errorf("stream send: %w", err)
+			return uuid.Nil, fmt.Errorf("stream.Send: %w", err)
 		}
 	}
 
 	res, err := stream.CloseAndRecv()
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("close and recv: %w", err)
+		return uuid.Nil, fmt.Errorf("stream.CloseAndRecv: %w", err)
 	}
 
 	id, err := uuid.FromString(res.FileId.Value)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("uuid from string: %w", err)
+		return uuid.Nil, fmt.Errorf("uuid.FromString: %w", err)
 	}
 
 	return id, nil
@@ -89,7 +90,7 @@ func (c *Client) SetMetadata(ctx context.Context, fileID uuid.UUID, fileMD map[s
 
 	details, err := structpb.NewStruct(fileMD)
 	if err != nil {
-		return fmt.Errorf("structpb new struct: %w", err)
+		return fmt.Errorf("structpb.NewStruct: %w", err)
 	}
 
 	in := &pb.SetMetadataRequest{
@@ -102,7 +103,7 @@ func (c *Client) SetMetadata(ctx context.Context, fileID uuid.UUID, fileMD map[s
 	case status.Code(err) == codes.NotFound:
 		return ErrNotFound
 	case err != nil:
-		return fmt.Errorf("set metadata: %w", err)
+		return fmt.Errorf("c.conn.SetMetadata: %w", err)
 	}
 
 	return nil
@@ -122,7 +123,7 @@ func (c *Client) Delete(ctx context.Context, fileID uuid.UUID) error {
 
 	_, err := c.conn.Delete(ctx, in)
 	if err != nil {
-		return fmt.Errorf("conn delete: %w", err)
+		return fmt.Errorf("c.conn.Delete: %w", err)
 	}
 
 	return nil

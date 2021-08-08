@@ -7,7 +7,9 @@ import (
 
 // NewServerMetrics returns gRPC server metrics.
 // Do not forget to call .InitializeMetrics(server) on returned value.
-func NewServerMetrics(reg *prometheus.Registry, namespace, subsystem string) *grpc_prometheus.ServerMetrics {
+func NewServerMetrics(reg *prometheus.Registry, namespace string) *grpc_prometheus.ServerMetrics {
+	const subsystem = `rpc_server`
+
 	serverMetrics := grpc_prometheus.NewServerMetrics(func(o *prometheus.CounterOpts) {
 		o.Namespace = namespace
 		o.Subsystem = subsystem
@@ -21,7 +23,9 @@ func NewServerMetrics(reg *prometheus.Registry, namespace, subsystem string) *gr
 }
 
 // NewClientMetrics returns gRPC client metrics.
-func NewClientMetrics(reg *prometheus.Registry, namespace, subsystem string) *grpc_prometheus.ClientMetrics {
+func NewClientMetrics(reg *prometheus.Registry, namespace string) *grpc_prometheus.ClientMetrics {
+	const subsystem = `rpc_client`
+
 	clientMetrics := grpc_prometheus.NewClientMetrics(func(o *prometheus.CounterOpts) {
 		o.Namespace = namespace
 		o.Subsystem = subsystem

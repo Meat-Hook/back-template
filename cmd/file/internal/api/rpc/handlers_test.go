@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
-	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -19,6 +17,9 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
 )
 
 var (
@@ -34,7 +35,7 @@ type fileMatcher struct {
 
 func (f fileMatcher) Matches(x interface{}) bool {
 	argFile, err := io.ReadAll(x.(io.Reader))
-	f.assert.Nil(err)
+	f.assert.NoError(err)
 
 	return bytes.Equal(argFile, f.file)
 }
@@ -48,13 +49,13 @@ func TestApi_Upload(t *testing.T) {
 	assert := require.New(t)
 
 	file, err := os.Open(testFile)
-	assert.Nil(err)
+	assert.NoError(err)
 	t.Cleanup(func() {
-		assert.Nil(file.Close())
+		assert.NoError(file.Close())
 	})
 
 	buf, err := io.ReadAll(file)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	testCases := map[string]struct {
 		file    io.Reader
@@ -81,14 +82,14 @@ func TestApi_Upload(t *testing.T) {
 				Return(tc.appRes, tc.appErr)
 
 			stream, err := c.Upload(ctx)
-			assert.Nil(err)
+			assert.NoError(err)
 
 			buf = make([]byte, app.MaxChunkSize)
 
 			for {
 				n, err := tc.file.Read(buf)
 				if err != nil && !errors.Is(err, io.EOF) {
-					assert.Nil(err)
+					assert.NoError(err)
 				}
 
 				if n == 0 {
@@ -102,7 +103,7 @@ func TestApi_Upload(t *testing.T) {
 				}
 
 				err = stream.Send(in)
-				assert.Nil(err)
+				assert.NoError(err)
 			}
 
 			res, err := stream.CloseAndRecv()
@@ -144,12 +145,12 @@ func TestApi_SetMetadata(t *testing.T) {
 			c, mockApp, assert := start(t)
 
 			js, err := json.Marshal(md)
-			assert.Nil(err)
+			assert.NoError(err)
 
 			mockApp.EXPECT().SetMetadata(gomock.Any(), tc.fileID, js).Return(tc.appErr)
 
 			st, err := structpb.NewStruct(md)
-			assert.Nil(err)
+			assert.NoError(err)
 
 			_, err = c.SetMetadata(ctx, &pb.SetMetadataRequest{
 				FileId: &pb.UUID{Value: tc.fileID.String()},

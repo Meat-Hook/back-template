@@ -25,13 +25,14 @@ func TestRepo_Smoke(t *testing.T) {
 	user2 := user
 
 	id, err := r.Save(ctx, user)
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.NotNil(id)
 	user.ID = id
 
 	user.Name = "new_username"
+	user.Avatars = []uuid.UUID{uuid.Must(uuid.NewV4())}
 	err = r.Update(ctx, user)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	_, err = r.Save(ctx, user2)
 	assert.ErrorIs(err, app.ErrEmailExist)
@@ -42,26 +43,26 @@ func TestRepo_Smoke(t *testing.T) {
 	assert.ErrorIs(err, app.ErrUsernameExist)
 
 	res, err := r.ByID(ctx, user.ID)
-	assert.Nil(err)
+	assert.NoError(err)
 	user.CreatedAt = res.CreatedAt
 	user.UpdatedAt = res.UpdatedAt
 	assert.Equal(user, *res)
 
 	res, err = r.ByEmail(ctx, user.Email)
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.Equal(user, *res)
 
 	res, err = r.ByUsername(ctx, user.Name)
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.Equal(user, *res)
 
 	listRes, total, err := r.ListUserByUsername(ctx, user.Name, app.SearchParams{Limit: 5})
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.Equal(1, total)
 	assert.Equal([]app.User{user}, listRes)
 
 	err = r.Delete(ctx, id)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	res, err = r.ByID(ctx, user.ID)
 	assert.Nil(res)

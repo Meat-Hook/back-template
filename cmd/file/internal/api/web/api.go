@@ -17,9 +17,8 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi/operations"
 	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
-	http2 "github.com/Meat-Hook/back-template/libs/http"
 	"github.com/Meat-Hook/back-template/libs/log"
-	"github.com/Meat-Hook/back-template/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/web"
 )
 
 //go:generate mockgen -source=api.go -destination mock.app.contracts_test.go -package web_test
@@ -42,7 +41,8 @@ type (
 )
 
 // New returns Swagger server configured to listen on the TCP network.
-func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) (*restapi.Server, error) {
+func New(ctx context.Context, module application, m *web.Metric, cfg Config) (*restapi.Server, error) {
+	logger := zerolog.Ctx(ctx)
 	svc := &service{
 		app: module,
 	}
@@ -53,7 +53,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	}
 
 	api := operations.NewFileServiceAPI(swaggerSpec)
-	swaggerLogger := logger.With().Str(log.Name, "swagger").Logger()
+	swaggerLogger := logger.With().Str(log.Subsystem, "swagger").Logger()
 	api.Logger = swaggerLogger.Printf
 
 	api.GetFileHandler = operations.GetFileHandlerFunc(svc.getFile)
@@ -65,8 +65,8 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 	// The middlewareFunc executes before anything.
 	globalMiddlewares := func(handler http.Handler) http.Handler {
 		xffmw, _ := xff.Default()
-		createLog := http2.CreateLogger(logger.With())
-		accesslog := http2.AccessLog(m)
+		createLog := web.CreateLogger(logger.With())
+		accesslog := web.AccessLog(m)
 		redocOpts := swag_middleware.RedocOpts{
 			BasePath: swaggerSpec.BasePath(),
 			Path:     "",
@@ -75,7 +75,7 @@ func New(module application, logger zerolog.Logger, m *metrics.API, cfg Config) 
 			Title:    "",
 		}
 
-		return xffmw.Handler(createLog(http2.Recovery(accesslog(http2.Health(
+		return xffmw.Handler(createLog(web.Recovery(accesslog(web.Health(
 			swag_middleware.Spec(swaggerSpec.BasePath(), restapi.FlatSwaggerJSON,
 				swag_middleware.Redoc(redocOpts, handler)))))))
 	}

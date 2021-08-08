@@ -3,15 +3,17 @@ package client_test
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
+	"os"
 	"reflect"
 	"testing"
 
 	"github.com/gofrs/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/xid"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -19,47 +21,48 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/Meat-Hook/back-template/cmd/file/client"
-	"github.com/Meat-Hook/back-template/cmd/file/internal/api/rpc"
+	server_rpc "github.com/Meat-Hook/back-template/cmd/file/internal/api/rpc"
 	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
 	"github.com/Meat-Hook/back-template/libs/log"
-	librpc "github.com/Meat-Hook/back-template/libs/rpc"
+	"github.com/Meat-Hook/back-template/libs/rpc"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
 )
 
 var (
-	reqID = xid.New()
-	ctx   = log.ReqIDWithCtx(context.Background(), reqID.String())
-
-	errAny = errors.New("any err")
+	logger       = zerolog.New(os.Stdout)
+	reqID        = xid.New()
+	ctx          = log.ReqIDWithCtx(context.Background(), reqID.String())
+	reg          = prometheus.NewPedanticRegistry()
+	clientMetric = rpc.NewClientMetrics(reg, "test")
 )
 
 func start(t *testing.T, fileID uuid.UUID, fileMD json.RawMessage, file []byte) (*client.Client, *serverMock, *require.Assertions) {
 	t.Helper()
-	r := require.New(t)
+	assert := require.New(t)
 
 	mock := &serverMock{
-		assert:   r,
+		assert:   assert,
 		fileID:   fileID,
 		metadata: fileMD,
 		file:     file,
 	}
 
 	srv := grpc.NewServer()
-	pb.RegisterFileServiceServer(srv, mock)
+	pb.RegisterServiceServer(srv, mock)
 	ln, err := net.Listen("tcp", "")
-	r.Nil(err)
-	go func() { r.Nil(srv.Serve(ln)) }()
+	assert.NoError(err)
+	go func() { assert.NoError(srv.Serve(ln)) }()
 	t.Cleanup(srv.Stop)
 
-	conn, err := librpc.Client(ctx, ln.Addr().String())
-	r.Nil(err)
+	conn, err := rpc.Dial(ctx, logger, ln.Addr().String(), clientMetric)
+	assert.NoError(err)
 
 	svc := client.New(conn)
 
-	return svc, mock, r
+	return svc, mock, assert
 }
 
-var _ pb.FileServiceServer = &serverMock{}
+var _ pb.ServiceServer = &serverMock{}
 
 type serverMock struct {
 	assert   *require.Assertions
@@ -68,9 +71,9 @@ type serverMock struct {
 	file     []byte
 }
 
-func (s serverMock) Upload(stream pb.FileService_UploadServer) error {
-	res, err := ioutil.ReadAll(rpc.NewReader(stream))
-	s.assert.Nil(err)
+func (s serverMock) Upload(stream pb.Service_UploadServer) error {
+	res, err := ioutil.ReadAll(server_rpc.NewReader(stream))
+	s.assert.NoError(err)
 
 	s.assert.Equal(s.file, res)
 

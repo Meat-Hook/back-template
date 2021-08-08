@@ -10,14 +10,14 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// API contains main metrics for http methods.
+// API contains main metrics for web methods.
 type API struct {
 	ReqInFlight prometheus.Gauge
 	ReqTotal    *prometheus.CounterVec
 	ReqDuration *prometheus.HistogramVec
 }
 
-// HTTP registers and returns common http metrics used by all
+// HTTP registers and returns common web metrics used by all
 // services (namespace).
 func HTTP(service string, swagger json.RawMessage) (metric API) {
 	const subsystem = "api"

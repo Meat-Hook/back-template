@@ -13,7 +13,8 @@
 //    - application/json
 //
 //  Produces:
-//    - application/octet-stream
+//    - image/jpeg
+//    - image/png
 //
 // swagger:meta
 package restapi

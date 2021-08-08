@@ -8,7 +8,8 @@ info:
 basePath: /file/api/v1
 
 produces:
-  - application/octet-stream
+  - image/png
+  - image/jpeg
 
 definitions:
 

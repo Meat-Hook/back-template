@@ -19,7 +19,8 @@ var (
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
   "produces": [
-    "application/octet-stream"
+    "image/png",
+    "image/jpeg"
   ],
   "swagger": "2.0",
   "info": {
@@ -82,7 +83,8 @@ func init() {
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "produces": [
-    "application/octet-stream"
+    "image/jpeg",
+    "image/png"
   ],
   "swagger": "2.0",
   "info": {

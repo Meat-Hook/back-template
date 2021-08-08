@@ -62,12 +62,12 @@ func UnaryServerAccessLog(ctx context.Context, req interface{}, _ *grpc.UnarySer
 }
 
 // MakeUnaryClientLogger returns a new unary client interceptor that contains request logger.
-func MakeUnaryClientLogger(logger zerolog.Logger) grpc.UnaryClientInterceptor {
-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-		l := newRPCLogger(ctx, logger, method)
-		ctx = l.WithContext(ctx)
-		return invoker(ctx, method, req, reply, cc, opts...)
-	}
+func MakeUnaryClientLogger(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	logger := *zerolog.Ctx(ctx)
+
+	logger = newRPCLogger(ctx, logger, method)
+	ctx = logger.WithContext(ctx)
+	return invoker(ctx, method, req, reply, cc, opts...)
 }
 
 // UnaryClientAccessLog returns a new unary client interceptor that logs request status.

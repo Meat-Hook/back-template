@@ -1,11 +1,19 @@
 package web_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
+
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/swag"
+	"github.com/golang/mock/gomock"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/require"
 
 	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web"
 	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/client"
@@ -13,22 +21,18 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/cmd/file/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/libs/metrics"
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
-	"github.com/golang/mock/gomock"
-	"github.com/rs/zerolog"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	libweb "github.com/Meat-Hook/back-template/libs/web"
 )
 
 var (
 	errAny = errors.New("any error")
+	reg    = prometheus.NewPedanticRegistry()
 )
 
 const testFile = `test.jpg`
 
 func TestMain(m *testing.M) {
-	metrics.InitMetrics()
+	metrics.InitMetrics(reg)
 
 	os.Exit(m.Run())
 }
@@ -38,20 +42,21 @@ func start(t *testing.T) (string, *Mockapplication, *client.FileService, *requir
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMockapplication(ctrl)
+	assert := require.New(t)
 
 	log := zerolog.New(os.Stdout)
-	m := metrics.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi.FlatSwaggerJSON)
-	server, err := web.New(mockApp, log, &m, web.Config{})
-	assert.NoError(t, err, "web.New")
-	assert.NoError(t, server.Listen(), "server.Listen")
+	webMetric := libweb.NewMetric(reg, strings.Replace(t.Name(), "/", "_", -1), restapi.FlatSwaggerJSON)
+	server, err := web.New(log.WithContext(context.Background()), mockApp, &webMetric, web.Config{})
+	assert.NoError(err, "web.New")
+	assert.NoError(server.Listen(), "server.Listen")
 
 	errc := make(chan error, 1)
 	go func() { errc <- server.Serve() }()
 	t.Cleanup(func() {
 		t.Helper()
 
-		assert.Nil(t, server.Shutdown(), "server.Shutdown")
-		assert.Nil(t, <-errc, "server.Serve")
+		assert.NoError(server.Shutdown(), "server.Shutdown")
+		assert.NoError(<-errc, "server.Serve")
 	})
 
 	url := fmt.Sprintf("%s:%d", client.DefaultHost, server.Port)

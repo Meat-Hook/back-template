@@ -12,12 +12,12 @@ var _ io.Reader = &Reader{}
 
 // Reader implements io.Reader for gRPC stream.
 type Reader struct {
-	stream pb.FileService_UploadServer
+	stream pb.Service_UploadServer
 	cache  []byte
 }
 
 // NewReader build new instance gRPC reader.
-func NewReader(stream pb.FileService_UploadServer) io.Reader {
+func NewReader(stream pb.Service_UploadServer) io.Reader {
 	return &Reader{
 		stream: stream,
 		cache:  []byte{},

@@ -1,6 +1,8 @@
 package app
 
 import (
+	"encoding/json"
+	"io"
 	"net"
 	"time"
 
@@ -25,6 +27,7 @@ type (
 		ID        uuid.UUID
 		Email     string
 		Name      string
+		Avatars   []uuid.UUID
 		PassHash  []byte
 		CreatedAt time.Time
 		UpdatedAt time.Time
@@ -44,5 +47,16 @@ type (
 	Origin struct {
 		IP        net.IP
 		UserAgent string
+	}
+
+	// File contains file info.
+	File struct {
+		io.ReadCloser
+		// ID file id.
+		ID uuid.UUID
+		// Size contains file size.
+		Size int64
+		// Metadata contains file meta info.
+		Metadata json.RawMessage
 	}
 )

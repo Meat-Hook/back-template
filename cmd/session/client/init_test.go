@@ -26,8 +26,9 @@ var (
 	reqID  = xid.New()
 	ctx    = log.ReqIDWithCtx(context.Background(), reqID.String())
 
-	errAny = errors.New("any err")
-	reg    = prometheus.NewPedanticRegistry()
+	errAny       = errors.New("any err")
+	reg          = prometheus.NewPedanticRegistry()
+	clientMetric = rpc.NewClientMetrics(reg, "test")
 )
 
 func TestMain(m *testing.M) {
@@ -38,7 +39,7 @@ func TestMain(m *testing.M) {
 
 func start(t *testing.T) (*client.Client, *MockServiceServer, *require.Assertions) {
 	t.Helper()
-	r := require.New(t)
+	assert := require.New(t)
 
 	ctrl := gomock.NewController(t)
 	mock := NewMockServiceServer(ctrl)
@@ -46,17 +47,17 @@ func start(t *testing.T) (*client.Client, *MockServiceServer, *require.Assertion
 	srv := grpc.NewServer()
 	pb.RegisterServiceServer(srv, mock)
 	ln, err := net.Listen("tcp", "")
-	r.Nil(err)
-	go func() { r.Nil(srv.Serve(ln)) }()
+	assert.NoError(err)
+	go func() { assert.NoError(srv.Serve(ln)) }()
 
 	t.Cleanup(func() {
 		srv.Stop()
 	})
 
-	conn, err := rpc.Dial(ctx, logger, ln.Addr().String(), rpc.NewClientMetrics(reg, "test", "grpc_client"))
-	r.Nil(err)
+	conn, err := rpc.Dial(ctx, logger, ln.Addr().String(), clientMetric)
+	assert.NoError(err)
 
 	svc := client.New(conn)
 
-	return svc, mock, r
+	return svc, mock, assert
 }

@@ -1,4 +1,4 @@
-// Package db contains implements for app.Repo.
+// Package repo contains implements for app.Repo.
 // Provide file chunk to and from repository.
 package repo
 
@@ -9,11 +9,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
-	"github.com/Meat-Hook/back-template/libs/metrics"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jmoiron/sqlx"
+
+	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
+	"github.com/Meat-Hook/back-template/libs/db"
 )
 
 var _ app.Repo = &Repo{}
@@ -21,8 +22,7 @@ var _ app.Repo = &Repo{}
 type (
 	// Repo provided data from and to database.
 	Repo struct {
-		db     *sqlx.DB
-		metric *metrics.Database
+		db *db.DB
 	}
 
 	fileInfo struct {
@@ -53,59 +53,34 @@ func (f *fileInfo) convert(r *file) *app.File {
 }
 
 // New build and returns user db.
-func New(db *sqlx.DB, m *metrics.Database) *Repo {
+func New(r *db.DB) *Repo {
 	return &Repo{
-		db:     db,
-		metric: m,
+		db: r,
 	}
 }
 
 // Save for implements app.Repo.
 func (r *Repo) Save(ctx context.Context, reader io.Reader) (res uuid.UUID, err error) {
-	err = r.metric.Collect(func() (err error) {
-		tx, err := r.db.BeginTxx(ctx, nil)
-		if err != nil {
-			return fmt.Errorf("begin tx: %w", convertErr(err))
-		}
-		defer func() {
-			if err != nil {
-				txRollbackErr := tx.Rollback()
-				if txRollbackErr != nil {
-					err = fmt.Errorf("%w: rollback with err: %s", err, txRollbackErr)
-				}
-			}
-		}()
+	err = r.db.Tx(ctx, nil, func(tx *sqlx.Tx) (err error) {
 
 		const querySaveFile = `
-			insert into files default values returning id
+			insert into files default values returning *
 		`
 
 		file := &fileInfo{}
-		err = tx.GetContext(ctx, file, querySaveFile)
+		err = tx.QueryRowxContext(ctx, querySaveFile).StructScan(file)
 		if err != nil {
-			return fmt.Errorf("save file info: %w", convertErr(err))
+			return fmt.Errorf("tx.QueryRowxContext: %w", convertErr(err))
 		}
 
-		const querySaveChunk = `insert into chunks (file_id, bytes) values ($1, $2) returning id`
-
-		stmt, err := tx.Preparex(querySaveChunk)
-		if err != nil {
-			return fmt.Errorf("tx prepare: %w", err)
-		}
-		defer func() {
-			if err != nil {
-				stmtErr := stmt.Close()
-				if stmtErr != nil {
-					err = fmt.Errorf("%w: close stmt err: %s", err, stmtErr)
-				}
-			}
-		}()
+		const querySaveChunk = `insert into chunks (file_id, bytes) values ($1, $2) returning *`
 
 		buf := make([]byte, app.MaxChunkSize)
+		i := 0
 		for {
 			n, err := reader.Read(buf)
 			if err != nil && !errors.Is(err, io.EOF) {
-				return fmt.Errorf("file read: %w", convertErr(err))
+				return fmt.Errorf("reader.Read: %w", convertErr(err))
 			}
 
 			if n == 0 {
@@ -113,17 +88,21 @@ func (r *Repo) Save(ctx context.Context, reader io.Reader) (res uuid.UUID, err e
 			}
 
 			fileChunk := &chunk{}
-			err = stmt.GetContext(ctx, fileChunk, file.ID, buf[:n])
+			err = tx.QueryRowxContext(ctx, querySaveChunk, file.ID, pgtype.Bytea{
+				Bytes:  buf[:n],
+				Status: pgtype.Present,
+			}).StructScan(fileChunk)
 			if err != nil {
-				return fmt.Errorf("save file chunk: %w", convertErr(err))
+				return fmt.Errorf("tx.QueryRowxContext: %w", convertErr(err))
 			}
 
 			file.ChunkIDs.Elements = append(file.ChunkIDs.Elements, fileChunk.ID)
 			file.Size += int64(n)
+			i++
 		}
 
 		const queryUpdateSizeAndChunks = `
-			update files set size = $1, chunk_ids = $2::UUID[] where id = $3;
+			update files set size = $1, chunk_ids = $2 where id = $3;
 		`
 
 		file.ChunkIDs.Status = pgtype.Present
@@ -134,12 +113,12 @@ func (r *Repo) Save(ctx context.Context, reader io.Reader) (res uuid.UUID, err e
 			})
 		_, err = tx.ExecContext(ctx, queryUpdateSizeAndChunks, file.Size, file.ChunkIDs, file.ID)
 		if err != nil {
-			return fmt.Errorf("update file size and chunk_ids: %w", convertErr(err))
+			return fmt.Errorf("tx.ExecContext: %w", convertErr(err))
 		}
 
 		res = file.ID.Bytes
 
-		return tx.Commit()
+		return nil
 	})
 	if err != nil {
 		return uuid.Nil, err
@@ -150,17 +129,17 @@ func (r *Repo) Save(ctx context.Context, reader io.Reader) (res uuid.UUID, err e
 
 // Read for implements app.Repo.
 func (r *Repo) Read(ctx context.Context, fileID uuid.UUID) (res *app.File, err error) {
-	err = r.metric.Collect(func() error {
+	err = r.db.NoTx(func(db *sqlx.DB) error {
 		const query = `select * from files where id = $1;`
 		fInfo := &fileInfo{}
 
-		err := r.db.GetContext(ctx, fInfo, query, fileID)
+		err := db.GetContext(ctx, fInfo, query, fileID)
 		if err != nil {
-			return fmt.Errorf("get file info: %w", convertErr(err))
+			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
 
 		f := &file{
-			db:          r.db,
+			db:          db,
 			chunks:      fInfo.ChunkIDs,
 			isClosed:    false,
 			size:        fInfo.Size,
@@ -182,7 +161,7 @@ func (r *Repo) Read(ctx context.Context, fileID uuid.UUID) (res *app.File, err e
 
 // SetMetadata for implements app.Repo.
 func (r *Repo) SetMetadata(ctx context.Context, fileID uuid.UUID, metadata json.RawMessage) error {
-	return r.metric.Collect(func() error {
+	return r.db.NoTx(func(db *sqlx.DB) error {
 		const query = `update files set metadata = $1 where id = $2`
 
 		convertMetadata := pgtype.JSONB{
@@ -190,14 +169,14 @@ func (r *Repo) SetMetadata(ctx context.Context, fileID uuid.UUID, metadata json.
 			Status: pgtype.Present,
 		}
 
-		result, err := r.db.ExecContext(ctx, query, convertMetadata, fileID)
+		result, err := db.ExecContext(ctx, query, convertMetadata, fileID)
 		if err != nil {
-			return fmt.Errorf("exec context: %w", convertErr(err))
+			return fmt.Errorf("db.ExecContext: %w", convertErr(err))
 		}
 
 		rowsAffected, err := result.RowsAffected()
 		if err != nil {
-			return fmt.Errorf("rows affected: %w", err)
+			return fmt.Errorf("result.RowsAffected: %w", err)
 		}
 
 		if rowsAffected == 0 {
@@ -210,15 +189,15 @@ func (r *Repo) SetMetadata(ctx context.Context, fileID uuid.UUID, metadata json.
 
 // Delete for implements app.Repo.
 func (r *Repo) Delete(ctx context.Context, fileID uuid.UUID) error {
-	return r.metric.Collect(func() error {
+	return r.db.NoTx(func(db *sqlx.DB) error {
 		const query = `
 		delete
 		from files
 		where id = $1`
 
-		_, err := r.db.ExecContext(ctx, query, fileID)
+		_, err := db.ExecContext(ctx, query, fileID)
 		if err != nil {
-			return fmt.Errorf("exec context: %w", convertErr(err))
+			return fmt.Errorf("db.ExecContext: %w", convertErr(err))
 		}
 
 		return nil

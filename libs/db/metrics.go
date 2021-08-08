@@ -18,8 +18,9 @@ const methodLabel = "method"
 
 // NewMetrics registers and returns common DAL metrics used by all
 // services (namespace).
-func NewMetrics(reg *prometheus.Registry, namespace, subsystem string, methodsFrom interface{}) *Metrics {
+func NewMetrics(reg *prometheus.Registry, namespace string, methodsFrom interface{}) *Metrics {
 	metric := &Metrics{}
+	const subsystem = "db"
 
 	metric.callErrTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{

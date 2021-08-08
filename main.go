@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -9,8 +10,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/Meat-Hook/back-template/cmd/file"
+	"github.com/Meat-Hook/back-template/cmd/session"
+	"github.com/Meat-Hook/back-template/cmd/user"
 	"github.com/Meat-Hook/back-template/libs/log"
 
 	"github.com/rs/zerolog"
@@ -21,17 +26,25 @@ const appVersion = `0.1.0`
 
 type embeddedService interface {
 	Name() string
-	Flags() []cli.Flag
-	RunServe(context.Context) error
+	UnmarshalConfig(json.RawMessage) error
+	RunServe(ctx context.Context, reg *prometheus.Registry, namespace string) error
 }
 
 var (
-	output = zerolog.ConsoleWriter{
-		Out:        os.Stdout,   // Standard output.
-		NoColor:    false,       // Not useful.
-		TimeFormat: time.RFC850, // Use for eyes.
+	embeddedServices = []embeddedService{
+		&user.Service{},
+		&session.Service{},
+		&file.Service{},
 	}
-	embeddedServices = []embeddedService{}
+	cfgFilePath = &cli.StringFlag{
+		Name:     "cfg",
+		Aliases:  []string{"c"},
+		Usage:    "config file path",
+		EnvVars:  []string{"CONFIG_FILE_PATH"},
+		Required: true,
+	}
+	// Service name -> json config
+	config map[string]json.RawMessage
 )
 
 func main() {
@@ -43,25 +56,13 @@ func main() {
 		Usage:                "Generate easy CRUD server.",
 		Version:              appVersion,
 		Commands:             []*cli.Command{},
-		Flags:                []cli.Flag{},
+		Flags:                []cli.Flag{cfgFilePath},
 		EnableBashCompletion: true,
 		BashComplete:         cli.DefaultAppComplete,
 		Action:               start,
 		Reader:               os.Stdin,
 		Writer:               os.Stdout,
 		ErrWriter:            os.Stderr,
-	}
-
-	// service name -> duplicate
-	duplicateService := make(map[string]bool)
-	for _, service := range embeddedServices {
-		name := service.Name()
-		if duplicateService[name] {
-			panic(fmt.Sprintf("duplicate service: %s", name))
-		}
-		duplicateService[name] = true
-
-		app.Flags = append(app.Flags, service.Flags()...)
 	}
 
 	signals := make(chan os.Signal, 1)
@@ -78,16 +79,32 @@ func main() {
 
 func start(c *cli.Context) error {
 	logger := zerolog.Ctx(c.Context)
+
+	cfgFile, err := os.Open(c.String(cfgFilePath.Name))
+	if err != nil {
+		return fmt.Errorf("os.Open: %w", err)
+	}
+
+	err = json.NewDecoder(cfgFile).Decode(&config)
+	if err != nil {
+		return fmt.Errorf("json.NewDecoder.Decode: %w", err)
+	}
+
 	g, ctx := errgroup.WithContext(c.Context)
 
 	for _, svc := range embeddedServices {
 		svc := svc
-
 		name := svc.Name()
-		serviceLogger := logger.With().Str(log.Service, name).Logger()
+		err := svc.UnmarshalConfig(config[name])
+		if err != nil {
+			return fmt.Errorf("svc.UnmarshalConfig: %w, json: %s, svc: %s", err, config[name], name)
+		}
 
 		g.Go(func() error {
-			return svc.RunServe(serviceLogger.WithContext(ctx))
+			serviceLogger := logger.With().Str(log.Service, name).Logger()
+			reg := prometheus.NewRegistry()
+
+			return svc.RunServe(serviceLogger.WithContext(ctx), reg, "test")
 		})
 	}
 

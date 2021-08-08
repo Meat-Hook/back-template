@@ -1,7 +1,9 @@
 package app_test
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"testing"
 	"time"
 
@@ -450,6 +452,128 @@ func TestModule_Logout(t *testing.T) {
 		name, tc := name, tc
 		t.Run(name, func(t *testing.T) {
 			err := module.Logout(ctx, *tc.session)
+			assert.ErrorIs(err, tc.wantErr)
+		})
+	}
+}
+
+func TestModule_UploadAvatar(t *testing.T) {
+	t.Parallel()
+
+	module, mocks, assert := start(t)
+
+	fileID := uuid.Must(uuid.NewV4())
+	userNotFoundID := uuid.Must(uuid.NewV4())
+
+	userWithoutAvatar := app.User{
+		ID:        uuid.Must(uuid.NewV4()),
+		Email:     "email@mail.com",
+		Name:      "username",
+		PassHash:  []byte{12, 12, 34, 124, 19},
+		Avatars:   []uuid.UUID{},
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	userWithAvatar := app.User{
+		ID:        userWithoutAvatar.ID,
+		Email:     "email@mail.com",
+		Name:      "username",
+		PassHash:  []byte{12, 12, 34, 124, 19},
+		Avatars:   []uuid.UUID{fileID},
+		CreatedAt: userWithoutAvatar.CreatedAt,
+		UpdatedAt: userWithoutAvatar.UpdatedAt,
+	}
+
+	correctFile := bytes.NewBuffer(uuid.Must(uuid.NewV4()).Bytes())
+
+	session := &app.Session{
+		ID:     uuid.Must(uuid.NewV4()),
+		UserID: userWithoutAvatar.ID,
+	}
+
+	mocks.repo.EXPECT().ByID(ctx, userWithoutAvatar.ID).Return(&userWithoutAvatar, nil).Times(2)
+	mocks.repo.EXPECT().ByID(ctx, userNotFoundID).Return(nil, app.ErrNotFound)
+	mocks.file.EXPECT().Upload(ctx, correctFile).Return(fileID, nil)
+	mocks.file.EXPECT().Upload(ctx, nil).Return(uuid.Nil, errAny)
+	mocks.repo.EXPECT().Update(ctx, userWithAvatar).Return(nil)
+
+	testCases := map[string]struct {
+		session *app.Session
+		file    io.Reader
+		wantErr error
+	}{
+		"success":            {session, correctFile, nil},
+		"err_upload_file":    {session, nil, errAny},
+		"err_user_not_found": {&app.Session{UserID: userNotFoundID}, nil, app.ErrNotFound},
+	}
+
+	for name, tc := range testCases {
+		name, tc := name, tc
+		t.Run(name, func(t *testing.T) {
+			err := module.UploadAvatar(ctx, *tc.session, tc.file)
+			assert.ErrorIs(err, tc.wantErr)
+		})
+	}
+}
+
+func TestModule_DeleteAvatar(t *testing.T) {
+	t.Parallel()
+
+	module, mocks, assert := start(t)
+
+	fileID := uuid.Must(uuid.NewV4())
+	fileID2 := uuid.Must(uuid.NewV4())
+	fileID3 := uuid.Must(uuid.NewV4())
+
+	userNotFoundID := uuid.Must(uuid.NewV4())
+
+	user := app.User{
+		ID:        uuid.Must(uuid.NewV4()),
+		Email:     "email@mail.com",
+		Name:      "username",
+		PassHash:  []byte{12, 12, 34, 124, 19},
+		Avatars:   []uuid.UUID{fileID, fileID2, fileID3},
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	userWithoutSecondAvatar := app.User{
+		ID:        user.ID,
+		Email:     "email@mail.com",
+		Name:      "username",
+		PassHash:  []byte{12, 12, 34, 124, 19},
+		Avatars:   []uuid.UUID{fileID, fileID3},
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	session := &app.Session{
+		ID:     uuid.Must(uuid.NewV4()),
+		UserID: user.ID,
+	}
+
+	mocks.repo.EXPECT().ByID(ctx, user.ID).Return(&user, nil).Times(3)
+	mocks.repo.EXPECT().ByID(ctx, userNotFoundID).Return(nil, app.ErrNotFound)
+	mocks.file.EXPECT().Delete(ctx, fileID2).Return(nil)
+	mocks.file.EXPECT().Delete(ctx, fileID3).Return(errAny)
+	mocks.repo.EXPECT().Update(ctx, userWithoutSecondAvatar).Return(nil)
+
+	testCases := map[string]struct {
+		session *app.Session
+		fileID  uuid.UUID
+		wantErr error
+	}{
+		"success":             {session, fileID2, nil},
+		"err_file_not_delete": {session, fileID3, errAny},
+		"err_file_not_found":  {session, uuid.Nil, app.ErrNotFound},
+		"err_user_not_found":  {&app.Session{UserID: userNotFoundID}, uuid.Nil, app.ErrNotFound},
+	}
+
+	for name, tc := range testCases {
+		name, tc := name, tc
+		t.Run(name, func(t *testing.T) {
+			err := module.DeleteAvatar(ctx, *tc.session, tc.fileID)
 			assert.ErrorIs(err, tc.wantErr)
 		})
 	}

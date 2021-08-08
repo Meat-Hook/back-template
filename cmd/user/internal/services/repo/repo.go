@@ -22,21 +22,69 @@ type (
 	}
 
 	user struct {
-		ID        uuid.UUID        `db:"id"`
+		ID        pgtype.UUID      `db:"id"`
 		Email     string           `db:"email"`
 		Name      string           `db:"name"`
-		PassHash  []byte           `db:"pass_hash"`
+		PassHash  pgtype.Bytea     `db:"pass_hash"`
+		Avatars   pgtype.UUIDArray `db:"avatars"`
 		CreatedAt pgtype.Timestamp `db:"created_at"`
 		UpdatedAt pgtype.Timestamp `db:"updated_at"`
 	}
 )
 
 func convert(u app.User) *user {
+	idStatus := pgtype.Present
+	if u.ID == uuid.Nil {
+		idStatus = pgtype.Null
+	}
+
+	id := pgtype.UUID{
+		Bytes:  u.ID,
+		Status: idStatus,
+	}
+
+	passHashStatus := pgtype.Present
+	if len(u.PassHash) == 0 {
+		passHashStatus = pgtype.Null
+	}
+
+	passHash := pgtype.Bytea{
+		Bytes:  u.PassHash,
+		Status: passHashStatus,
+	}
+
+	avatarsUUID := pgtype.UUIDArray{
+		Elements:   make([]pgtype.UUID, 0, len(u.Avatars)),
+		Dimensions: nil,
+		Status:     pgtype.Present,
+	}
+
+	for i := range u.Avatars {
+		fileIDStatus := pgtype.Present
+		if u.Avatars[i] == uuid.Nil {
+			fileIDStatus = pgtype.Null
+		}
+
+		fileID := pgtype.UUID{
+			Bytes:  u.Avatars[i],
+			Status: fileIDStatus,
+		}
+
+		avatarsUUID.Elements = append(avatarsUUID.Elements, fileID)
+	}
+
+	avatarsUUID.Dimensions = append(avatarsUUID.Dimensions,
+		pgtype.ArrayDimension{
+			Length:     int32(len(avatarsUUID.Elements)),
+			LowerBound: 1,
+		})
+
 	return &user{
-		ID:       u.ID,
+		ID:       id,
 		Email:    u.Email,
 		Name:     u.Name,
-		PassHash: u.PassHash,
+		PassHash: passHash,
+		Avatars:  avatarsUUID,
 		CreatedAt: pgtype.Timestamp{
 			Time:             u.CreatedAt,
 			Status:           pgtype.Present,
@@ -51,11 +99,17 @@ func convert(u app.User) *user {
 }
 
 func (u user) convert() *app.User {
+	avatars := make([]uuid.UUID, len(u.Avatars.Elements))
+	for i := range u.Avatars.Elements {
+		avatars[i] = uuid.Must(uuid.FromBytes(u.Avatars.Elements[i].Bytes[:]))
+	}
+
 	return &app.User{
-		ID:        u.ID,
+		ID:        u.ID.Bytes,
 		Email:     u.Email,
 		Name:      u.Name,
-		PassHash:  u.PassHash,
+		PassHash:  u.PassHash.Bytes,
+		Avatars:   avatars,
 		CreatedAt: u.CreatedAt.Time,
 		UpdatedAt: u.UpdatedAt.Time,
 	}
@@ -81,12 +135,7 @@ func (r *Repo) Save(ctx context.Context, u app.User) (id uuid.UUID, err error) {
 		returning id
 		`
 
-		passHash := pgtype.Bytea{
-			Bytes:  newUser.PassHash,
-			Status: pgtype.Present,
-		}
-
-		err := db.GetContext(ctx, &id, query, newUser.Email, newUser.Name, passHash)
+		err := db.GetContext(ctx, &id, query, newUser.Email, newUser.Name, newUser.PassHash)
 		if err != nil {
 			return fmt.Errorf("db.GetContext: %w", convertErr(err))
 		}
@@ -110,15 +159,11 @@ func (r *Repo) Update(ctx context.Context, u app.User) error {
 		set 
 			email 	  = $1,
     		name  	  = $2,
-    		pass_hash = $3
-		where id = $4`
+    		pass_hash = $3,
+		    avatars   = $4
+		where id = $5`
 
-		passHash := pgtype.Bytea{
-			Bytes:  updateUser.PassHash,
-			Status: pgtype.Present,
-		}
-
-		_, err := db.ExecContext(ctx, query, updateUser.Email, updateUser.Name, passHash, updateUser.ID)
+		_, err := db.ExecContext(ctx, query, updateUser.Email, updateUser.Name, updateUser.PassHash, updateUser.Avatars, updateUser.ID)
 		if err != nil {
 			return fmt.Errorf("db.ExecContext: %w", convertErr(err))
 		}

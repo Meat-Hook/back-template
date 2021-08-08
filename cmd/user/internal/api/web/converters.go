@@ -1,6 +1,8 @@
 package web
 
 import (
+	"github.com/go-openapi/strfmt"
+
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 
@@ -37,9 +39,15 @@ func User(u *app.User) *models.User {
 	username := models.Username(u.Name)
 	email := models.Email(u.Email)
 
+	avatars := make([]strfmt.UUID, len(u.Avatars))
+	for i := range u.Avatars {
+		avatars[i] = strfmt.UUID(u.Avatars[i].String())
+	}
+
 	return &models.User{
 		ID:       &id,
 		Username: &username,
 		Email:    &email,
+		Avatars:  avatars,
 	}
 }

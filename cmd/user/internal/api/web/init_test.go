@@ -14,7 +14,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web"
@@ -24,6 +23,7 @@ import (
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
 	"github.com/Meat-Hook/back-template/libs/metrics"
+	libweb "github.com/Meat-Hook/back-template/libs/web"
 )
 
 var (
@@ -31,7 +31,7 @@ var (
 
 	user = app.User{
 		ID:    uuid.Must(uuid.NewV4()),
-		Email: "email",
+		Email: "email@email.test",
 		Name:  "username",
 	}
 
@@ -57,20 +57,21 @@ func start(t *testing.T) (string, *Mockapplication, *client.UserService, *requir
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMockapplication(ctrl)
+	assert := require.New(t)
 
 	logger := zerolog.New(os.Stdout)
-	m := metrics.HTTP(strings.ReplaceAll(t.Name(), "/", "_"), restapi.FlatSwaggerJSON)
-	server, err := web.New(logger.WithContext(context.Background()), mockApp, &m, web.Config{})
-	assert.NoError(t, err, "web.New")
-	assert.NoError(t, server.Listen(), "server.Listen")
+	webMetric := libweb.NewMetric(reg, strings.Replace(t.Name(), "/", "_", -1), restapi.FlatSwaggerJSON)
+	server, err := web.New(logger.WithContext(context.Background()), mockApp, &webMetric, web.Config{})
+	assert.NoError(err, "web.New")
+	assert.NoError(server.Listen(), "server.Listen")
 
 	errc := make(chan error, 1)
 	go func() { errc <- server.Serve() }()
 	t.Cleanup(func() {
 		t.Helper()
 
-		assert.Nil(t, server.Shutdown(), "server.Shutdown")
-		assert.Nil(t, <-errc, "server.Serve")
+		assert.NoError(server.Shutdown(), "server.Shutdown")
+		assert.NoError(<-errc, "server.Serve")
 	})
 
 	url := fmt.Sprintf("%s:%d", client.DefaultHost, server.Port)
@@ -113,6 +114,10 @@ func errPayload(err interface{}) *models.Error {
 	case *operations.LoginDefault:
 		return err.Payload
 	case *operations.LogoutDefault:
+		return err.Payload
+	case *operations.NewAvatarDefault:
+		return err.Payload
+	case *operations.DeleteAvatarDefault:
 		return err.Payload
 	default:
 		return nil

@@ -11,6 +11,7 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Meat-Hook/back-template/cmd/user/internal/services/repo"
@@ -24,7 +25,8 @@ const (
 )
 
 var (
-	reg = prometheus.NewPedanticRegistry()
+	logger = zerolog.New(os.Stdout)
+	reg    = prometheus.NewPedanticRegistry()
 )
 
 func TestMain(m *testing.M) {
@@ -39,9 +41,9 @@ func start(t *testing.T) (context.Context, *repo.Repo, *require.Assertions) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
 
-	r := require.New(t)
+	assert := require.New(t)
 	pool, err := dockertest.NewPool("")
-	r.Nil(err)
+	assert.NoError(err)
 	pool.MaxWait = timeout
 
 	opt := &dockertest.RunOptions{
@@ -53,13 +55,12 @@ func start(t *testing.T) (context.Context, *repo.Repo, *require.Assertions) {
 	resource, err := pool.RunWithOptions(opt, func(cfg *docker.HostConfig) {
 		cfg.AutoRemove = true
 	})
-	r.Nil(err)
+	assert.NoError(err)
 
-	m := db.NewMetrics(reg, "test", "repo", new(repo.Repo))
+	m := db.NewMetrics(reg, "test", new(repo.Repo))
 	var conn *db.DB
 	err = pool.Retry(func() error {
-		str := fmt.Sprintf("host=localhost port=%s user=root "+
-			"password=root dbname=postgres sslmode=disable", resource.GetPort("26257/tcp"))
+		str := fmt.Sprintf("postgresql://root:root@localhost:%s/defaultdb?sslmode=disable", resource.GetPort("26257/tcp"))
 		conn, err = db.Postgres(ctx, db.PostgresConfig{
 			DSN:        str,
 			MigrateDir: migrateDir,
@@ -71,12 +72,12 @@ func start(t *testing.T) (context.Context, *repo.Repo, *require.Assertions) {
 
 		return nil
 	})
-	r.Nil(err)
+	assert.NoError(err)
 
 	t.Cleanup(func() {
 		err = pool.Purge(resource)
-		r.Nil(err)
+		assert.NoError(err)
 	})
 
-	return ctx, repo.New(conn), r
+	return logger.WithContext(ctx), repo.New(conn), assert
 }

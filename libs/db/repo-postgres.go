@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 
@@ -38,7 +37,7 @@ type PostgresConfig struct {
 func Postgres(ctx context.Context, cfg PostgresConfig) (_ *DB, err error) {
 	logger := *zerolog.Ctx(ctx)
 
-	db, err := sql.Open("postgres", cfg.DSN)
+	db, err := sqlx.Connect("postgres", cfg.DSN)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open: %w", err)
 	}
@@ -48,22 +47,13 @@ func Postgres(ctx context.Context, cfg PostgresConfig) (_ *DB, err error) {
 		}
 	}()
 
-	err = db.PingContext(ctx)
-	for err != nil {
-		nextErr := db.PingContext(ctx)
-		if errors.Is(nextErr, context.DeadlineExceeded) || errors.Is(nextErr, context.Canceled) {
-			return nil, fmt.Errorf("db.Ping: %w", err)
-		}
-		err = nextErr
-	}
-
-	err = migrater.Auto(ctx, db, cfg.MigrateDir)
+	err = migrater.Auto(ctx, db.DB, cfg.MigrateDir)
 	if err != nil {
 		return nil, fmt.Errorf("migrater.Auto: %w", err)
 	}
 
 	r := &DB{
-		conn:   sqlx.NewDb(db, "postgres"),
+		conn:   db,
 		metric: cfg.Metric,
 	}
 

@@ -1,19 +1,9 @@
 #!/bin/bash
 
-# For MacOS.
-if test "$(uname)" = "Darwin"; then
-  shopt -s expand_aliases
-  alias sed=gsed
-  alias grep=ggrep
-  alias xargs=gxargs
-fi
-
 # Start Dockerfile linter.
 hadolint Dockerfile
-
 # Start shel linter.
-shellcheck env.sh.dist scripts/*
-
+shellcheck scripts/*
 # Start buf lint.
 buf lint
 # Start golang linter.
@@ -21,4 +11,4 @@ golangci-lint run
 # Start buf breaking check.
 buf breaking --against '.git#branch=master'
 # Start golang test.
-gotestsum -- -race "$@" ./...
+go test -race "$@" ./...

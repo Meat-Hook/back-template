@@ -78,7 +78,8 @@ type FileServiceAPI struct {
 	JSONConsumer runtime.Consumer
 
 	// BinProducer registers a producer for the following mime types:
-	//   - application/octet-stream
+	//   - image/jpeg
+	//   - image/png
 	BinProducer runtime.Producer
 
 	// GetFileHandler sets the operation handler for the get file operation
@@ -209,8 +210,10 @@ func (o *FileServiceAPI) ProducersFor(mediaTypes []string) map[string]runtime.Pr
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/octet-stream":
-			result["application/octet-stream"] = o.BinProducer
+		case "image/jpeg":
+			result["image/jpeg"] = o.BinProducer
+		case "image/png":
+			result["image/png"] = o.BinProducer
 		}
 
 		if p, ok := o.customProducers[mt]; ok {

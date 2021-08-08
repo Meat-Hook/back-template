@@ -32,7 +32,7 @@ func Metric(logger zerolog.Logger, host string, port int) func(context.Context) 
 		select {
 		case err := <-errc:
 			if err != nil {
-				return fmt.Errorf("failed to listen http server: %w", err)
+				return fmt.Errorf("failed to listen web server: %w", err)
 			}
 		case <-ctx.Done():
 			ctxDone, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
@@ -40,7 +40,7 @@ func Metric(logger zerolog.Logger, host string, port int) func(context.Context) 
 
 			err := srv.Shutdown(ctxDone)
 			if err != nil {
-				return fmt.Errorf("failed to shutdown http server: %w", err)
+				return fmt.Errorf("failed to shutdown web server: %w", err)
 			}
 		}
 

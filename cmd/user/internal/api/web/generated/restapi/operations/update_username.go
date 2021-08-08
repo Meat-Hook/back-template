@@ -6,9 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -86,25 +84,6 @@ type UpdateUsernameBody struct {
 	// username
 	// Required: true
 	Username *models.Username `json:"username"`
-}
-
-// UnmarshalJSON unmarshals this object while disallowing additional properties from JSON
-func (o *UpdateUsernameBody) UnmarshalJSON(data []byte) error {
-	var props struct {
-
-		// username
-		// Required: true
-		Username *models.Username `json:"username"`
-	}
-
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&props); err != nil {
-		return err
-	}
-
-	o.Username = props.Username
-	return nil
 }
 
 // Validate validates this update username body

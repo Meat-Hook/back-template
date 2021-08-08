@@ -30,10 +30,10 @@ func TestRepo_Smoke(t *testing.T) {
 	}
 
 	err := r.Save(ctx, session)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	res, err := r.ByID(ctx, session.ID)
-	assert.Nil(err)
+	assert.NoError(err)
 	session.CreatedAt = res.CreatedAt
 	session.UpdatedAt = res.UpdatedAt
 	if session.Origin.IP.Equal(res.Origin.IP) {
@@ -41,7 +41,7 @@ func TestRepo_Smoke(t *testing.T) {
 	}
 	assert.Equal(session, *res)
 	err = r.Delete(ctx, session.ID)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	res, err = r.ByID(ctx, session.ID)
 	assert.Nil(res)

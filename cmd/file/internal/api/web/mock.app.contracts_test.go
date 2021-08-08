@@ -6,36 +6,37 @@ package web_test
 
 import (
 	context "context"
+	reflect "reflect"
+
 	app "github.com/Meat-Hook/back-template/cmd/file/internal/app"
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
-// Mockapplication is a mock of application interface
+// Mockapplication is a mock of application interface.
 type Mockapplication struct {
 	ctrl     *gomock.Controller
 	recorder *MockapplicationMockRecorder
 }
 
-// MockapplicationMockRecorder is the mock recorder for Mockapplication
+// MockapplicationMockRecorder is the mock recorder for Mockapplication.
 type MockapplicationMockRecorder struct {
 	mock *Mockapplication
 }
 
-// NewMockapplication creates a new mock instance
+// NewMockapplication creates a new mock instance.
 func NewMockapplication(ctrl *gomock.Controller) *Mockapplication {
 	mock := &Mockapplication{ctrl: ctrl}
 	mock.recorder = &MockapplicationMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *Mockapplication) EXPECT() *MockapplicationMockRecorder {
 	return m.recorder
 }
 
-// GetFile mocks base method
+// GetFile mocks base method.
 func (m *Mockapplication) GetFile(ctx context.Context, fileID uuid.UUID) (*app.File, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFile", ctx, fileID)
@@ -44,7 +45,7 @@ func (m *Mockapplication) GetFile(ctx context.Context, fileID uuid.UUID) (*app.F
 	return ret0, ret1
 }
 
-// GetFile indicates an expected call of GetFile
+// GetFile indicates an expected call of GetFile.
 func (mr *MockapplicationMockRecorder) GetFile(ctx, fileID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*Mockapplication)(nil).GetFile), ctx, fileID)

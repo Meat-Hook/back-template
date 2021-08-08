@@ -9,21 +9,21 @@ import (
 
 // Log name.
 const (
-	Func          = `func`
-	HTTPMethod    = `http-method`
-	Version       = `version`
-	Service       = `service`
-	Code          = `code`
-	IP            = `ip`
-	ReqID         = `req-id`
-	User          = `user`
-	PanicReason   = `panic-reason`
-	HandledStatus = `handled`
-	Duration      = `duration`
-	Host          = `host`
-	Port          = `port`
-	Subsystem     = `subsystem`
-	DBMethod      = `db-method`
+	Path        = `path`
+	GRPCFunc    = `grpc-func`
+	HTTPMethod  = `web-method`
+	Version     = `version`
+	Service     = `service`
+	Code        = `code`
+	IP          = `ip`
+	ReqID       = `req-id`
+	User        = `user`
+	PanicReason = `panic-reason`
+	Duration    = `duration`
+	Host        = `host`
+	Port        = `port`
+	Subsystem   = `subsystem`
+	DBMethod    = `db-method`
 )
 
 // WarnIfFail logs if callback finished with error.

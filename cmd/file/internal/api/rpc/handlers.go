@@ -4,17 +4,20 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
-	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
 	"github.com/gofrs/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
 )
 
 // Upload file to database.
-func (a *api) Upload(stream pb.FileService_UploadServer) error {
-	id, err := a.app.UploadFile(stream.Context(), NewReader(stream))
+func (a *api) Upload(stream pb.Service_UploadServer) error {
+	reader := NewReader(stream)
+
+	id, err := a.app.UploadFile(stream.Context(), reader)
 	if err != nil {
 		return apiError(err)
 	}

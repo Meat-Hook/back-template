@@ -55,15 +55,10 @@ type LoginOK struct {
 	/* Session auth.
 	 */
 	SetCookie string
-
-	Payload *models.User
 }
 
 func (o *LoginOK) Error() string {
-	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
-}
-func (o *LoginOK) GetPayload() *models.User {
-	return o.Payload
+	return fmt.Sprintf("[POST /login][%d] loginOK ", 200)
 }
 
 func (o *LoginOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -73,13 +68,6 @@ func (o *LoginOK) readResponse(response runtime.ClientResponse, consumer runtime
 
 	if hdrSetCookie != "" {
 		o.SetCookie = hdrSetCookie
-	}
-
-	o.Payload = new(models.User)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
 	}
 
 	return nil

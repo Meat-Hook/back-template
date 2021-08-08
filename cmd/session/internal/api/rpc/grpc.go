@@ -33,11 +33,9 @@ type api struct {
 }
 
 // New creates and returns gRPC server.
-func New(ctx context.Context, req *prometheus.Registry,namespace string, applications sessions) *grpc.Server {
+func New(ctx context.Context, req *prometheus.Registry, namespace string, applications sessions) *grpc.Server {
 	logger := zerolog.Ctx(ctx)
-
-	const subsystem = `grpc`
-	metric.server = rpc.NewServerMetrics(req, namespace, subsystem)
+	metric.server = rpc.NewServerMetrics(req, namespace)
 
 	srv := rpc.Server(*logger, metric.server)
 	pb.RegisterServiceServer(srv, &api{app: applications})

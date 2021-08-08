@@ -21,12 +21,12 @@ func Dial(ctx context.Context, logger zerolog.Logger, addr string, metrics *grpc
 		}),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 			metrics.UnaryClientInterceptor(),
-			MakeUnaryClientLogger(logger),
+			MakeUnaryClientLogger,
 			UnaryClientAccessLog,
 		)),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(
 			metrics.StreamClientInterceptor(),
-			MakeStreamClientLogger(logger),
+			MakeStreamClientLogger,
 			StreamClientAccessLog,
 		)),
 		grpc.WithReadBufferSize(68*1024),

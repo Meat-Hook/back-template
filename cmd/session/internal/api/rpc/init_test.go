@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -29,20 +30,20 @@ func TestMain(m *testing.M) {
 
 func start(t *testing.T, reg *prometheus.Registry) (pb.ServiceClient, *Mocksessions, *require.Assertions) {
 	t.Helper()
-	r := require.New(t)
+	assert := require.New(t)
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMocksessions(ctrl)
 	logger := zerolog.New(os.Stdout)
 
-	server := rpc.New(logger.WithContext(context.Background()), reg, "test", mockApp)
+	server := rpc.New(logger.WithContext(context.Background()), reg, strings.Replace(t.Name(), "/", "_", -1), mockApp)
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	r.Nil(err)
+	assert.NoError(err)
 
 	go func() {
 		err := server.Serve(ln)
-		r.Nil(err)
+		assert.NoError(err)
 	}()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -50,14 +51,14 @@ func start(t *testing.T, reg *prometheus.Registry) (pb.ServiceClient, *Mocksessi
 		grpc.WithInsecure(), // TODO Add TLS and remove this.
 		grpc.WithBlock(),
 	)
-	r.Nil(err)
+	assert.NoError(err)
 
 	t.Cleanup(func() {
 		err := conn.Close()
-		r.Nil(err)
+		assert.NoError(err)
 		server.GracefulStop()
 		cancel()
 	})
 
-	return pb.NewServiceClient(conn), mockApp, r
+	return pb.NewServiceClient(conn), mockApp, assert
 }

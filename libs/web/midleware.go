@@ -1,4 +1,4 @@
-package http
+package web
 
 import (
 	"net"
@@ -14,7 +14,7 @@ import (
 	"github.com/Meat-Hook/back-template/libs/metrics"
 )
 
-// Recovery for http server.
+// Recovery for web server.
 // go-swagger responders panic on error while writing response to client,
 // this shouldn't result in crash - unlike a real, reasonable panic.
 //
@@ -45,7 +45,7 @@ func CreateLogger(builder zerolog.Context) func(http.Handler) http.Handler {
 			newLogger := builder.
 				IPAddr(log.IP, net.ParseIP(ip)).
 				Str(log.HTTPMethod, r.Method).
-				Str(log.Func, r.URL.Path).
+				Str(log.Path, r.URL.Path).
 				Stringer(log.ReqID, reqID).
 				Logger()
 
@@ -58,7 +58,7 @@ func CreateLogger(builder zerolog.Context) func(http.Handler) http.Handler {
 }
 
 // AccessLog logs handled request.
-func AccessLog(metric *metrics.API) func(http.Handler) http.Handler {
+func AccessLog(metric *Metric) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			m := httpsnoop.CaptureMetrics(next, w, r)

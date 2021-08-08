@@ -5,14 +5,16 @@ package app
 type Module struct {
 	user Repo
 	hash Hasher
-	auth Auth
+	file FileSvc
+	auth AuthSvc
 }
 
 // New build and returns new Module for working with user info.
-func New(r Repo, h Hasher, a Auth) *Module {
+func New(r Repo, h Hasher, a AuthSvc, f FileSvc) *Module {
 	return &Module{
 		user: r,
 		hash: h,
+		file: f,
 		auth: a,
 	}
 }

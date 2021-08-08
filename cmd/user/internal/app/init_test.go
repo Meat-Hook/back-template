@@ -24,7 +24,8 @@ var (
 type mocks struct {
 	hasher *MockHasher
 	repo   *MockRepo
-	auth   *MockAuth
+	auth   *MockAuthSvc
+	file   *MockFileSvc
 }
 
 func start(t *testing.T) (*app.Module, *mocks, *require.Assertions) {
@@ -33,14 +34,16 @@ func start(t *testing.T) (*app.Module, *mocks, *require.Assertions) {
 
 	mockRepo := NewMockRepo(ctrl)
 	mockHasher := NewMockHasher(ctrl)
-	mockAuth := NewMockAuth(ctrl)
+	mockAuth := NewMockAuthSvc(ctrl)
+	mockFile := NewMockFileSvc(ctrl)
 
-	module := app.New(mockRepo, mockHasher, mockAuth)
+	module := app.New(mockRepo, mockHasher, mockAuth, mockFile)
 
 	mocks := &mocks{
 		hasher: mockHasher,
 		repo:   mockRepo,
 		auth:   mockAuth,
+		file:   mockFile,
 	}
 
 	return module, mocks, require.New(t)

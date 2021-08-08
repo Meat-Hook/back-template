@@ -6,13 +6,21 @@ import (
 	"encoding/json"
 	"io"
 
-	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
 	"github.com/gofrs/uuid"
-	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/Meat-Hook/back-template/libs/rpc"
+	pb "github.com/Meat-Hook/back-template/proto/gen/go/file/v1"
+
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
 
-//go:generate mockgen -source=grpc.go -destination mock.app.contracts_test.go -package rpc_test
+// Metric contains general metrics for gRPC methods.
+var metric struct { //nolint:gochecknoglobals // Metrics are global anyway.
+	server *grpc_prometheus.ServerMetrics
+}
 
 // For convenient testing.
 // Wrapper for app.Module.
@@ -27,10 +35,12 @@ type api struct {
 }
 
 // New register service by grpc.Server and register metrics.
-func New(applications files, srv *grpc.Server) *grpc.Server {
-	pb.RegisterFileServiceServer(srv, &api{app: applications})
+func New(ctx context.Context, req *prometheus.Registry, namespace string, applications files) *grpc.Server {
+	logger := zerolog.Ctx(ctx)
+	metric.server = rpc.NewServerMetrics(req, namespace)
 
-	prometheus.Register(srv)
+	srv := rpc.Server(*logger, metric.server)
+	pb.RegisterServiceServer(srv, &api{app: applications})
 
 	return srv
 }

@@ -47,7 +47,7 @@ func (a *Client) GetFile(params *GetFileParams, writer io.Writer, opts ...Client
 		ID:                 "getFile",
 		Method:             "GET",
 		PathPattern:        "/file",
-		ProducesMediaTypes: []string{"application/octet-stream"},
+		ProducesMediaTypes: []string{"image/jpeg", "image/png"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,

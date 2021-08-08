@@ -29,12 +29,14 @@ func Server(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			serverMetrics.UnaryServerInterceptor(),
 			MakeUnaryServerLogger(logger),
+			MakeUnaryServerRecover(),
 			grpc_recovery.UnaryServerInterceptor(grpc_recovery.WithRecoveryHandlerContext(recoveryFunc)),
 			UnaryServerAccessLog,
 		)),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			prometheus.StreamServerInterceptor,
 			MakeStreamServerLogger(logger),
+			MakeStreamServerRecover(),
 			grpc_recovery.StreamServerInterceptor(grpc_recovery.WithRecoveryHandlerContext(recoveryFunc)),
 			StreamServerAccessLog,
 		)),

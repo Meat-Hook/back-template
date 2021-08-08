@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/gofrs/uuid"
@@ -11,6 +12,8 @@ import (
 
 // VerificationEmail check exists or not user email.
 func (m *Module) VerificationEmail(ctx context.Context, email string) error {
+	email = strings.ToLower(email)
+
 	_, err := m.user.ByEmail(ctx, email)
 	switch {
 	case errors.Is(err, ErrNotFound):
@@ -134,4 +137,49 @@ func (m *Module) Login(ctx context.Context, email, password string, origin Origi
 // Logout remove user session.
 func (m *Module) Logout(ctx context.Context, session Session) error {
 	return m.auth.RemoveSession(ctx, session.ID)
+}
+
+// UploadAvatar upload new avatar for user account.
+func (m *Module) UploadAvatar(ctx context.Context, session Session, file io.Reader) error {
+	user, err := m.user.ByID(ctx, session.UserID)
+	if err != nil {
+		return fmt.Errorf("m.user.ByID: %w", err)
+	}
+
+	fileID, err := m.file.Upload(ctx, file)
+	if err != nil {
+		return fmt.Errorf("m.file.Upload: %w", err)
+	}
+
+	user.Avatars = append(user.Avatars, fileID)
+
+	return m.user.Update(ctx, *user)
+}
+
+// DeleteAvatar delete user's avatar from service.
+func (m *Module) DeleteAvatar(ctx context.Context, session Session, fileID uuid.UUID) error {
+	user, err := m.user.ByID(ctx, session.UserID)
+	if err != nil {
+		return fmt.Errorf("m.user.ByID: %w", err)
+	}
+
+	fileIDIndex := 0
+	for i := range user.Avatars {
+		if user.Avatars[i] == fileID {
+			fileIDIndex = i
+		}
+	}
+
+	if fileIDIndex == 0 {
+		return ErrNotFound
+	}
+
+	user.Avatars = append(user.Avatars[:fileIDIndex], user.Avatars[fileIDIndex+1:]...)
+
+	err = m.file.Delete(ctx, fileID)
+	if err != nil {
+		return fmt.Errorf("m.file.Delete: %w", err)
+	}
+
+	return m.user.Update(ctx, *user)
 }

@@ -1,8 +1,10 @@
 package web_test
 
 import (
+	"bytes"
 	"testing"
 
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/gofrs/uuid"
@@ -307,37 +309,18 @@ func TestService_Login(t *testing.T) {
 		token = app.Token{
 			Value: "token",
 		}
-		user = app.User{
-			ID:    uuid.Must(uuid.NewV4()),
-			Email: "email@email.com",
-			Name:  "password",
-		}
 	)
 
 	testCases := map[string]struct {
 		email, pass string
-		user        *app.User
 		token       *app.Token
 		appErr      error
-		want        *models.User
 		wantErr     *models.Error
 	}{
-		"success": {
-			user.Email, "password",
-			&user, &token, nil, web.User(&user), nil,
-		},
-		"err_not_found": {
-			"notExist@email.com", "password",
-			nil, nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error()),
-		},
-		"err_not_valid_password": {
-			user.Email, "notValidPass",
-			nil, nil, app.ErrNotValidPassword, nil, APIError(app.ErrNotValidPassword.Error()),
-		},
-		"err_any": {
-			"randomEmail@email.com", "notValidPass",
-			nil, nil, errAny, nil, APIError("Internal Server Error"),
-		},
+		"success":                {user.Email, "password", &token, nil, nil},
+		"err_not_found":          {"notExist@email.com", "password", nil, app.ErrNotFound, APIError(app.ErrNotFound.Error())},
+		"err_not_valid_password": {user.Email, "notValidPass", nil, app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
+		"err_any":                {"randomEmail@email.com", "notValidPass", nil, errAny, APIError("Internal Server Error")},
 	}
 
 	for name, tc := range testCases {
@@ -347,7 +330,7 @@ func TestService_Login(t *testing.T) {
 
 			_, mockApp, client, assert := start(t)
 
-			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, gomock.Any()).Return(tc.user, tc.token, tc.appErr)
+			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, gomock.Any()).Return(tc.token, tc.appErr)
 
 			email := models.Email(tc.email)
 			password := models.Password(tc.pass)
@@ -357,14 +340,8 @@ func TestService_Login(t *testing.T) {
 					Email:    &email,
 					Password: &password,
 				})
-			res, err := client.Operations.Login(params)
-			if tc.wantErr == nil {
-				assert.Nil(err)
-				assert.Equal(tc.want, res.Payload)
-			} else {
-				assert.Nil(res)
-				assert.Equal(tc.wantErr, errPayload(err))
-			}
+			_, err := client.Operations.Login(params)
+			assert.Equal(tc.wantErr, errPayload(err))
 		})
 	}
 }
@@ -398,6 +375,78 @@ func TestService_Logout(t *testing.T) {
 
 			params := operations.NewLogoutParams()
 			_, err := client.Operations.Logout(params, apiKeyAuth)
+			assert.Equal(tc.want, errPayload(err))
+		})
+	}
+}
+
+func TestService_UploadAvatar(t *testing.T) {
+	t.Parallel()
+
+	session := app.Session{
+		ID:     uuid.Must(uuid.NewV4()),
+		UserID: user.ID,
+	}
+
+	file := bytes.NewBuffer(uuid.Must(uuid.NewV4()).Bytes())
+
+	testCases := []struct {
+		name   string
+		appErr error
+		want   *models.Error
+	}{
+		{"success", nil, nil},
+		{"err_any", errAny, APIError("Internal Server Error")},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			_, mockApp, client, assert := start(t)
+			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
+
+			mockApp.EXPECT().UploadAvatar(gomock.Any(), session, gomock.Any()).Return(tc.appErr)
+
+			params := operations.NewNewAvatarParams().WithUpfile(runtime.NamedReader(tc.name+".txt", file))
+			_, err := client.Operations.NewAvatar(params, apiKeyAuth)
+			assert.Equal(tc.want, errPayload(err))
+		})
+	}
+}
+
+func TestService_DeleteAvatar(t *testing.T) {
+	t.Parallel()
+
+	session := app.Session{
+		ID:     uuid.Must(uuid.NewV4()),
+		UserID: user.ID,
+	}
+
+	fileID := uuid.Must(uuid.NewV4())
+
+	testCases := []struct {
+		name   string
+		appErr error
+		want   *models.Error
+	}{
+		{"success", nil, nil},
+		{"err_any", errAny, APIError("Internal Server Error")},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			_, mockApp, client, assert := start(t)
+			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
+
+			mockApp.EXPECT().DeleteAvatar(gomock.Any(), session, fileID).Return(tc.appErr)
+
+			params := operations.NewDeleteAvatarParams().WithFileID(fileID.String())
+			_, err := client.Operations.DeleteAvatar(params, apiKeyAuth)
 			assert.Equal(tc.want, errPayload(err))
 		})
 	}

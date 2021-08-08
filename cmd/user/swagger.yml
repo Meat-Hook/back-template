@@ -85,6 +85,7 @@ definitions:
       - id
       - username
       - email
+      - avatars
     properties:
       id:
         $ref: '#/definitions/UserID'
@@ -92,6 +93,10 @@ definitions:
         $ref: '#/definitions/Username'
       email:
         $ref: '#/definitions/Email'
+      avatars:
+        type: array
+        items:
+          format: uuid
 
   LoginParam:
     type: object
@@ -288,14 +293,38 @@ paths:
             Set-Cookie:
               description: Session auth.
               type: string
-          schema:
-            $ref: '#/definitions/User'
         default: { $ref: '#/responses/GenericError' }
 
   /logout:
     post:
       operationId: logout
       description: Logout for user.
+      responses:
+        204: { $ref: '#/responses/NoContent' }
+        default: { $ref: '#/responses/GenericError' }
+
+  /avatar:
+    post:
+      operationId: newAvatar
+      description: Upload new avatar for user.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: upfile
+          type: file
+          description: The file to upload.
+      responses:
+        204: { $ref: '#/responses/NoContent' }
+        default: { $ref: '#/responses/GenericError' }
+    delete:
+      operationId: deleteAvatar
+      description: Delete user's avatar.
+      parameters:
+        - name: fileID
+          in: query
+          required: true
+          type: string
       responses:
         204: { $ref: '#/responses/NoContent' }
         default: { $ref: '#/responses/GenericError' }

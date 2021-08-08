@@ -1,59 +1,55 @@
 package repo_test
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"os"
 	"testing"
 
 	"github.com/Meat-Hook/back-template/cmd/file/internal/app"
-	"github.com/Meat-Hook/back-template/cmd/file/internal/repo"
-	"github.com/Meat-Hook/back-template/libs/metrics"
 )
 
 func TestRepo_Smoke(t *testing.T) {
 	t.Parallel()
 
-	db, assert := start(t)
-
-	m := metrics.DB("file", metrics.MethodsOf(&repo.Repo{})...)
-	r := repo.New(db, &m)
+	ctx, r, assert := start(t)
 
 	f, err := os.Open(testFile)
-	assert.Nil(err)
+	assert.NoError(err)
 	defer func() {
-		assert.Nil(f.Close())
+		assert.NoError(f.Close())
 	}()
 
 	fileID, err := r.Save(ctx, f)
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.NotNil(fileID)
 
 	_, err = f.Seek(0, io.SeekStart)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	fFromDB, err := r.Read(ctx, fileID)
-	assert.Nil(err)
+	assert.NoError(err, context.Canceled)
 
 	bufOldFile, err := io.ReadAll(f)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	bufNewFile, err := io.ReadAll(fFromDB)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	assert.Equal(bufOldFile, bufNewFile)
 
 	fFromDB.Metadata = json.RawMessage(`{"hello": "world!"}`)
 	err = r.SetMetadata(ctx, fFromDB.ID, fFromDB.Metadata)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	updatedFileFromDB, err := r.Read(ctx, fFromDB.ID)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	assert.Equal(fFromDB.Metadata, updatedFileFromDB.Metadata)
 
 	err = r.Delete(ctx, fFromDB.ID)
-	assert.Nil(err)
+	assert.NoError(err)
 
 	newF, err := r.Read(ctx, fFromDB.ID)
 	assert.Nil(newF)

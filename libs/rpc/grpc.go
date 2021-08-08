@@ -29,7 +29,7 @@ var (
 
 func newRPCLogger(ctx context.Context, logger zerolog.Logger, fullMethod string) zerolog.Logger {
 	l := logger.With().
-		Str(log.Func, path.Base(fullMethod)).
+		Str(log.GRPCFunc, path.Base(fullMethod)).
 		Logger()
 
 	if p, ok := peer.FromContext(ctx); ok {
@@ -50,12 +50,12 @@ func rpcLogHandler(l *zerolog.Logger, err error) error {
 	code, msg := s.Code(), s.Message()
 	switch code {
 	case codes.OK, codes.Canceled, codes.NotFound:
-		l.Info().Str(log.Code, code.String()).Str(log.HandledStatus, "success").Send()
+		l.Info().Str(log.Code, code.String()).Msg("success")
 	case codes.Unknown:
-		l.Error().Str(log.Code, code.String()).Str(log.HandledStatus, "failed").Msg(msg)
+		l.Error().Str(log.Code, code.String()).Msg(msg)
 		err = errInternal
 	default:
-		l.Error().Str(log.Code, code.String()).Str(log.HandledStatus, "failed").Msg(msg)
+		l.Error().Str(log.Code, code.String()).Msg(msg)
 	}
 
 	return err

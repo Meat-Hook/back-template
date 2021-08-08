@@ -7,52 +7,52 @@ package app_test
 import (
 	context "context"
 	json "encoding/json"
+	io "io"
+	reflect "reflect"
+
 	app "github.com/Meat-Hook/back-template/cmd/file/internal/app"
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
-	io "io"
-	reflect "reflect"
 )
 
-// MockRepo is a mock of Repo interface
+// MockRepo is a mock of Repo interface.
 type MockRepo struct {
 	ctrl     *gomock.Controller
 	recorder *MockRepoMockRecorder
 }
 
-// MockRepoMockRecorder is the mock recorder for MockRepo
+// MockRepoMockRecorder is the mock recorder for MockRepo.
 type MockRepoMockRecorder struct {
 	mock *MockRepo
 }
 
-// NewMockRepo creates a new mock instance
+// NewMockRepo creates a new mock instance.
 func NewMockRepo(ctrl *gomock.Controller) *MockRepo {
 	mock := &MockRepo{ctrl: ctrl}
 	mock.recorder = &MockRepoMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 	return m.recorder
 }
 
-// Save mocks base method
-func (m *MockRepo) Save(arg0 context.Context, arg1 io.Reader) (uuid.UUID, error) {
+// Delete mocks base method.
+func (m *MockRepo) Delete(arg0 context.Context, arg1 uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", arg0, arg1)
-	ret0, _ := ret[0].(uuid.UUID)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// Save indicates an expected call of Save
-func (mr *MockRepoMockRecorder) Save(arg0, arg1 interface{}) *gomock.Call {
+// Delete indicates an expected call of Delete.
+func (mr *MockRepoMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepo)(nil).Save), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepo)(nil).Delete), arg0, arg1)
 }
 
-// Read mocks base method
+// Read mocks base method.
 func (m *MockRepo) Read(arg0 context.Context, arg1 uuid.UUID) (*app.File, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0, arg1)
@@ -61,13 +61,28 @@ func (m *MockRepo) Read(arg0 context.Context, arg1 uuid.UUID) (*app.File, error)
 	return ret0, ret1
 }
 
-// Read indicates an expected call of Read
+// Read indicates an expected call of Read.
 func (mr *MockRepoMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockRepo)(nil).Read), arg0, arg1)
 }
 
-// SetMetadata mocks base method
+// Save mocks base method.
+func (m *MockRepo) Save(arg0 context.Context, arg1 io.Reader) (uuid.UUID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Save", arg0, arg1)
+	ret0, _ := ret[0].(uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Save indicates an expected call of Save.
+func (mr *MockRepoMockRecorder) Save(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepo)(nil).Save), arg0, arg1)
+}
+
+// SetMetadata mocks base method.
 func (m *MockRepo) SetMetadata(arg0 context.Context, arg1 uuid.UUID, arg2 json.RawMessage) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetMetadata", arg0, arg1, arg2)
@@ -75,22 +90,8 @@ func (m *MockRepo) SetMetadata(arg0 context.Context, arg1 uuid.UUID, arg2 json.R
 	return ret0
 }
 
-// SetMetadata indicates an expected call of SetMetadata
+// SetMetadata indicates an expected call of SetMetadata.
 func (mr *MockRepoMockRecorder) SetMetadata(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMetadata", reflect.TypeOf((*MockRepo)(nil).SetMetadata), arg0, arg1, arg2)
-}
-
-// Delete mocks base method
-func (m *MockRepo) Delete(arg0 context.Context, arg1 uuid.UUID) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Delete indicates an expected call of Delete
-func (mr *MockRepoMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepo)(nil).Delete), arg0, arg1)
 }
