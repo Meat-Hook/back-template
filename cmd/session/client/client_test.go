@@ -78,21 +78,22 @@ func TestClient_Session(t *testing.T) {
 		internalStatusErr = status.Error(codes.Internal, errAny.Error())
 	)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name        string
 		token       string
 		appResponse *pb.SessionResponse
 		appError    error
 		want        *client.Session
 		wantErr     error
 	}{
-		"success":   {token, &pb.SessionResponse{SessionId: &pb.UUID{Value: session.ID.String()}, UserId: &pb.UUID{Value: session.UserID.String()}}, nil, session, nil},
-		"not_found": {notValidToken, nil, status.Error(codes.NotFound, "not found"), nil, client.ErrNotFound},
-		"err_any":   {notValidToken, nil, internalStatusErr, nil, internalStatusErr},
+		{"success", token, &pb.SessionResponse{SessionId: &pb.UUID{Value: session.ID.String()}, UserId: &pb.UUID{Value: session.UserID.String()}}, nil, session, nil},
+		{"not_found", notValidToken, nil, status.Error(codes.NotFound, "not found"), nil, client.ErrNotFound},
+		{"err_any", notValidToken, nil, internalStatusErr, nil, internalStatusErr},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			conn, mock, assert := start(t)
 
 			mock.EXPECT().Session(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.SessionRequest{Token: tc.token}}).
@@ -113,18 +114,19 @@ func TestClient_RemoveSession(t *testing.T) {
 		sessionID         = uuid.Must(uuid.NewV4())
 	)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name        string
 		appResponse *pb.RemoveSessionResponse
 		appError    error
 		wantErr     error
 	}{
-		"success": {&pb.RemoveSessionResponse{Empty: &emptypb.Empty{}}, nil, nil},
-		"err_any": {nil, internalStatusErr, status.Error(codes.Internal, errAny.Error())},
+		{"success", &pb.RemoveSessionResponse{Empty: &emptypb.Empty{}}, nil, nil},
+		{"err_any", nil, internalStatusErr, status.Error(codes.Internal, errAny.Error())},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			conn, mock, assert := start(t)
 
 			mock.EXPECT().RemoveSession(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.RemoveSessionRequest{SessionId: &pb.UUID{Value: sessionID.String()}}}).
@@ -147,19 +149,20 @@ func TestClient_NewSession(t *testing.T) {
 		token             = "token"
 	)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name        string
 		appResponse *pb.NewSessionResponse
 		appError    error
 		want        *client.Token
 		wantErr     error
 	}{
-		"success": {&pb.NewSessionResponse{Token: token}, nil, &client.Token{Value: token}, nil},
-		"err_any": {nil, internalStatusErr, nil, status.Error(codes.Internal, errAny.Error())},
+		{"success", &pb.NewSessionResponse{Token: token}, nil, &client.Token{Value: token}, nil},
+		{"err_any", nil, internalStatusErr, nil, status.Error(codes.Internal, errAny.Error())},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			conn, mock, assert := start(t)
 
 			mock.EXPECT().NewSession(reqIDMatcher{expect: reqID.String()}, protoMatcher{value: &pb.NewSessionRequest{

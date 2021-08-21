@@ -18,17 +18,18 @@ func TestClient_Delete(t *testing.T) {
 	fileID := uuid.Must(uuid.NewV4())
 	conn, _, assert := start(t, fileID, nil, nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		fileID uuid.UUID
 		want   error
 	}{
-		"success":       {fileID, nil},
-		"err_not_found": {uuid.Must(uuid.NewV4()), status.Error(codes.NotFound, app.ErrNotFound.Error())},
+		{"success", fileID, nil},
+		{"err_not_found", uuid.Must(uuid.NewV4()), status.Error(codes.NotFound, app.ErrNotFound.Error())},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := conn.Delete(ctx, tc.fileID)
 			assert.ErrorIs(err, tc.want)
 		})
@@ -42,18 +43,19 @@ func TestClient_SetMetadata(t *testing.T) {
 	md := json.RawMessage(`{"field":"value"}`)
 	conn, _, assert := start(t, fileID, md, nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		fileID uuid.UUID
 		md     map[string]interface{}
 		want   error
 	}{
-		"success":       {fileID, map[string]interface{}{"field": "value"}, nil},
-		"err_not_found": {uuid.Must(uuid.NewV4()), nil, client.ErrNotFound},
+		{"success", fileID, map[string]interface{}{"field": "value"}, nil},
+		{"err_not_found", uuid.Must(uuid.NewV4()), nil, client.ErrNotFound},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := conn.SetMetadata(ctx, tc.fileID, tc.md)
 			assert.ErrorIs(err, tc.want)
 		})

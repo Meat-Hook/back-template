@@ -52,22 +52,23 @@ func TestApi_Session(t *testing.T) {
 
 	const token = `accessToken`
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		session *app.Session
 		want    *pb.SessionResponse
 		appErr  error
 		wantErr error
 	}{
-		"success":       {&sessionInfo, &sessionResponse, nil, nil},
-		"err_not_found": {nil, nil, app.ErrNotFound, errNotFound},
-		"err_deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
-		"err_canceled":  {nil, nil, context.Canceled, errCanceled},
-		"err_any":       {nil, nil, errAny, errInternal},
+		{"success", &sessionInfo, &sessionResponse, nil, nil},
+		{"err_not_found", nil, nil, app.ErrNotFound, errNotFound},
+		{"err_deadline", nil, nil, context.DeadlineExceeded, errDeadline},
+		{"err_canceled", nil, nil, context.Canceled, errCanceled},
+		{"err_any", nil, nil, errAny, errInternal},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -92,20 +93,21 @@ func TestApi_RemoveSession(t *testing.T) {
 	errCanceled := status.Error(codes.Canceled, context.Canceled.Error())
 	errInternal := status.Error(codes.Internal, errAny.Error())
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		appErr error
 		want   error
 	}{
-		"success":       {nil, nil},
-		"err_not_found": {app.ErrNotFound, errNotFound},
-		"err_deadline":  {context.DeadlineExceeded, errDeadline},
-		"err_canceled":  {context.Canceled, errCanceled},
-		"err_any":       {errAny, errInternal},
+		{"success", nil, nil},
+		{"err_not_found", app.ErrNotFound, errNotFound},
+		{"err_deadline", context.DeadlineExceeded, errDeadline},
+		{"err_canceled", context.Canceled, errCanceled},
+		{"err_any", errAny, errInternal},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -133,22 +135,23 @@ func TestApi_NewSession(t *testing.T) {
 
 	const token = `token`
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name     string
 		appToken *app.Token
 		want     *pb.NewSessionResponse
 		appErr   error
 		wantErr  error
 	}{
-		"success":       {&app.Token{Value: token}, &pb.NewSessionResponse{Token: token}, nil, nil},
-		"err_not_found": {nil, nil, app.ErrNotFound, errNotFound},
-		"err_deadline":  {nil, nil, context.DeadlineExceeded, errDeadline},
-		"err_canceled":  {nil, nil, context.Canceled, errCanceled},
-		"err_any":       {nil, nil, errAny, errInternal},
+		{"success", &app.Token{Value: token}, &pb.NewSessionResponse{Token: token}, nil, nil},
+		{"err_not_found", nil, nil, app.ErrNotFound, errNotFound},
+		{"err_deadline", nil, nil, context.DeadlineExceeded, errDeadline},
+		{"err_canceled", nil, nil, context.Canceled, errCanceled},
+		{"err_any", nil, nil, errAny, errInternal},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)

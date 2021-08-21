@@ -19,19 +19,20 @@ import (
 func TestService_VerificationEmail(t *testing.T) {
 	t.Parallel()
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		email  string
 		appErr error
 		want   *models.Error
 	}{
-		"success":         {"notExist@mail.com", nil, nil},
-		"err_email_exist": {"email@mail.com", app.ErrEmailExist, APIError(app.ErrEmailExist.Error())},
-		"err_any":         {"email@mail.com", errAny, APIError("Internal Server Error")},
+		{"success", "notExist@mail.com", nil, nil},
+		{"err_email_exist", "email@mail.com", app.ErrEmailExist, APIError(app.ErrEmailExist.Error())},
+		{"err_any", "email@mail.com", errAny, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, _ := start(t)
@@ -50,19 +51,20 @@ func TestService_VerificationEmail(t *testing.T) {
 func TestService_VerificationUsername(t *testing.T) {
 	t.Parallel()
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name     string
 		username string
 		appErr   error
 		want     *models.Error
 	}{
-		"success":            {"freeUsername", nil, nil},
-		"err_username_exist": {"existUsername", app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
-		"err_any":            {"existUsername", errAny, APIError("Internal Server Error")},
+		{"success", "freeUsername", nil, nil},
+		{"err_username_exist", "existUsername", app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
+		{"err_any", "existUsername", errAny, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, _ := start(t)
@@ -89,21 +91,22 @@ func TestService_CreateUser(t *testing.T) {
 
 	uid := uuid.Must(uuid.NewV4())
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		id      uuid.UUID
 		appErr  error
 		want    *operations.CreateUserOK
 		wantErr *models.Error
 	}{
-		"success":            {uid, nil, &operations.CreateUserOK{Payload: &operations.CreateUserOKBody{ID: models.UserID(uid.String())}}, nil},
-		"err_email_exist":    {uuid.Nil, app.ErrEmailExist, nil, APIError(app.ErrEmailExist.Error())},
-		"err_username_exist": {uuid.Nil, app.ErrUsernameExist, nil, APIError(app.ErrUsernameExist.Error())},
-		"err_any":            {uuid.Nil, errAny, nil, APIError("Internal Server Error")},
+		{"success", uid, nil, &operations.CreateUserOK{Payload: &operations.CreateUserOKBody{ID: models.UserID(uid.String())}}, nil},
+		{"err_email_exist", uuid.Nil, app.ErrEmailExist, nil, APIError(app.ErrEmailExist.Error())},
+		{"err_username_exist", uuid.Nil, app.ErrUsernameExist, nil, APIError(app.ErrUsernameExist.Error())},
+		{"err_any", uuid.Nil, errAny, nil, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, _ := start(t)
@@ -132,21 +135,22 @@ func TestService_GetUser(t *testing.T) {
 	t.Parallel()
 
 	restUser := web.User(&user)
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		arg     uuid.UUID
 		user    *app.User
 		appErr  error
 		want    *operations.GetUserOK
 		wantErr *models.Error
 	}{
-		"success":       {user.ID, &user, nil, &operations.GetUserOK{Payload: restUser}, nil},
-		"err_not_found": {uuid.Must(uuid.NewV4()), nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error())},
-		"err_any":       {uuid.Must(uuid.NewV4()), nil, errAny, nil, APIError("Internal Server Error")},
+		{"success", user.ID, &user, nil, &operations.GetUserOK{Payload: restUser}, nil},
+		{"err_not_found", uuid.Must(uuid.NewV4()), nil, app.ErrNotFound, nil, APIError(app.ErrNotFound.Error())},
+		{"err_any", uuid.Must(uuid.NewV4()), nil, errAny, nil, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, apiKeyAuth := start(t)
@@ -167,17 +171,18 @@ func TestService_GetUser(t *testing.T) {
 func TestService_DeleteUser(t *testing.T) {
 	t.Parallel()
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		appErr error
 		want   *models.Error
 	}{
-		"success": {nil, nil},
-		"err_any": {errAny, APIError("Internal Server Error")},
+		{"success", nil, nil},
+		{"err_any", errAny, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, apiKeyAuth := start(t)
@@ -195,19 +200,20 @@ func TestService_DeleteUser(t *testing.T) {
 func TestServiceUpdatePassword(t *testing.T) {
 	t.Parallel()
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name             string
 		oldPass, newPass string
 		appErr           error
 		want             *models.Error
 	}{
-		"success":                {"old_pass", "NewPassword", nil, nil},
-		"err_not_valid_password": {"notCorrectPass", "NewPassword", app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
-		"err_any":                {"notCorrectPass2", "NewPassword", errAny, APIError("Internal Server Error")},
+		{"success", "old_pass", "NewPassword", nil, nil},
+		{"err_not_valid_password", "notCorrectPass", "NewPassword", app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
+		{"err_any", "notCorrectPass2", "NewPassword", errAny, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, apiKeyAuth := start(t)
@@ -232,19 +238,20 @@ func TestServiceUpdateUsername(t *testing.T) {
 
 	const userName = `zergsLaw`
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		appErr error
 		want   *models.Error
 	}{
-		"success":                    {nil, nil},
-		"err_username_exist":         {app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
-		"err_username_not_different": {app.ErrNotDifferent, APIError(app.ErrNotDifferent.Error())},
-		"err_any":                    {errAny, APIError("Internal Server Error")},
+		{"success", nil, nil},
+		{"err_username_exist", app.ErrUsernameExist, APIError(app.ErrUsernameExist.Error())},
+		{"err_username_not_different", app.ErrNotDifferent, APIError(app.ErrNotDifferent.Error())},
+		{"err_any", errAny, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, apiKeyAuth := start(t)
@@ -267,20 +274,21 @@ func TestServiceGetUsers(t *testing.T) {
 
 	const userName = `zergsL`
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name      string
 		users     []app.User
 		appErr    error
 		want      *operations.GetUsersOK
 		wantTotal int32
 		wantErr   *models.Error
 	}{
-		"success": {[]app.User{user}, nil, &operations.GetUsersOK{Payload: &operations.GetUsersOKBody{Total: swag.Int32(1), Users: web.Users([]app.User{user})}}, 1, nil},
-		"err_any": {nil, errAny, nil, 0, APIError("Internal Server Error")},
+		{"success", []app.User{user}, nil, &operations.GetUsersOK{Payload: &operations.GetUsersOKBody{Total: swag.Int32(1), Users: web.Users([]app.User{user})}}, 1, nil},
+		{"err_any", nil, errAny, nil, 0, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, apiKeyAuth := start(t)
@@ -311,21 +319,22 @@ func TestService_Login(t *testing.T) {
 		}
 	)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name        string
 		email, pass string
 		token       *app.Token
 		appErr      error
 		wantErr     *models.Error
 	}{
-		"success":                {user.Email, "password", &token, nil, nil},
-		"err_not_found":          {"notExist@email.com", "password", nil, app.ErrNotFound, APIError(app.ErrNotFound.Error())},
-		"err_not_valid_password": {user.Email, "notValidPass", nil, app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
-		"err_any":                {"randomEmail@email.com", "notValidPass", nil, errAny, APIError("Internal Server Error")},
+		{"success", user.Email, "password", &token, nil, nil},
+		{"err_not_found", "notExist@email.com", "password", nil, app.ErrNotFound, APIError(app.ErrNotFound.Error())},
+		{"err_not_valid_password", user.Email, "notValidPass", nil, app.ErrNotValidPassword, APIError(app.ErrNotValidPassword.Error())},
+		{"err_any", "randomEmail@email.com", "notValidPass", nil, errAny, APIError("Internal Server Error")},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			_, mockApp, client, assert, _ := start(t)

@@ -51,18 +51,19 @@ func TestModule_NewSession(t *testing.T) {
 	mocks.repo.EXPECT().Save(ctx, session).Return(nil)
 	mocks.repo.EXPECT().Save(ctx, errSaveSession).Return(errAny)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		userID  uuid.UUID
 		want    *app.Token
 		wantErr error
 	}{
-		"success":       {userID1, &token, nil},
-		"err_any":       {userID2, nil, errAny},
+		{"success", userID1, &token, nil},
+		{"err_any", userID2, nil, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			resToken, err := module.NewSession(ctx, tc.userID, origin)
 			assert.Equal(tc.want, resToken)
 			assert.ErrorIs(err, tc.wantErr)
@@ -78,16 +79,17 @@ func TestModule_RemoveSession(t *testing.T) {
 	id := uuid.Must(uuid.NewV4())
 	mocks.repo.EXPECT().Delete(ctx, id).Return(nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		session uuid.UUID
 		want    error
 	}{
-		"success": {id, nil},
+		{"success", id, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.RemoveSession(ctx, id)
 			assert.Equal(tc.want, err)
 		})
@@ -126,19 +128,20 @@ func TestModule_Session(t *testing.T) {
 	mocks.repo.EXPECT().ByID(ctx, successSubject.SessionID).Return(&session, nil)
 	mocks.repo.EXPECT().ByID(ctx, subjectForNotFoundToken.SessionID).Return(nil, app.ErrNotFound)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		token   string
 		want    *app.Session
 		wantErr error
 	}{
-		"success":           {token, &session, nil},
-		"err_not_found":     {tokenNotFound, nil, app.ErrNotFound},
-		"err_invalid_token": {notValidToken, nil, app.ErrInvalidToken},
+		{"success", token, &session, nil},
+		{"err_not_found", tokenNotFound, nil, app.ErrNotFound},
+		{"err_invalid_token", notValidToken, nil, app.ErrInvalidToken},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			res, err := module.Session(ctx, tc.token)
 			assert.Equal(tc.want, res)
 			assert.ErrorIs(err, tc.wantErr)

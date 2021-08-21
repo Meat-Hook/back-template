@@ -12,17 +12,18 @@ func TestClient_Upload(t *testing.T) {
 
 	file := bytes.NewBuffer(uuid.Must(uuid.NewV4()).Bytes())
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		want    uuid.UUID
 		wantErr error
 	}{
-		"success": {uuid.Must(uuid.NewV4()), nil},
-		"err_any": {uuid.Nil, errAny},
+		{"success", uuid.Must(uuid.NewV4()), nil},
+		{"err_any", uuid.Nil, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			svc, mock, assert := start(t)
@@ -41,16 +42,17 @@ func TestClient_Delete(t *testing.T) {
 
 	fileID := uuid.Must(uuid.NewV4())
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name string
 		want error
 	}{
-		"success": {nil},
-		"err_any": {errAny},
+		{"success", nil},
+		{"err_any", errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			svc, mock, assert := start(t)

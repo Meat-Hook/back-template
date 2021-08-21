@@ -20,17 +20,18 @@ func TestService_GetFile(t *testing.T) {
 	t.Parallel()
 	assert := require.New(t)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name     string
 		filePath string
 		appErr   error
 		wantErr  *models.Error
 	}{
-		"success": {testFile, nil, nil},
+		{"success", testFile, nil, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			file, err := os.Open(tc.filePath)

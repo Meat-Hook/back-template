@@ -17,19 +17,20 @@ func TestClient_Session(t *testing.T) {
 		UserID: uuid.Must(uuid.NewV4()),
 	}
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		token   string
 		want    *app.Session
 		wantErr error
 	}{
-		"success":       {"validToken", sessionInfo, nil},
-		"err_not_found": {"notFoundToken", nil, app.ErrNotFound},
-		"err_any":       {"notValidToken", nil, errAny},
+		{"success", "validToken", sessionInfo, nil},
+		{"err_not_found", "notFoundToken", nil, app.ErrNotFound},
+		{"err_any", "notValidToken", nil, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			svc, mock, assert := start(t)
@@ -61,17 +62,18 @@ func TestClient_NewSession(t *testing.T) {
 		userID = uuid.Must(uuid.NewV4())
 	)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		want    *app.Token
 		wantErr error
 	}{
-		"success": {token, nil},
-		"err_any": {nil, errAny},
+		{"success", token, nil},
+		{"err_any", nil, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			svc, mock, assert := start(t)
@@ -96,16 +98,17 @@ func TestClient_RemoveSession(t *testing.T) {
 
 	sessionID := uuid.Must(uuid.NewV4())
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name string
 		want error
 	}{
-		"success": {nil},
-		"err_any": {errAny},
+		{"success", nil},
+		{"err_any", errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			svc, mock, assert := start(t)

@@ -27,18 +27,19 @@ func TestModule_VerificationEmail(t *testing.T) {
 	mocks.repo.EXPECT().ByEmail(ctx, free).Return(nil, app.ErrNotFound)
 	mocks.repo.EXPECT().ByEmail(ctx, any).Return(nil, errAny)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name  string
 		email string
 		want  error
 	}{
-		"success":         {free, nil},
-		"err_email_exist": {exist, app.ErrEmailExist},
-		"err_any":         {any, errAny},
+		{"success", free, nil},
+		{"err_email_exist", exist, app.ErrEmailExist},
+		{"err_any", any, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.VerificationEmail(ctx, tc.email)
 			assert.ErrorIs(err, tc.want)
 		})
@@ -60,18 +61,19 @@ func TestModule_VerificationUsername(t *testing.T) {
 	mocks.repo.EXPECT().ByUsername(ctx, free).Return(nil, app.ErrNotFound)
 	mocks.repo.EXPECT().ByUsername(ctx, any).Return(nil, errAny)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name     string
 		username string
 		want     error
 	}{
-		"success":            {free, nil},
-		"err_username_exist": {exist, app.ErrUsernameExist},
-		"err_any":            {any, errAny},
+		{"success", free, nil},
+		{"err_username_exist", exist, app.ErrUsernameExist},
+		{"err_any", any, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.VerificationUsername(ctx, tc.username)
 			assert.ErrorIs(err, tc.want)
 		})
@@ -107,21 +109,22 @@ func TestModule_CreateUser(t *testing.T) {
 	}).Return(uuid.Nil, app.ErrUsernameExist)
 	mocks.hasher.EXPECT().Hashing(unknownPass).Return(nil, errAny)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name     string
 		email    string
 		username string
 		password string
 		want     uuid.UUID
 		wantErr  error
 	}{
-		"success":       {email, username, pass, wantID, nil},
-		"err_save_user": {email, existUserName, pass, uuid.Nil, app.ErrUsernameExist},
-		"err_hashing":   {notValidEmail, username, unknownPass, uuid.Nil, errAny},
+		{"success", email, username, pass, wantID, nil},
+		{"err_save_user", email, existUserName, pass, uuid.Nil, app.ErrUsernameExist},
+		{"err_hashing", notValidEmail, username, unknownPass, uuid.Nil, errAny},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			res, err := module.CreateUser(ctx, tc.email, tc.username, tc.password)
 			assert.Equal(tc.want, res)
 			assert.ErrorIs(err, tc.wantErr)
@@ -145,17 +148,18 @@ func TestModule_UserByID(t *testing.T) {
 
 	mocks.repo.EXPECT().ByID(ctx, user.ID).Return(user, nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		userID  uuid.UUID
 		want    *app.User
 		wantErr error
 	}{
-		"success": {user.ID, user, nil},
+		{"success", user.ID, user, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			res, err := module.UserByID(ctx, app.Session{}, tc.userID)
 			assert.Equal(tc.want, res)
 			assert.ErrorIs(err, tc.wantErr)
@@ -175,16 +179,17 @@ func TestModule_DeleteUser(t *testing.T) {
 
 	mocks.repo.EXPECT().Delete(ctx, session.UserID).Return(nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		session *app.Session
 		want    error
 	}{
-		"success": {session, nil},
+		{"success", session, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.DeleteUser(ctx, *tc.session)
 			assert.ErrorIs(err, tc.want)
 		})
@@ -222,19 +227,20 @@ func TestModule_UpdateUsername(t *testing.T) {
 	})
 	mocks.repo.EXPECT().ByID(ctx, notValidSession.UserID).Return(nil, app.ErrNotFound)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name     string
 		session  *app.Session
 		username string
 		want     error
 	}{
-		"success":                {session, newUsername, nil},
-		"err_different_username": {session, user.Name, app.ErrNotDifferent},
-		"err__not_found":         {notValidSession, newUsername, app.ErrNotFound},
+		{"success", session, newUsername, nil},
+		{"err_different_username", session, user.Name, app.ErrNotDifferent},
+		{"err__not_found", notValidSession, newUsername, app.ErrNotFound},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.UpdateUsername(ctx, *tc.session, tc.username)
 			assert.ErrorIs(err, tc.want)
 		})
@@ -285,21 +291,22 @@ func TestModule_UpdatePassword(t *testing.T) {
 	})
 	mocks.repo.EXPECT().ByID(ctx, notValidSession.UserID).Return(nil, app.ErrNotFound)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name             string
 		session          *app.Session
 		oldPass, newPass string
 		want             error
 	}{
-		"success":            {session, string(user.PassHash), newPass, nil},
-		"err_hashing":        {session, string(user.PassHash), notValidPass, errAny},
-		"err_different_pass": {session, string(user.PassHash), string(user.PassHash), app.ErrNotDifferent},
-		"err_not_valid_pass": {session, notValidPass, newPass, app.ErrNotValidPassword},
-		"err_not_found":      {notValidSession, "", "", app.ErrNotFound},
+		{"success", session, string(user.PassHash), newPass, nil},
+		{"err_hashing", session, string(user.PassHash), notValidPass, errAny},
+		{"err_different_pass", session, string(user.PassHash), string(user.PassHash), app.ErrNotDifferent},
+		{"err_not_valid_pass", session, notValidPass, newPass, app.ErrNotValidPassword},
+		{"err_not_found", notValidSession, "", "", app.ErrNotFound},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.UpdatePassword(ctx, *tc.session, tc.oldPass, tc.newPass)
 			assert.ErrorIs(err, tc.want)
 		})
@@ -327,18 +334,19 @@ func TestModule_ListUserByUsername(t *testing.T) {
 
 	mocks.repo.EXPECT().ListUserByUsername(ctx, user.Name, p).Return([]app.User{user}, 1, nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name      string
 		username  string
 		want      []app.User
 		wantTotal int
 		wantErr   error
 	}{
-		"success": {user.Name, []app.User{user}, 1, nil},
+		{"success", user.Name, []app.User{user}, 1, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			res, total, err := module.ListUserByUsername(ctx, app.Session{}, tc.username, p)
 			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
@@ -361,17 +369,18 @@ func TestModule_Auth(t *testing.T) {
 
 	mocks.auth.EXPECT().Session(ctx, token).Return(session, nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		token   string
 		want    *app.Session
 		wantErr error
 	}{
-		"success": {token, session, nil},
+		{"success", token, session, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			res, err := module.Auth(ctx, tc.token)
 			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
@@ -408,20 +417,21 @@ func TestModule_Login(t *testing.T) {
 	mocks.hasher.EXPECT().Compare(user.PassHash, user.PassHash).Return(true)
 	mocks.hasher.EXPECT().Compare(user.PassHash, []byte(notValidPass)).Return(false)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		email   string
 		pass    string
 		want    *app.Token
 		wantErr error
 	}{
-		"success":       {user.Email, string(user.PassHash), token, nil},
-		"err_not_valid": {user.Email, notValidPass, nil, app.ErrNotValidPassword},
-		"err_not_found": {unknownEmail, "", nil, app.ErrNotFound},
+		{"success", user.Email, string(user.PassHash), token, nil},
+		{"err_not_valid", user.Email, notValidPass, nil, app.ErrNotValidPassword},
+		{"err_not_found", unknownEmail, "", nil, app.ErrNotFound},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			res, err := module.Login(ctx, tc.email, tc.pass, origin)
 			assert.ErrorIs(err, tc.wantErr)
 			assert.Equal(tc.want, res)
@@ -441,16 +451,17 @@ func TestModule_Logout(t *testing.T) {
 
 	mocks.auth.EXPECT().RemoveSession(ctx, session.ID).Return(nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		session *app.Session
 		wantErr error
 	}{
-		"success": {session, nil},
+		{"success", session, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.Logout(ctx, *tc.session)
 			assert.ErrorIs(err, tc.wantErr)
 		})
@@ -498,19 +509,20 @@ func TestModule_UploadAvatar(t *testing.T) {
 	mocks.file.EXPECT().Upload(ctx, nil).Return(uuid.Nil, errAny)
 	mocks.repo.EXPECT().Update(ctx, userWithAvatar).Return(nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		session *app.Session
 		file    io.Reader
 		wantErr error
 	}{
-		"success":            {session, correctFile, nil},
-		"err_upload_file":    {session, nil, errAny},
-		"err_user_not_found": {&app.Session{UserID: userNotFoundID}, nil, app.ErrNotFound},
+		{"success", session, correctFile, nil},
+		{"err_upload_file", session, nil, errAny},
+		{"err_user_not_found", &app.Session{UserID: userNotFoundID}, nil, app.ErrNotFound},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.UploadAvatar(ctx, *tc.session, tc.file)
 			assert.ErrorIs(err, tc.wantErr)
 		})
@@ -559,20 +571,21 @@ func TestModule_DeleteAvatar(t *testing.T) {
 	mocks.file.EXPECT().Delete(ctx, fileID3).Return(errAny)
 	mocks.repo.EXPECT().Update(ctx, userWithoutSecondAvatar).Return(nil)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		session *app.Session
 		fileID  uuid.UUID
 		wantErr error
 	}{
-		"success":             {session, fileID2, nil},
-		"err_file_not_delete": {session, fileID3, errAny},
-		"err_file_not_found":  {session, uuid.Nil, app.ErrNotFound},
-		"err_user_not_found":  {&app.Session{UserID: userNotFoundID}, uuid.Nil, app.ErrNotFound},
+		{"success", session, fileID2, nil},
+		{"err_file_not_delete", session, fileID3, errAny},
+		{"err_file_not_found", session, uuid.Nil, app.ErrNotFound},
+		{"err_user_not_found", &app.Session{UserID: userNotFoundID}, uuid.Nil, app.ErrNotFound},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			err := module.DeleteAvatar(ctx, *tc.session, tc.fileID)
 			assert.ErrorIs(err, tc.wantErr)
 		})

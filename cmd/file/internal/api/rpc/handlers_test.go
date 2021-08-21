@@ -57,19 +57,20 @@ func TestApi_Upload(t *testing.T) {
 	buf, err := io.ReadAll(file)
 	assert.NoError(err)
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name    string
 		file    io.Reader
 		want    *pb.UploadResponse
 		appRes  uuid.UUID
 		appErr  error
 		wantErr error
 	}{
-		"success": {bytes.NewBuffer(buf), &pb.UploadResponse{FileId: &pb.UUID{Value: fileID.String()}}, fileID, nil, nil},
+		{"success", bytes.NewBuffer(buf), &pb.UploadResponse{FileId: &pb.UUID{Value: fileID.String()}}, fileID, nil, nil},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -122,21 +123,22 @@ func TestApi_SetMetadata(t *testing.T) {
 	errInternal := status.Error(codes.Internal, errAny.Error())
 
 	md := map[string]interface{}{"key": "value"}
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		fileID uuid.UUID
 		appErr error
 		want   error
 	}{
-		"success":       {uuid.Must(uuid.NewV4()), nil, nil},
-		"err_not_found": {uuid.Must(uuid.NewV4()), app.ErrNotFound, errNotFound},
-		"err_deadline":  {uuid.Must(uuid.NewV4()), context.DeadlineExceeded, errDeadline},
-		"err_canceled":  {uuid.Must(uuid.NewV4()), context.Canceled, errCanceled},
-		"err_any":       {uuid.Must(uuid.NewV4()), errAny, errInternal},
+		{"success", uuid.Must(uuid.NewV4()), nil, nil},
+		{"err_not_found", uuid.Must(uuid.NewV4()), app.ErrNotFound, errNotFound},
+		{"err_deadline", uuid.Must(uuid.NewV4()), context.DeadlineExceeded, errDeadline},
+		{"err_canceled", uuid.Must(uuid.NewV4()), context.Canceled, errCanceled},
+		{"err_any", uuid.Must(uuid.NewV4()), errAny, errInternal},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -172,21 +174,22 @@ func TestApi_Delete(t *testing.T) {
 	errCanceled := status.Error(codes.Canceled, context.Canceled.Error())
 	errInternal := status.Error(codes.Internal, errAny.Error())
 
-	testCases := map[string]struct {
+	testCases := []struct {
+		name   string
 		fileID uuid.UUID
 		appErr error
 		want   error
 	}{
-		"success":       {uuid.Must(uuid.NewV4()), nil, nil},
-		"err_not_found": {uuid.Must(uuid.NewV4()), app.ErrNotFound, errNotFound},
-		"err_deadline":  {uuid.Must(uuid.NewV4()), context.DeadlineExceeded, errDeadline},
-		"err_canceled":  {uuid.Must(uuid.NewV4()), context.Canceled, errCanceled},
-		"err_any":       {uuid.Must(uuid.NewV4()), errAny, errInternal},
+		{"success", uuid.Must(uuid.NewV4()), nil, nil},
+		{"err_not_found", uuid.Must(uuid.NewV4()), app.ErrNotFound, errNotFound},
+		{"err_deadline", uuid.Must(uuid.NewV4()), context.DeadlineExceeded, errDeadline},
+		{"err_canceled", uuid.Must(uuid.NewV4()), context.Canceled, errCanceled},
+		{"err_any", uuid.Must(uuid.NewV4()), errAny, errInternal},
 	}
 
-	for name, tc := range testCases {
-		name, tc := name, tc
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
