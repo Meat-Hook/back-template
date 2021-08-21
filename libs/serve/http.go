@@ -48,6 +48,7 @@ func Metrics(logger zerolog.Logger, host string, port int, reg *prometheus.Regis
 	return func(ctx context.Context) error {
 		mux := http.NewServeMux()
 		HandleMetrics(mux, reg)
+
 		return HTTP(logger, host, port, mux)(ctx)
 	}
 }

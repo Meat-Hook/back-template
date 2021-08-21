@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/swag"
 	"github.com/gofrs/uuid"
@@ -26,6 +27,8 @@ import (
 	libweb "github.com/Meat-Hook/back-template/libs/web"
 )
 
+const token = "token"
+
 var (
 	errAny = errors.New("any error")
 
@@ -40,9 +43,6 @@ var (
 		UserID: user.ID,
 	}
 
-	token      = "token"
-	apiKeyAuth = httptransport.APIKeyAuth("Cookie", "header", "authKey="+token)
-
 	reg = prometheus.NewPedanticRegistry()
 )
 
@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (string, *Mockapplication, *client.UserService, *require.Assertions) {
+func start(t *testing.T) (string, *Mockapplication, *client.UserService, *require.Assertions, runtime.ClientAuthInfoWriter) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
@@ -79,7 +79,7 @@ func start(t *testing.T) (string, *Mockapplication, *client.UserService, *requir
 	transport := httptransport.New(url, client.DefaultBasePath, client.DefaultSchemes)
 	c := client.New(transport, nil)
 
-	return url, mockApp, c, require.New(t)
+	return url, mockApp, c, require.New(t), httptransport.APIKeyAuth("Cookie", "header", "authKey="+token)
 }
 
 // APIError returns model.Error with given msg.

@@ -4,7 +4,6 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -34,7 +33,7 @@ func Server(
 			UnaryServerAccessLog,
 		)),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			prometheus.StreamServerInterceptor,
+			grpc_prometheus.StreamServerInterceptor,
 			MakeStreamServerLogger(logger),
 			MakeStreamServerRecover(),
 			grpc_recovery.StreamServerInterceptor(grpc_recovery.WithRecoveryHandlerContext(recoveryFunc)),

@@ -29,7 +29,8 @@ const (
 // WarnIfFail logs if callback finished with error.
 func WarnIfFail(l zerolog.Logger, cb func() error) {
 	if err := cb(); err != nil {
-		l.Error().Caller(2).Err(err).Msg("cb fail")
+		const stackOffset = 2
+		l.Error().Caller(stackOffset).Err(err).Msg("cb fail")
 	}
 }
 

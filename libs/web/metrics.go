@@ -19,7 +19,7 @@ type Metric struct {
 
 // NewMetric registers and returns common web metrics used by all
 // services (namespace).
-func NewMetric(reg *prometheus.Registry, namespace string, swagger json.RawMessage) (metric Metric) {
+func NewMetric(reg *prometheus.Registry, namespace string, swagger json.RawMessage) (metric Metric) { //nolint:funlen // By design.
 	const subsystem = "web"
 
 	// Labels.

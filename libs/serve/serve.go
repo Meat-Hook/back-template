@@ -2,6 +2,7 @@ package serve
 
 import (
 	"context"
+	"fmt"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -12,14 +13,19 @@ import (
 //
 // Returns error of first service which returned non-nil error, if any.
 func Start(ctx context.Context, services ...func(context.Context) error) error {
-	group, groupCtx := errgroup.WithContext(ctx)
+	g, groupCtx := errgroup.WithContext(ctx)
 
 	for i := range services {
 		i := i
-		group.Go(func() error {
+		g.Go(func() error {
 			return services[i](groupCtx)
 		})
 	}
 
-	return group.Wait()
+	err := g.Wait()
+	if err != nil {
+		return fmt.Errorf("g.Wait: %w", err)
+	}
+
+	return nil
 }

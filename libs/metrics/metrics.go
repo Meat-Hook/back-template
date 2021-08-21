@@ -7,16 +7,17 @@ import (
 )
 
 // PanicsTotal contains metrics for rates of panic.
-var PanicsTotal struct{ prometheus.Counter }
+var PanicsTotal struct{ prometheus.Counter } //nolint:gochecknoglobals // By design.
 
 // InitMetrics must be called once before using this package.
 // It registers and initializes metrics used by this package.
-func InitMetrics(reg *prometheus.Registry) {
+func InitMetrics(reg prometheus.Registerer) {
 	PanicsTotal.Counter = promauto.NewCounter(
 		prometheus.CounterOpts{
 			Name: "panics_total",
 			Help: "Amount of recovered panics.",
 		},
 	)
+
 	reg.MustRegister(PanicsTotal)
 }

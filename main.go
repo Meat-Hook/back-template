@@ -30,6 +30,7 @@ type embeddedService interface {
 	RunServe(ctx context.Context, reg *prometheus.Registry, namespace string) error
 }
 
+//nolint:gochecknoglobals,nolintlint // By design.
 var (
 	embeddedServices = []embeddedService{
 		&user.Service{},
@@ -43,7 +44,7 @@ var (
 		EnvVars:  []string{"CONFIG_FILE_PATH"},
 		Required: true,
 	}
-	// Service name -> json config
+	// Service name -> json config.
 	config map[string]json.RawMessage
 )
 
@@ -104,11 +105,21 @@ func start(c *cli.Context) error {
 			serviceLogger := logger.With().Str(log.Service, name).Logger()
 			reg := prometheus.NewRegistry()
 
-			return svc.RunServe(serviceLogger.WithContext(ctx), reg, "test")
+			err = svc.RunServe(serviceLogger.WithContext(ctx), reg, c.App.Name)
+			if err != nil {
+				return fmt.Errorf("svc.RunServe: %w", err)
+			}
+
+			return nil
 		})
 	}
 
-	return g.Wait()
+	err = g.Wait()
+	if err != nil {
+		return fmt.Errorf("g.Wait: %w", err)
+	}
+
+	return nil
 }
 
 func forceShutdown(ctx context.Context) {

@@ -62,7 +62,6 @@ func New(r *db.DB) *Repo {
 // Save for implements app.Repo.
 func (r *Repo) Save(ctx context.Context, reader io.Reader) (res uuid.UUID, err error) {
 	err = r.db.Tx(ctx, nil, func(tx *sqlx.Tx) (err error) {
-
 		const querySaveFile = `
 			insert into files default values returning *
 		`
@@ -150,6 +149,7 @@ func (r *Repo) Read(ctx context.Context, fileID uuid.UUID) (res *app.File, err e
 		}
 
 		res = fInfo.convert(f)
+
 		return nil
 	})
 	if err != nil {

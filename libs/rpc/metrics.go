@@ -19,6 +19,7 @@ func NewServerMetrics(reg *prometheus.Registry, namespace string) *grpc_promethe
 		o.Subsystem = subsystem
 	})
 	reg.MustRegister(serverMetrics)
+
 	return serverMetrics
 }
 
@@ -35,5 +36,6 @@ func NewClientMetrics(reg *prometheus.Registry, namespace string) *grpc_promethe
 		o.Subsystem = subsystem
 	})
 	reg.MustRegister(clientMetrics)
+
 	return clientMetrics
 }

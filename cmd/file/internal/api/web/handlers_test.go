@@ -20,31 +20,12 @@ func TestService_GetFile(t *testing.T) {
 	t.Parallel()
 	assert := require.New(t)
 
-	file, err := os.Open(testFile)
-	assert.NoError(err)
-	stat, err := file.Stat()
-	assert.NoError(err)
-
-	fileBuf, err := io.ReadAll(file)
-	assert.NoError(err)
-	_, err = file.Seek(0, io.SeekStart)
-	assert.NoError(err)
-
-	appFile := app.File{
-		ReadSeekCloser: file,
-		ID:             uuid.Must(uuid.NewV4()),
-		Size:           stat.Size(),
-		Metadata:       nil,
-	}
-
 	testCases := map[string]struct {
-		fileID  uuid.UUID
-		appRes  *app.File
-		appErr  error
-		want    []byte
-		wantErr *models.Error
+		filePath string
+		appErr   error
+		wantErr  *models.Error
 	}{
-		"success": {appFile.ID, &appFile, nil, fileBuf, nil},
+		"success": {testFile, nil, nil},
 	}
 
 	for name, tc := range testCases {
@@ -52,18 +33,35 @@ func TestService_GetFile(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
+			file, err := os.Open(tc.filePath)
+			assert.NoError(err)
+			stat, err := file.Stat()
+			assert.NoError(err)
+
+			fileBuf, err := io.ReadAll(file)
+			assert.NoError(err)
+			_, err = file.Seek(0, io.SeekStart)
+			assert.NoError(err)
+
+			appFile := &app.File{
+				ReadSeekCloser: file,
+				ID:             uuid.Must(uuid.NewV4()),
+				Size:           stat.Size(),
+				Metadata:       nil,
+			}
+
 			_, mockApp, client, assert := start(t)
 
-			mockApp.EXPECT().GetFile(gomock.Any(), tc.fileID).Return(tc.appRes, tc.appErr)
+			mockApp.EXPECT().GetFile(gomock.Any(), appFile.ID).Return(appFile, tc.appErr)
 
 			b := &bytes.Buffer{}
 			params := operations.NewGetFileParams().
-				WithID(strfmt.UUID(tc.fileID.String()))
+				WithID(strfmt.UUID(appFile.ID.String()))
 
 			res, err := client.Operations.GetFile(params, b)
 			if tc.wantErr == nil {
 				assert.NoError(err)
-				assert.Equal(tc.want, b.Bytes())
+				assert.Equal(fileBuf, b.Bytes())
 			} else {
 				assert.NoError(res)
 				assert.Equal(tc.wantErr, errPayload(err))

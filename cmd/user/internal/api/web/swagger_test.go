@@ -13,7 +13,7 @@ import (
 func TestServeSwagger(t *testing.T) {
 	t.Parallel()
 
-	url, _, _, assert := start(t)
+	url, _, _, assert, _ := start(t)
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	assert.NoError(err)

@@ -2,12 +2,12 @@ package web_test
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
@@ -25,8 +25,7 @@ import (
 )
 
 var (
-	errAny = errors.New("any error")
-	reg    = prometheus.NewPedanticRegistry()
+	reg = prometheus.NewPedanticRegistry()
 )
 
 const testFile = `test.jpg`
@@ -44,7 +43,7 @@ func start(t *testing.T) (string, *Mockapplication, *client.FileService, *requir
 	mockApp := NewMockapplication(ctrl)
 	assert := require.New(t)
 
-	log := zerolog.New(os.Stdout)
+	log := zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
 	webMetric := libweb.NewMetric(reg, strings.Replace(t.Name(), "/", "_", -1), restapi.FlatSwaggerJSON)
 	server, err := web.New(log.WithContext(context.Background()), mockApp, &webMetric, web.Config{})
 	assert.NoError(err, "web.New")
@@ -62,6 +61,8 @@ func start(t *testing.T) (string, *Mockapplication, *client.FileService, *requir
 	url := fmt.Sprintf("%s:%d", client.DefaultHost, server.Port)
 
 	transport := httptransport.New(url, client.DefaultBasePath, client.DefaultSchemes)
+	transport.Consumers["image/jpeg"] = runtime.ByteStreamConsumer()
+	transport.Consumers["image/png"] = runtime.ByteStreamConsumer()
 	c := client.New(transport, nil)
 
 	return url, mockApp, c, require.New(t)

@@ -14,7 +14,7 @@ import (
 
 // GRPC starts gRPC server on addr, logged as service.
 // It runs until failed or ctx.Done.
-func GRPC(logger zerolog.Logger,host string, port int, srv *grpc.Server) func(context.Context) error {
+func GRPC(logger zerolog.Logger, host string, port int, srv *grpc.Server) func(context.Context) error {
 	return func(ctx context.Context) error {
 		ln, err := net.Listen("tcp", net.JoinHostPort(host, strconv.Itoa(port)))
 		if err != nil {

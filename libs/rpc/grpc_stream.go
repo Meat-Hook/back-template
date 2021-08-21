@@ -76,7 +76,8 @@ func StreamServerAccessLog(srv interface{}, stream grpc.ServerStream, _ *grpc.St
 }
 
 // MakeStreamClientLogger returns a new stream client interceptor that contains request logger.
-func MakeStreamClientLogger(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+func MakeStreamClientLogger(ctx context.Context, desc *grpc.StreamDesc,
+	cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	logger := *zerolog.Ctx(ctx)
 	logger = newRPCLogger(ctx, logger, method)
 	ctx = logger.WithContext(ctx)
@@ -85,7 +86,8 @@ func MakeStreamClientLogger(ctx context.Context, desc *grpc.StreamDesc, cc *grpc
 }
 
 // StreamClientAccessLog returns a new stream client interceptor that logs request status.
-func StreamClientAccessLog(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+func StreamClientAccessLog(ctx context.Context, desc *grpc.StreamDesc,
+	cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	logger := zerolog.Ctx(ctx)
 	clientStream, err := streamer(ctx, desc, cc, method, opts...)
 	err = rpcLogHandler(logger, err)

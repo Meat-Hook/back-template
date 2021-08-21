@@ -93,7 +93,7 @@ func inet(ip net.IP) (*pgtype.Inet, error) {
 	if ip == nil || ip.IsUnspecified() {
 		err := inet.Set(nil)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("inet.Set: %w", err)
 		}
 	} else {
 		err := inet.Set(ip)

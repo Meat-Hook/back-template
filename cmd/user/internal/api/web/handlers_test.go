@@ -34,7 +34,7 @@ func TestService_VerificationEmail(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, _ := start(t)
 
 			mockApp.EXPECT().VerificationEmail(gomock.Any(), tc.email).Return(tc.appErr)
 
@@ -65,7 +65,7 @@ func TestService_VerificationUsername(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, _ := start(t)
 
 			mockApp.EXPECT().VerificationUsername(gomock.Any(), tc.username).Return(tc.appErr)
 
@@ -106,7 +106,7 @@ func TestService_CreateUser(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, _ := start(t)
 
 			mockApp.EXPECT().
 				CreateUser(gomock.Any(), email, username, pass).
@@ -149,7 +149,7 @@ func TestService_GetUser(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 
 			mockApp.EXPECT().UserByID(gomock.Any(), session, tc.arg).Return(tc.user, tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
@@ -180,7 +180,7 @@ func TestService_DeleteUser(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 
 			mockApp.EXPECT().DeleteUser(gomock.Any(), session).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
@@ -210,7 +210,7 @@ func TestServiceUpdatePassword(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 
 			mockApp.EXPECT().UpdatePassword(gomock.Any(), session, tc.oldPass, tc.newPass).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
@@ -247,7 +247,7 @@ func TestServiceUpdateUsername(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 
 			mockApp.EXPECT().UpdateUsername(gomock.Any(), session, userName).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
@@ -283,7 +283,7 @@ func TestServiceGetUsers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 
 			mockApp.EXPECT().
 				ListUserByUsername(gomock.Any(), session, userName, app.SearchParams{Limit: 10}).
@@ -328,7 +328,7 @@ func TestService_Login(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, _ := start(t)
 
 			mockApp.EXPECT().Login(gomock.Any(), tc.email, tc.pass, gomock.Any()).Return(tc.token, tc.appErr)
 
@@ -368,7 +368,7 @@ func TestService_Logout(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 
 			mockApp.EXPECT().Logout(gomock.Any(), session).Return(tc.appErr)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
@@ -388,8 +388,6 @@ func TestService_UploadAvatar(t *testing.T) {
 		UserID: user.ID,
 	}
 
-	file := bytes.NewBuffer(uuid.Must(uuid.NewV4()).Bytes())
-
 	testCases := []struct {
 		name   string
 		appErr error
@@ -404,7 +402,9 @@ func TestService_UploadAvatar(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			file := bytes.NewBuffer(uuid.Must(uuid.NewV4()).Bytes())
+
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
 			mockApp.EXPECT().UploadAvatar(gomock.Any(), session, gomock.Any()).Return(tc.appErr)
@@ -440,7 +440,7 @@ func TestService_DeleteAvatar(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			_, mockApp, client, assert := start(t)
+			_, mockApp, client, assert, apiKeyAuth := start(t)
 			mockApp.EXPECT().Auth(gomock.Any(), token).Return(&session, nil)
 
 			mockApp.EXPECT().DeleteAvatar(gomock.Any(), session, fileID).Return(tc.appErr)

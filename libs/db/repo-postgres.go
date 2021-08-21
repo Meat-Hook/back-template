@@ -22,6 +22,7 @@ const (
 // PostgresErrName returns true if err is PostgreSQL error with given name.
 func PostgresErrName(err error, name string) bool {
 	pqErr := new(pq.Error)
+
 	return errors.As(err, &pqErr) && pqErr.Code.Name() == name
 }
 

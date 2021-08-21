@@ -23,9 +23,7 @@ const (
 	keepaliveMinTime = 30 * time.Second
 )
 
-var (
-	errInternal = status.Error(codes.Internal, "internal error")
-)
+var errInternal = status.Error(codes.Internal, "internal error")
 
 func newRPCLogger(ctx context.Context, logger zerolog.Logger, fullMethod string) zerolog.Logger {
 	l := logger.With().

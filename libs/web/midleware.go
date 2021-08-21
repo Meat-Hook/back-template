@@ -14,6 +14,13 @@ import (
 	"github.com/Meat-Hook/back-template/libs/metrics"
 )
 
+// Labels.
+const (
+	ResourceLabel = "resource"
+	MethodLabel   = "method"
+	CodeLabel     = "code"
+)
+
 // Recovery for web server.
 // go-swagger responders panic on error while writing response to client,
 // this shouldn't result in crash - unlike a real, reasonable panic.
@@ -67,9 +74,9 @@ func AccessLog(metric *Metric) func(http.Handler) http.Handler {
 			defer metric.ReqInFlight.Dec()
 
 			l := prometheus.Labels{
-				metrics.ResourceLabel: r.URL.Path,
-				metrics.MethodLabel:   r.Method,
-				metrics.CodeLabel:     strconv.Itoa(m.Code),
+				ResourceLabel: r.URL.Path,
+				MethodLabel:   r.Method,
+				CodeLabel:     strconv.Itoa(m.Code),
 			}
 			metric.ReqTotal.With(l).Inc()
 			metric.ReqDuration.With(l).Observe(m.Duration.Seconds())

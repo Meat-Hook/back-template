@@ -59,7 +59,12 @@ func (s *Service) Name() string {
 
 // UnmarshalConfig implements main.embeddedService.
 func (s *Service) UnmarshalConfig(buf json.RawMessage) error {
-	return json.Unmarshal(buf, &s.cfg)
+	err := json.Unmarshal(buf, &s.cfg)
+	if err != nil {
+		return fmt.Errorf("json.Unmarshal: %w", err)
+	}
+
+	return nil
 }
 
 // RunServe implements main.embeddedService.
@@ -96,7 +101,7 @@ func (s *Service) RunServe(ctx context.Context, reg *prometheus.Registry, namesp
 	module := app.New(r, hasher, sessionSvcClient, fileSvcClient)
 
 	webMetric := libweb.NewMetric(reg, namespace, restapi.FlatSwaggerJSON)
-	webApi, err := web.New(ctx, module, &webMetric, web.Config{
+	webAPI, err := web.New(ctx, module, &webMetric, web.Config{
 		Host: s.cfg.Server.Host,
 		Port: s.cfg.Server.Port.WEB,
 	})
@@ -104,9 +109,14 @@ func (s *Service) RunServe(ctx context.Context, reg *prometheus.Registry, namesp
 		return fmt.Errorf("web.New: %w", err)
 	}
 
-	return serve.Start(
+	err = serve.Start(
 		ctx,
 		serve.Metrics(logger.With().Str(log.Subsystem, "metric").Logger(), s.cfg.Server.Host, s.cfg.Server.Port.Metric, reg),
-		serve.HTTP(logger.With().Str(log.Subsystem, "web").Logger(), s.cfg.Server.Host, s.cfg.Server.Port.WEB, webApi.GetHandler()),
+		serve.HTTP(logger.With().Str(log.Subsystem, "web").Logger(), s.cfg.Server.Host, s.cfg.Server.Port.WEB, webAPI.GetHandler()),
 	)
+	if err != nil {
+		return fmt.Errorf("serve.Start: %w", err)
+	}
+
+	return nil
 }

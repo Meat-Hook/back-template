@@ -111,6 +111,7 @@ func New(ctx context.Context, module application, m *web.Metric, cfg Config) (*r
 	}
 
 	server.SetHandler(globalMiddlewares(api.Serve(nil)))
+
 	return server, nil
 }
 
@@ -155,7 +156,7 @@ func (s *service) authorizerFunc(name, in string, _ security.TokenAuthentication
 	inl := strings.ToLower(in)
 	if inl != query && inl != header {
 		// panic because this is most likely a typo
-		panic(fmt.Sprintf(`api key auth: in value needs to be either "query" or "header"`))
+		panic(`api key auth: in value needs to be either "query" or "header"`)
 	}
 
 	var getToken func(*http.Request) string
@@ -173,6 +174,7 @@ func (s *service) authorizerFunc(name, in string, _ security.TokenAuthentication
 		}
 
 		p, err := s.cookieKeyAuth(r.Context(), token)
+
 		return true, p, err
 	})
 }

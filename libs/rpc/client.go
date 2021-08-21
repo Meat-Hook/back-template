@@ -29,7 +29,6 @@ func Dial(ctx context.Context, logger zerolog.Logger, addr string, metrics *grpc
 			MakeStreamClientLogger,
 			StreamClientAccessLog,
 		)),
-		grpc.WithReadBufferSize(68*1024),
 		grpc.WithInsecure(),
 	)
 	if err != nil {

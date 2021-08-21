@@ -15,7 +15,7 @@ import (
 
 // DB provides access to storage.
 type DB struct {
-	conn     *sqlx.DB
+	conn   *sqlx.DB
 	metric Metrics
 }
 
@@ -24,11 +24,13 @@ type DB struct {
 // - wrapping errors with DAL method name.
 func (d *DB) NoTx(f func(db *sqlx.DB) error) (err error) {
 	methodName := reflect.CallerMethodName(1)
+
 	return d.metric.instrument(methodName, func() error {
 		err := f(d.conn)
 		if err != nil {
 			err = fmt.Errorf("%s: %w", methodName, err)
 		}
+
 		return err
 	})()
 }
@@ -39,6 +41,7 @@ func (d *DB) NoTx(f func(db *sqlx.DB) error) (err error) {
 // - transaction.
 func (d *DB) Tx(ctx context.Context, opts *sql.TxOptions, f func(*sqlx.Tx) error) (err error) {
 	methodName := reflect.CallerMethodName(1)
+
 	return d.metric.instrument(methodName, func() error {
 		tx, err := d.conn.BeginTxx(ctx, opts)
 		if err == nil { //nolint:nestif // No idea how to simplify.
@@ -62,6 +65,7 @@ func (d *DB) Tx(ctx context.Context, opts *sql.TxOptions, f func(*sqlx.Tx) error
 		if err != nil {
 			err = fmt.Errorf("%s: %w", methodName, err)
 		}
+
 		return err
 	})()
 }

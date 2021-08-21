@@ -1,9 +1,15 @@
 run:
   tests: false
+  skip-dirs:
+    - generated
 
 linters-settings:
+  funlen:
+    lines: 70
+    statements: 40
+
   lll:
-    line-length: 130
+    line-length: 150
     tab-width: 1
 
   maligned:
@@ -20,4 +26,11 @@ linters:
     - paralleltest # strange behavior
     - exhaustivestruct # strange behavior
     - tagliatelle # strange behavior
+    - ifshort # strange behavior
+    - dogsled # strange behavior
+    - wrapcheck # strange behavior
+    - exhaustive # strange behavior
+    - errorlint # strange behavior
+    - revive # strange behavior
+    - gci # strange behavior
   fast: false

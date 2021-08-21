@@ -5,7 +5,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/Meat-Hook/back-template/libs/metrics"
+	"github.com/Meat-Hook/back-template/libs/reflect"
 )
 
 // Metrics contains general metrics for DAL methods.
@@ -43,7 +43,7 @@ func NewMetrics(reg *prometheus.Registry, namespace string, methodsFrom interfac
 	)
 	reg.MustRegister(metric.callDuration)
 
-	for _, methodName := range metrics.MethodsOf(methodsFrom) {
+	for _, methodName := range reflect.MethodsOf(methodsFrom) {
 		l := prometheus.Labels{
 			methodLabel: methodName,
 		}
@@ -67,6 +67,7 @@ func (m Metrics) instrument(method string, f func() error) func() error {
 				panic(err)
 			}
 		}()
+
 		return f()
 	}
 }
