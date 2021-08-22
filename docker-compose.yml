@@ -17,6 +17,7 @@ services:
     ports:
       - "15000:15000" # user-svc
       - "20000:20000" # user-svc-metric
+      - "20001:20001" # session-svc-metric
       - "15002:15002" # file-svc
       - "20002:20002" # file-svc-metric
 
