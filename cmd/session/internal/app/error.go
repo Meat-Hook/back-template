@@ -6,7 +6,6 @@ import (
 
 // Errors.
 var (
-	ErrNotFound         = errors.New("not found")
-	ErrNotValidPassword = errors.New("not valid password")
-	ErrInvalidToken     = errors.New("not valid auth")
+	ErrNotFound     = errors.New("not found")
+	ErrInvalidToken = errors.New("not valid auth")
 )

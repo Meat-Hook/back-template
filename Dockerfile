@@ -1,6 +1,6 @@
-FROM golang:1.16-alpine AS builder
+FROM golang:1.16-alpine3.14 AS builder
 
-RUN apk update && apk add git && apk add ca-certificates
+RUN apk update && apk add --no-cache ca-certificates=20191127-r5
 
 WORKDIR /build
 
@@ -15,9 +15,8 @@ ARG GO111MODULE=on
 ARG CGO_ENABLED=0
 ARG GOOS=linux
 ARG GOARCH=amd64
-ARG SERVICE
 
-RUN go build ./cmd/$SERVICE
+RUN go build .
 
 FROM scratch
 
@@ -26,7 +25,9 @@ WORKDIR /bin
 ARG SERVICE
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /build/$SERVICE $SERVICE
-COPY ./cmd/$SERVICE/migrate/ migrate/
+COPY --from=builder /build/back-template back-template
+COPY ./cmd/user/migrate/ user/migrate/
+COPY ./cmd/session/migrate/ session/migrate/
+COPY ./cmd/file/migrate/ file/migrate/
 
-CMD ./$SERVICE
+ENTRYPOINT ["back-template"]

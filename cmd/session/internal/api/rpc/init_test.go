@@ -4,40 +4,47 @@ import (
 	"context"
 	"net"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 
 	"github.com/Meat-Hook/back-template/cmd/session/internal/api/rpc"
 	"github.com/Meat-Hook/back-template/libs/metrics"
 	librpc "github.com/Meat-Hook/back-template/libs/rpc"
 	pb "github.com/Meat-Hook/back-template/proto/gen/go/session/v1"
-	"github.com/golang/mock/gomock"
-	"github.com/rs/zerolog"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
+)
+
+var (
+	reg = prometheus.NewPedanticRegistry()
 )
 
 func TestMain(m *testing.M) {
-	metrics.InitMetrics()
+	metrics.InitMetrics(reg)
 
 	os.Exit(m.Run())
 }
 
-func start(t *testing.T) (pb.SessionServiceClient, *Mocksessions, *require.Assertions) {
+func start(t *testing.T, reg *prometheus.Registry) (pb.ServiceClient, *Mocksessions, *require.Assertions) {
 	t.Helper()
-	r := require.New(t)
+	assert := require.New(t)
 
 	ctrl := gomock.NewController(t)
 	mockApp := NewMocksessions(ctrl)
-	t.Cleanup(ctrl.Finish)
+	logger := zerolog.New(os.Stdout)
 
-	server := rpc.New(mockApp, librpc.Server(zerolog.New(os.Stdout)))
+	server := rpc.New(logger.WithContext(context.Background()), mockApp, librpc.NewServerMetrics(reg, strings.Replace(t.Name(), "/", "_", -1)))
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	r.Nil(err)
+	assert.NoError(err)
 
 	go func() {
 		err := server.Serve(ln)
-		r.Nil(err)
+		assert.NoError(err)
 	}()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -45,14 +52,14 @@ func start(t *testing.T) (pb.SessionServiceClient, *Mocksessions, *require.Asser
 		grpc.WithInsecure(), // TODO Add TLS and remove this.
 		grpc.WithBlock(),
 	)
-	r.Nil(err)
+	assert.NoError(err)
 
 	t.Cleanup(func() {
 		err := conn.Close()
-		r.Nil(err)
+		assert.NoError(err)
 		server.GracefulStop()
 		cancel()
 	})
 
-	return pb.NewSessionServiceClient(conn), mockApp, r
+	return pb.NewServiceClient(conn), mockApp, assert
 }

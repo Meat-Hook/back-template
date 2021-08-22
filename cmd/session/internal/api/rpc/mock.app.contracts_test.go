@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	app "github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -33,6 +34,35 @@ func NewMocksessions(ctrl *gomock.Controller) *Mocksessions {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *Mocksessions) EXPECT() *MocksessionsMockRecorder {
 	return m.recorder
+}
+
+// NewSession mocks base method.
+func (m *Mocksessions) NewSession(ctx context.Context, userID uuid.UUID, origin app.Origin) (*app.Token, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewSession", ctx, userID, origin)
+	ret0, _ := ret[0].(*app.Token)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewSession indicates an expected call of NewSession.
+func (mr *MocksessionsMockRecorder) NewSession(ctx, userID, origin interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSession", reflect.TypeOf((*Mocksessions)(nil).NewSession), ctx, userID, origin)
+}
+
+// RemoveSession mocks base method.
+func (m *Mocksessions) RemoveSession(ctx context.Context, sessionID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSession", ctx, sessionID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveSession indicates an expected call of RemoveSession.
+func (mr *MocksessionsMockRecorder) RemoveSession(ctx, sessionID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSession", reflect.TypeOf((*Mocksessions)(nil).RemoveSession), ctx, sessionID)
 }
 
 // Session mocks base method.

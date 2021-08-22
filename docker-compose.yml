@@ -2,73 +2,56 @@ version: '3.8'
 
 services:
 
-  user-service:
+  back-template:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        SERVICE: user
-    image: user-service
-    container_name: user-service
+    image: back-template
+    container_name: back-template
     restart: always
-    command: "./user"
+    command: "./back-template"
+    volumes:
+      - "./cfg.json:/bin/cfg.json"
     environment:
-      - "DB_NAME=postgres"
-      - "DB_USER=root"
-      - "DB_PASS=root"
-      - "DB_HOST=user-db"
-      - "DB_SSL_MODE=disable"
-      - "DB_PORT=26257"
-      - "SESSION_SRV=session-service:8090"
-      - "MIGRATE=true"
+      - "CONFIG_FILE_PATH=cfg.json"
     ports:
-      - "8080:8080"
+      - "15000:15000" # user-svc
+      - "20000:20000" # user-svc-metric
+      - "15002:15002" # file-svc
+      - "20002:20002" # file-svc-metric
 
   user-db:
     container_name: user-db
     image: cockroachdb/cockroach:v20.2.4
     restart: always
     ports:
-      - "3501:26257"
-      - "3502:8080"
+      - "26257:26257"
     volumes:
       - "./volume/user-db-data:/cockroach/cockroach-data"
     command:
       - "start-single-node"
       - "--insecure"
 
-  session-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SERVICE: session
-    image: session-service
-    container_name: session-service
-    restart: always
-    command: "./session"
-    environment:
-      - "DB_NAME=postgres"
-      - "DB_USER=root"
-      - "DB_PASS=root"
-      - "DB_HOST=session-db"
-      - "DB_SSL_MODE=disable"
-      - "DB_PORT=26257"
-      - "AUTH_KEY=super-duper-secret-key-for-tests"
-      - "USER_SRV=user-service:8090"
-      - "MIGRATE=true"
-    ports:
-      - "8081:8080"
-
   session-db:
     container_name: session-db
     image: cockroachdb/cockroach:v20.2.4
     restart: always
     ports:
-      - "3503:26257"
-      - "3504:8080"
+      - "26258:26257"
     volumes:
       - "./volume/session-db-data:/cockroach/cockroach-data"
+    command:
+      - "start-single-node"
+      - "--insecure"
+
+  file-db:
+    container_name: file-db
+    image: cockroachdb/cockroach:v20.2.4
+    restart: always
+    ports:
+      - "26259:26257"
+    volumes:
+      - "./volume/file-db-data:/cockroach/cockroach-data"
     command:
       - "start-single-node"
       - "--insecure"

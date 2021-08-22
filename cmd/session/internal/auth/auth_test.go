@@ -3,24 +3,25 @@ package auth_test
 import (
 	"testing"
 
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/require"
+
 	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 	"github.com/Meat-Hook/back-template/cmd/session/internal/auth"
-	"github.com/rs/xid"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAuth_TokenAndSubject(t *testing.T) {
 	t.Parallel()
 
-	r := require.New(t)
+	assert := require.New(t)
 	a := auth.New("super-duper-secret-key-qwertyuio")
 
-	subject := app.Subject{SessionID: xid.New().String()}
+	subject := app.Subject{SessionID: uuid.Must(uuid.NewV4())}
 	appToken, err := a.Token(subject)
-	r.Nil(err)
-	r.NotNil(appToken)
+	assert.NoError(err)
+	assert.NotNil(appToken)
 
 	res, err := a.Subject(appToken.Value)
-	r.Nil(err)
-	r.Equal(&subject, res)
+	assert.NoError(err)
+	assert.Equal(&subject, res)
 }

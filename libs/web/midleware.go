@@ -1,0 +1,109 @@
+package web
+
+import (
+	"net"
+	"net/http"
+	"strconv"
+
+	"github.com/felixge/httpsnoop"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/xid"
+	"github.com/rs/zerolog"
+
+	"github.com/Meat-Hook/back-template/libs/log"
+	"github.com/Meat-Hook/back-template/libs/metrics"
+)
+
+// Labels.
+const (
+	ResourceLabel = "resource"
+	MethodLabel   = "method"
+	CodeLabel     = "code"
+)
+
+// Recovery for web server.
+// go-swagger responders panic on error while writing response to client,
+// this shouldn't result in crash - unlike a real, reasonable panic.
+//
+// Usually it should be second middlewareFunc (after CreateLogger).
+func Recovery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				metrics.PanicsTotal.Inc()
+				logger := zerolog.Ctx(r.Context())
+				logger.Error().Msgf("panic with error: %v", err)
+
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}()
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+// CreateLogger create new logger by base path and zerolog builder.
+func CreateLogger(builder zerolog.Context) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			reqID := xid.New()
+
+			newLogger := builder.
+				IPAddr(log.IP, net.ParseIP(ip)).
+				Str(log.HTTPMethod, r.Method).
+				Str(log.Path, r.URL.Path).
+				Stringer(log.ReqID, reqID).
+				Logger()
+
+			ctx := log.ReqIDWithCtx(r.Context(), reqID.String())
+			ctx = newLogger.WithContext(ctx)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+// AccessLog logs handled request.
+func AccessLog(metric *Metric) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			m := httpsnoop.CaptureMetrics(next, w, r)
+
+			metric.ReqInFlight.Inc()
+			defer metric.ReqInFlight.Dec()
+
+			l := prometheus.Labels{
+				ResourceLabel: r.URL.Path,
+				MethodLabel:   r.Method,
+				CodeLabel:     strconv.Itoa(m.Code),
+			}
+			metric.ReqTotal.With(l).Inc()
+			metric.ReqDuration.With(l).Observe(m.Duration.Seconds())
+
+			logger := zerolog.Ctx(r.Context())
+			if m.Code < http.StatusInternalServerError {
+				logger.Info().Int(log.Code, m.Code).Stringer(log.Duration, m.Duration).Msg("success")
+			} else {
+				logger.Warn().Int(log.Code, m.Code).Stringer(log.Duration, m.Duration).Msg("failed to handle")
+			}
+		})
+	}
+}
+
+// Health it must be the last middleware.
+// Needed to check for health from the discovery service.
+func Health(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		const health = `/health`
+		if r.URL.Path != health {
+			next.ServeHTTP(w, r)
+
+			return
+		}
+
+		logger := zerolog.Ctx(r.Context())
+		w.WriteHeader(http.StatusOK)
+		logger.Debug().Msg("handled discovery checker")
+	})
+}

@@ -6,6 +6,7 @@ package app_test
 
 import (
 	context "context"
+	io "io"
 	reflect "reflect"
 
 	app "github.com/Meat-Hook/back-template/cmd/user/internal/app"
@@ -192,31 +193,60 @@ func (mr *MockHasherMockRecorder) Hashing(password interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hashing", reflect.TypeOf((*MockHasher)(nil).Hashing), password)
 }
 
-// MockAuth is a mock of Auth interface.
-type MockAuth struct {
+// MockAuthSvc is a mock of AuthSvc interface.
+type MockAuthSvc struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthMockRecorder
+	recorder *MockAuthSvcMockRecorder
 }
 
-// MockAuthMockRecorder is the mock recorder for MockAuth.
-type MockAuthMockRecorder struct {
-	mock *MockAuth
+// MockAuthSvcMockRecorder is the mock recorder for MockAuthSvc.
+type MockAuthSvcMockRecorder struct {
+	mock *MockAuthSvc
 }
 
-// NewMockAuth creates a new mock instance.
-func NewMockAuth(ctrl *gomock.Controller) *MockAuth {
-	mock := &MockAuth{ctrl: ctrl}
-	mock.recorder = &MockAuthMockRecorder{mock}
+// NewMockAuthSvc creates a new mock instance.
+func NewMockAuthSvc(ctrl *gomock.Controller) *MockAuthSvc {
+	mock := &MockAuthSvc{ctrl: ctrl}
+	mock.recorder = &MockAuthSvcMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAuth) EXPECT() *MockAuthMockRecorder {
+func (m *MockAuthSvc) EXPECT() *MockAuthSvcMockRecorder {
 	return m.recorder
 }
 
+// NewSession mocks base method.
+func (m *MockAuthSvc) NewSession(ctx context.Context, userID uuid.UUID, origin app.Origin) (*app.Token, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewSession", ctx, userID, origin)
+	ret0, _ := ret[0].(*app.Token)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewSession indicates an expected call of NewSession.
+func (mr *MockAuthSvcMockRecorder) NewSession(ctx, userID, origin interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSession", reflect.TypeOf((*MockAuthSvc)(nil).NewSession), ctx, userID, origin)
+}
+
+// RemoveSession mocks base method.
+func (m *MockAuthSvc) RemoveSession(ctx context.Context, sessionID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSession", ctx, sessionID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveSession indicates an expected call of RemoveSession.
+func (mr *MockAuthSvcMockRecorder) RemoveSession(ctx, sessionID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSession", reflect.TypeOf((*MockAuthSvc)(nil).RemoveSession), ctx, sessionID)
+}
+
 // Session mocks base method.
-func (m *MockAuth) Session(ctx context.Context, token string) (*app.Session, error) {
+func (m *MockAuthSvc) Session(ctx context.Context, token string) (*app.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session", ctx, token)
 	ret0, _ := ret[0].(*app.Session)
@@ -225,7 +255,59 @@ func (m *MockAuth) Session(ctx context.Context, token string) (*app.Session, err
 }
 
 // Session indicates an expected call of Session.
-func (mr *MockAuthMockRecorder) Session(ctx, token interface{}) *gomock.Call {
+func (mr *MockAuthSvcMockRecorder) Session(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockAuth)(nil).Session), ctx, token)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Session", reflect.TypeOf((*MockAuthSvc)(nil).Session), ctx, token)
+}
+
+// MockFileSvc is a mock of FileSvc interface.
+type MockFileSvc struct {
+	ctrl     *gomock.Controller
+	recorder *MockFileSvcMockRecorder
+}
+
+// MockFileSvcMockRecorder is the mock recorder for MockFileSvc.
+type MockFileSvcMockRecorder struct {
+	mock *MockFileSvc
+}
+
+// NewMockFileSvc creates a new mock instance.
+func NewMockFileSvc(ctrl *gomock.Controller) *MockFileSvc {
+	mock := &MockFileSvc{ctrl: ctrl}
+	mock.recorder = &MockFileSvcMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockFileSvc) EXPECT() *MockFileSvcMockRecorder {
+	return m.recorder
+}
+
+// Delete mocks base method.
+func (m *MockFileSvc) Delete(ctx context.Context, uuid uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, uuid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockFileSvcMockRecorder) Delete(ctx, uuid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFileSvc)(nil).Delete), ctx, uuid)
+}
+
+// Upload mocks base method.
+func (m *MockFileSvc) Upload(ctx context.Context, file io.Reader) (uuid.UUID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upload", ctx, file)
+	ret0, _ := ret[0].(uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upload indicates an expected call of Upload.
+func (mr *MockFileSvcMockRecorder) Upload(ctx, file interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upload", reflect.TypeOf((*MockFileSvc)(nil).Upload), ctx, file)
 }

@@ -85,6 +85,7 @@ definitions:
       - id
       - username
       - email
+      - avatars
     properties:
       id:
         $ref: '#/definitions/UserID'
@@ -92,6 +93,21 @@ definitions:
         $ref: '#/definitions/Username'
       email:
         $ref: '#/definitions/Email'
+      avatars:
+        type: array
+        items:
+          format: uuid
+
+  LoginParam:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        $ref: '#/definitions/Email'
+      password:
+        $ref: '#/definitions/Password'
 
 responses:
 
@@ -257,4 +273,58 @@ paths:
                 type: integer
                 format: int32
                 minimum: 0
+        default: { $ref: '#/responses/GenericError' }
+
+  /login:
+    post:
+      operationId: login
+      description: Login for user.
+      security: [ ]
+      parameters:
+        - name: args
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/LoginParam'
+      responses:
+        200:
+          description: OK
+          headers:
+            Set-Cookie:
+              description: Session auth.
+              type: string
+        default: { $ref: '#/responses/GenericError' }
+
+  /logout:
+    post:
+      operationId: logout
+      description: Logout for user.
+      responses:
+        204: { $ref: '#/responses/NoContent' }
+        default: { $ref: '#/responses/GenericError' }
+
+  /avatar:
+    post:
+      operationId: newAvatar
+      description: Upload new avatar for user.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: upfile
+          type: file
+          description: The file to upload.
+      responses:
+        204: { $ref: '#/responses/NoContent' }
+        default: { $ref: '#/responses/GenericError' }
+    delete:
+      operationId: deleteAvatar
+      description: Delete user's avatar.
+      parameters:
+        - name: fileID
+          in: query
+          required: true
+          type: string
+      responses:
+        204: { $ref: '#/responses/NoContent' }
         default: { $ref: '#/responses/GenericError' }

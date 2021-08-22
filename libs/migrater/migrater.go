@@ -13,7 +13,8 @@ import (
 )
 
 // Auto start automate migration to database.
-func Auto(ctx context.Context, logger zerolog.Logger, db *sql.DB, dir string) error {
+func Auto(ctx context.Context, db *sql.DB, dir string) error {
+	logger := zerolog.Ctx(ctx)
 	logger.Info().Msg("started migration...")
 	defer logger.Info().Msg("finished migration")
 
@@ -22,10 +23,10 @@ func Auto(ctx context.Context, logger zerolog.Logger, db *sql.DB, dir string) er
 		return fmt.Errorf("begin tx: %w", err)
 	}
 
-	m := migrate.New(logger, filesystem.New(), repo.New(tx))
+	m := migrate.New(*logger, filesystem.New(), repo.New(tx))
 	err = m.Migrate(ctx, dir, migrate.Config{Cmd: migrate.Up})
 	if err != nil {
-		return fmt.Errorf("migrate: %w, rollback: %s", err, tx.Rollback())
+		return fmt.Errorf("m.Migrate: %w, tx.Rollback: %s", err, tx.Rollback())
 	}
 
 	return tx.Commit()

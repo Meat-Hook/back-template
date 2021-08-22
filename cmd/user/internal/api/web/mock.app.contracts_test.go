@@ -6,6 +6,7 @@ package web_test
 
 import (
 	context "context"
+	io "io"
 	reflect "reflect"
 
 	app "github.com/Meat-Hook/back-template/cmd/user/internal/app"
@@ -37,18 +38,18 @@ func (m *Mockapplication) EXPECT() *MockapplicationMockRecorder {
 }
 
 // Auth mocks base method.
-func (m *Mockapplication) Auth(ctx context.Context, raw string) (*app.Session, error) {
+func (m *Mockapplication) Auth(ctx context.Context, token string) (*app.Session, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Auth", ctx, raw)
+	ret := m.ctrl.Call(m, "Auth", ctx, token)
 	ret0, _ := ret[0].(*app.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Auth indicates an expected call of Auth.
-func (mr *MockapplicationMockRecorder) Auth(ctx, raw interface{}) *gomock.Call {
+func (mr *MockapplicationMockRecorder) Auth(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*Mockapplication)(nil).Auth), ctx, raw)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*Mockapplication)(nil).Auth), ctx, token)
 }
 
 // CreateUser mocks base method.
@@ -64,6 +65,20 @@ func (m *Mockapplication) CreateUser(ctx context.Context, email, username, pass 
 func (mr *MockapplicationMockRecorder) CreateUser(ctx, email, username, pass interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*Mockapplication)(nil).CreateUser), ctx, email, username, pass)
+}
+
+// DeleteAvatar mocks base method.
+func (m *Mockapplication) DeleteAvatar(ctx context.Context, session app.Session, fileID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAvatar", ctx, session, fileID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAvatar indicates an expected call of DeleteAvatar.
+func (mr *MockapplicationMockRecorder) DeleteAvatar(ctx, session, fileID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAvatar", reflect.TypeOf((*Mockapplication)(nil).DeleteAvatar), ctx, session, fileID)
 }
 
 // DeleteUser mocks base method.
@@ -96,6 +111,35 @@ func (mr *MockapplicationMockRecorder) ListUserByUsername(ctx, session, username
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUserByUsername", reflect.TypeOf((*Mockapplication)(nil).ListUserByUsername), ctx, session, username, page)
 }
 
+// Login mocks base method.
+func (m *Mockapplication) Login(ctx context.Context, email, password string, origin app.Origin) (*app.Token, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Login", ctx, email, password, origin)
+	ret0, _ := ret[0].(*app.Token)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Login indicates an expected call of Login.
+func (mr *MockapplicationMockRecorder) Login(ctx, email, password, origin interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*Mockapplication)(nil).Login), ctx, email, password, origin)
+}
+
+// Logout mocks base method.
+func (m *Mockapplication) Logout(ctx context.Context, session app.Session) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Logout", ctx, session)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Logout indicates an expected call of Logout.
+func (mr *MockapplicationMockRecorder) Logout(ctx, session interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*Mockapplication)(nil).Logout), ctx, session)
+}
+
 // UpdatePassword mocks base method.
 func (m *Mockapplication) UpdatePassword(ctx context.Context, session app.Session, oldPass, newPass string) error {
 	m.ctrl.T.Helper()
@@ -122,6 +166,20 @@ func (m *Mockapplication) UpdateUsername(ctx context.Context, session app.Sessio
 func (mr *MockapplicationMockRecorder) UpdateUsername(ctx, session, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsername", reflect.TypeOf((*Mockapplication)(nil).UpdateUsername), ctx, session, username)
+}
+
+// UploadAvatar mocks base method.
+func (m *Mockapplication) UploadAvatar(ctx context.Context, session app.Session, file io.Reader) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UploadAvatar", ctx, session, file)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UploadAvatar indicates an expected call of UploadAvatar.
+func (mr *MockapplicationMockRecorder) UploadAvatar(ctx, session, file interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadAvatar", reflect.TypeOf((*Mockapplication)(nil).UploadAvatar), ctx, session, file)
 }
 
 // UserByID mocks base method.

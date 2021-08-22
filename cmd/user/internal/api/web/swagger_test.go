@@ -5,17 +5,18 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 	"github.com/go-openapi/loads"
+
+	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi"
 )
 
 func TestServeSwagger(t *testing.T) {
 	t.Parallel()
 
-	url, _, _, assert := start(t)
+	url, _, _, assert, _ := start(t)
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
-	assert.Nil(err)
+	assert.NoError(err)
 	basePath := swaggerSpec.BasePath()
 
 	testCases := []struct {
@@ -35,9 +36,9 @@ func TestServeSwagger(t *testing.T) {
 
 	for _, tc := range testCases {
 		req, err := http.NewRequestWithContext(context.Background(), "GET", "http://"+url+tc.path, nil)
-		assert.Nil(err)
+		assert.NoError(err)
 		resp, err := c.Do(req)
-		assert.Nil(err, tc.path)
+		assert.NoError(err, tc.path)
 		assert.Equal(tc.want, resp.StatusCode, tc.path)
 	}
 }

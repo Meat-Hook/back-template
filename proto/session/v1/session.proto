@@ -2,12 +2,18 @@ syntax = "proto3";
 
 package session.v1;
 
+import "google/protobuf/empty.proto";
+
 option go_package = "github.com/Meat-Hook/back-template/proto/go/session/v1;pb";
 
 // Internal service API fot check user session by auth token.
-service SessionService {
+service Service {
   // Session get session info by token.
   rpc Session (SessionRequest) returns (SessionResponse);
+  // Delete user's session
+  rpc RemoveSession(RemoveSessionRequest) returns (RemoveSessionResponse);
+  // Make new session specific user.
+  rpc NewSession(NewSessionRequest) returns (NewSessionResponse);
 }
 
 // Request.
@@ -19,7 +25,41 @@ message SessionRequest {
 // Response.
 message SessionResponse {
   // Contains session UUID.
-  string        id = 1;
+  UUID   session_id = 1;
   // Contains user UUID.
-  string   user_id = 2;
+  UUID      user_id = 2;
+}
+
+// Request.
+message RemoveSessionRequest {
+  // Contains session UUID.
+  UUID   session_id = 1;
+}
+
+// Response.
+message RemoveSessionResponse {
+  // Empty.
+  google.protobuf.Empty empty = 1;
+}
+
+// Request.
+message NewSessionRequest {
+  // Contains user UUID.
+  UUID  user_id = 1;
+  // Contains user's origin IP.
+  string ip = 2;
+  // Contains user's client.
+  string user_agent = 3;
+}
+
+// Response.
+message NewSessionResponse {
+  // User's auth token.
+  string token = 1;
+}
+
+// Contains uuid.
+message UUID {
+  // Presents uuid.
+  string value = 1;
 }

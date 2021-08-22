@@ -5,8 +5,10 @@ package auth
 import (
 	"fmt"
 
-	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
+	"github.com/gofrs/uuid"
 	"github.com/o1egl/paseto/v2"
+
+	"github.com/Meat-Hook/back-template/cmd/session/internal/app"
 )
 
 var _ app.Auth = &Auth{}
@@ -25,7 +27,7 @@ func New(secretKey string) *Auth {
 }
 
 type jsonToken struct {
-	SessionID string `json:"session_id"`
+	SessionID uuid.UUID `json:"session_id"`
 }
 
 // Token need for implements app.Auth.
@@ -36,7 +38,7 @@ func (a *Auth) Token(subject app.Subject) (*app.Token, error) {
 
 	value, err := paseto.Encrypt(a.key, t, "")
 	if err != nil {
-		return nil, fmt.Errorf("paseto encrypt: %w", err)
+		return nil, fmt.Errorf("paseto.Encrypt: %w", err)
 	}
 
 	res := &app.Token{
@@ -48,9 +50,7 @@ func (a *Auth) Token(subject app.Subject) (*app.Token, error) {
 
 // Subject need for implements app.Auth.
 func (a *Auth) Subject(token string) (*app.Subject, error) {
-	t := jsonToken{
-		SessionID: token,
-	}
+	t := jsonToken{}
 
 	err := paseto.Decrypt(token, a.key, &t, nil)
 	if err != nil {

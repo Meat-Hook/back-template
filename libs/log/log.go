@@ -9,24 +9,28 @@ import (
 
 // Log name.
 const (
-	Func          = `func`
-	HTTPMethod    = `method`
-	Code          = `code`
-	IP            = `ip`
-	ReqID         = `id`
-	User          = `user`
-	Err           = `err`
-	HandledStatus = `handled`
-	Duration      = `duration`
-	Host          = `host`
-	Port          = `port`
-	Name          = `name`
+	Path        = `path`
+	GRPCFunc    = `grpc-func`
+	HTTPMethod  = `web-method`
+	Version     = `version`
+	Service     = `service`
+	Code        = `code`
+	IP          = `ip`
+	ReqID       = `req-id`
+	User        = `user`
+	PanicReason = `panic-reason`
+	Duration    = `duration`
+	Host        = `host`
+	Port        = `port`
+	Subsystem   = `subsystem`
+	DBMethod    = `db-method`
 )
 
 // WarnIfFail logs if callback finished with error.
 func WarnIfFail(l zerolog.Logger, cb func() error) {
 	if err := cb(); err != nil {
-		l.Error().Caller(2).Err(err).Msg("cb fail")
+		const stackOffset = 2
+		l.Error().Caller(stackOffset).Err(err).Msg("cb fail")
 	}
 }
 

@@ -1,0 +1,51 @@
+swagger: '2.0'
+
+info:
+  version: 0.1.0
+  title: "File service."
+  description: "Microservice for managing file."
+
+basePath: /file/api/v1
+
+produces:
+  - image/png
+  - image/jpeg
+
+definitions:
+
+  Error:
+    type: object
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+responses:
+
+  GenericError:
+    description: Generic error response.
+    schema:
+      $ref: '#/definitions/Error'
+
+  NoContent:
+    description: The server successfully processed the request and is not returning any content.
+
+paths:
+
+  /file:
+    get:
+      operationId: getFile
+      parameters:
+        - name: id
+          in: query
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: download file
+          schema:
+            type: file
+        default: { $ref: '#/responses/GenericError' }
+

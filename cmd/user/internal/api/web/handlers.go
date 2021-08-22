@@ -4,17 +4,18 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/go-openapi/swag"
+	"github.com/gofrs/uuid"
+
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/models"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/api/web/generated/restapi/operations"
 	"github.com/Meat-Hook/back-template/cmd/user/internal/app"
-	"github.com/go-openapi/swag"
-	"github.com/gofrs/uuid"
 )
 
-func (svc *service) verificationEmail(params operations.VerificationEmailParams) operations.VerificationEmailResponder {
-	ctx, log := fromRequest(params.HTTPRequest, nil)
+func (s *service) verificationEmail(params operations.VerificationEmailParams) operations.VerificationEmailResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
 
-	err := svc.app.VerificationEmail(ctx, string(*params.Args.Email))
+	err := s.app.VerificationEmail(ctx, string(*params.Args.Email))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -27,10 +28,10 @@ func (svc *service) verificationEmail(params operations.VerificationEmailParams)
 	}
 }
 
-func (svc *service) verificationUsername(params operations.VerificationUsernameParams) operations.VerificationUsernameResponder {
-	ctx, log := fromRequest(params.HTTPRequest, nil)
+func (s *service) verificationUsername(params operations.VerificationUsernameParams) operations.VerificationUsernameResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
 
-	err := svc.app.VerificationUsername(ctx, string(*params.Args.Username))
+	err := s.app.VerificationUsername(ctx, string(*params.Args.Username))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -43,10 +44,10 @@ func (svc *service) verificationUsername(params operations.VerificationUsernameP
 	}
 }
 
-func (svc *service) createUser(params operations.CreateUserParams) operations.CreateUserResponder {
-	ctx, log := fromRequest(params.HTTPRequest, nil)
+func (s *service) createUser(params operations.CreateUserParams) operations.CreateUserResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, nil)
 
-	id, err := svc.app.CreateUser(
+	id, err := s.app.CreateUser(
 		ctx,
 		string(*params.Args.Email),
 		string(*params.Args.Username),
@@ -66,15 +67,15 @@ func (svc *service) createUser(params operations.CreateUserParams) operations.Cr
 	}
 }
 
-func (svc *service) getUser(params operations.GetUserParams, session *app.Session) operations.GetUserResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+func (s *service) getUser(params operations.GetUserParams, session *app.Session) operations.GetUserResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	getUserID := session.UserID
 	if params.ID != nil {
 		getUserID = uuid.FromStringOrNil(params.ID.String())
 	}
 
-	u, err := svc.app.UserByID(ctx, *session, getUserID)
+	u, err := s.app.UserByID(ctx, *session, getUserID)
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -87,10 +88,10 @@ func (svc *service) getUser(params operations.GetUserParams, session *app.Sessio
 	}
 }
 
-func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.Session) operations.DeleteUserResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+func (s *service) deleteUser(params operations.DeleteUserParams, session *app.Session) operations.DeleteUserResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
-	err := svc.app.DeleteUser(ctx, *session)
+	err := s.app.DeleteUser(ctx, *session)
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -101,10 +102,10 @@ func (svc *service) deleteUser(params operations.DeleteUserParams, session *app.
 	}
 }
 
-func (svc *service) updatePassword(params operations.UpdatePasswordParams, session *app.Session) operations.UpdatePasswordResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+func (s *service) updatePassword(params operations.UpdatePasswordParams, session *app.Session) operations.UpdatePasswordResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
-	err := svc.app.UpdatePassword(ctx, *session, string(*params.Args.Old), string(*params.Args.New))
+	err := s.app.UpdatePassword(ctx, *session, string(*params.Args.Old), string(*params.Args.New))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -118,10 +119,10 @@ func (svc *service) updatePassword(params operations.UpdatePasswordParams, sessi
 	}
 }
 
-func (svc *service) updateUsername(params operations.UpdateUsernameParams, session *app.Session) operations.UpdateUsernameResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+func (s *service) updateUsername(params operations.UpdateUsernameParams, session *app.Session) operations.UpdateUsernameResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
-	err := svc.app.UpdateUsername(ctx, *session, string(*params.Args.Username))
+	err := s.app.UpdateUsername(ctx, *session, string(*params.Args.Username))
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -138,15 +139,15 @@ func (svc *service) updateUsername(params operations.UpdateUsernameParams, sessi
 	}
 }
 
-func (svc *service) getUsers(params operations.GetUsersParams, session *app.Session) operations.GetUsersResponder {
-	ctx, log := fromRequest(params.HTTPRequest, session)
+func (s *service) getUsers(params operations.GetUsersParams, session *app.Session) operations.GetUsersResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
 
 	page := app.SearchParams{
 		Limit:  uint(params.Limit),
 		Offset: uint(swag.Int32Value(params.Offset)),
 	}
 
-	u, total, err := svc.app.ListUserByUsername(ctx, *session, params.Username, page)
+	u, total, err := s.app.ListUserByUsername(ctx, *session, params.Username, page)
 	defer logs(log, err)
 	switch {
 	case err == nil:
@@ -156,6 +157,75 @@ func (svc *service) getUsers(params operations.GetUsersParams, session *app.Sess
 		})
 	default:
 		return operations.NewGetUsersDefault(http.StatusInternalServerError).
+			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func (s *service) login(params operations.LoginParams) operations.LoginResponder {
+	ctx, log, remoteIP := fromRequest(params.HTTPRequest, nil)
+
+	origin := app.Origin{
+		IP:        remoteIP,
+		UserAgent: params.HTTPRequest.Header.Get("User-Agent"),
+	}
+
+	token, err := s.app.Login(ctx, string(*params.Args.Email), string(*params.Args.Password), origin)
+	defer logs(log, err)
+	switch {
+	case err == nil:
+		return operations.NewLoginOK().WithSetCookie(generateCookie(token.Value).String())
+	case errors.Is(err, app.ErrNotFound):
+		return operations.NewLoginDefault(http.StatusNotFound).WithPayload(apiError(app.ErrNotFound.Error()))
+	case errors.Is(err, app.ErrNotValidPassword):
+		return operations.NewLoginDefault(http.StatusBadRequest).WithPayload(apiError(app.ErrNotValidPassword.Error()))
+	default:
+		return operations.NewLoginDefault(http.StatusInternalServerError).
+			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func (s *service) logout(params operations.LogoutParams, session *app.Session) operations.LogoutResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+
+	err := s.app.Logout(ctx, *session)
+	defer logs(log, err)
+	switch {
+	case err == nil:
+		return operations.NewLogoutNoContent()
+	default:
+		return operations.NewLogoutDefault(http.StatusInternalServerError).
+			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func (s *service) uploadAvatar(params operations.NewAvatarParams, session *app.Session) operations.NewAvatarResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+
+	err := s.app.UploadAvatar(ctx, *session, params.Upfile)
+	defer logs(log, err)
+	switch {
+	case errors.Is(err, app.ErrNotFound):
+		return operations.NewNewAvatarDefault(http.StatusNotFound).WithPayload(apiError(app.ErrNotFound.Error()))
+	case err == nil:
+		return operations.NewNewAvatarNoContent()
+	default:
+		return operations.NewNewAvatarDefault(http.StatusInternalServerError).
+			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func (s *service) deleteAvatar(params operations.DeleteAvatarParams, session *app.Session) operations.DeleteAvatarResponder {
+	ctx, log, _ := fromRequest(params.HTTPRequest, session)
+
+	err := s.app.DeleteAvatar(ctx, *session, uuid.FromStringOrNil(params.FileID))
+	defer logs(log, err)
+	switch {
+	case errors.Is(err, app.ErrNotFound):
+		return operations.NewDeleteAvatarDefault(http.StatusNotFound).WithPayload(apiError(app.ErrNotFound.Error()))
+	case err == nil:
+		return operations.NewDeleteAvatarNoContent()
+	default:
+		return operations.NewDeleteAvatarDefault(http.StatusInternalServerError).
 			WithPayload(apiError(http.StatusText(http.StatusInternalServerError)))
 	}
 }

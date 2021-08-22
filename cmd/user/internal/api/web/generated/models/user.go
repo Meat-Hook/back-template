@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -18,6 +19,10 @@ import (
 //
 // swagger:model User
 type User struct {
+
+	// avatars
+	// Required: true
+	Avatars []strfmt.UUID `json:"avatars"`
 
 	// email
 	// Required: true
@@ -38,6 +43,10 @@ type User struct {
 func (m *User) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAvatars(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateEmail(formats); err != nil {
 		res = append(res, err)
 	}
@@ -53,6 +62,23 @@ func (m *User) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *User) validateAvatars(formats strfmt.Registry) error {
+
+	if err := validate.Required("avatars", "body", m.Avatars); err != nil {
+		return err
+	}
+
+	for i := 0; i < len(m.Avatars); i++ {
+
+		if err := validate.FormatOf("avatars"+"."+strconv.Itoa(i), "body", "uuid", m.Avatars[i].String(), formats); err != nil {
+			return err
+		}
+
+	}
+
 	return nil
 }
 

@@ -30,11 +30,19 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	CreateUser(params *CreateUserParams, opts ...ClientOption) (*CreateUserOK, error)
 
+	DeleteAvatar(params *DeleteAvatarParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteAvatarNoContent, error)
+
 	DeleteUser(params *DeleteUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteUserNoContent, error)
 
 	GetUser(params *GetUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUserOK, error)
 
 	GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetUsersOK, error)
+
+	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
+
+	Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*LogoutNoContent, error)
+
+	NewAvatar(params *NewAvatarParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*NewAvatarNoContent, error)
 
 	UpdatePassword(params *UpdatePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdatePasswordNoContent, error)
 
@@ -81,6 +89,44 @@ func (a *Client) CreateUser(params *CreateUserParams, opts ...ClientOption) (*Cr
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*CreateUserDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  DeleteAvatar Delete user's avatar.
+*/
+func (a *Client) DeleteAvatar(params *DeleteAvatarParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteAvatarNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteAvatarParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteAvatar",
+		Method:             "DELETE",
+		PathPattern:        "/avatar",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DeleteAvatarReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteAvatarNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DeleteAvatarDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -195,6 +241,119 @@ func (a *Client) GetUsers(params *GetUsersParams, authInfo runtime.ClientAuthInf
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*GetUsersDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  Login Login for user.
+*/
+func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewLoginParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "login",
+		Method:             "POST",
+		PathPattern:        "/login",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &LoginReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*LoginOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*LoginDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  Logout Logout for user.
+*/
+func (a *Client) Logout(params *LogoutParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*LogoutNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewLogoutParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "logout",
+		Method:             "POST",
+		PathPattern:        "/logout",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &LogoutReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*LogoutNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*LogoutDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  NewAvatar Upload new avatar for user.
+*/
+func (a *Client) NewAvatar(params *NewAvatarParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*NewAvatarNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewNewAvatarParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "newAvatar",
+		Method:             "POST",
+		PathPattern:        "/avatar",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"multipart/form-data"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &NewAvatarReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*NewAvatarNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*NewAvatarDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

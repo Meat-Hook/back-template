@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+
+	"github.com/gofrs/uuid"
 )
 
 type (
@@ -12,17 +14,10 @@ type (
 		Save(context.Context, Session) error
 		// ByID returns user session by session id.
 		// Errors: ErrNotFound, unknown.
-		ByID(context.Context, string) (*Session, error)
+		ByID(context.Context, uuid.UUID) (*Session, error)
 		// Delete removes user session.
 		// Errors: unknown.
-		Delete(ctx context.Context, sessionID string) error
-	}
-
-	// Users microservice for get user information.
-	Users interface {
-		// Access get user by email and check password.
-		// Errors: ErrNotFound, ErrNotValidPassword, unknown.
-		Access(ctx context.Context, email, password string) (*User, error)
+		Delete(context.Context, uuid.UUID) error
 	}
 
 	// Auth interface for generate access and refresh token by subject.
@@ -38,6 +33,6 @@ type (
 	// ID generator for session.
 	ID interface {
 		// New generate new ID for session.
-		New() string
+		New() uuid.UUID
 	}
 )

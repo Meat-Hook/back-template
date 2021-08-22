@@ -3,8 +3,9 @@ package hash_test
 import (
 	"testing"
 
-	"github.com/Meat-Hook/back-template/libs/hash"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Meat-Hook/back-template/libs/hash"
 )
 
 var pass = "pass"
